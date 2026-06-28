@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Greenova – Admin Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Nunito:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sky:#e8f4f8;--leaf:#3a7d1a;--leaf2:#4a9a28;--leaf3:#5bb832;--leaf-light:#e8f5e0;--leaf-pale:#f0f8ec;
+  --earth:#5c4033;--earth2:#8b6f4e;--earth3:#c4a67d;
+  --sun:#f0a830;--sun-light:#fef7e0;
+  --water:#2196F3;--water-light:#e3f2fd;
+  --red:#e74c3c;--red-light:#fdeaea;
+  --bg:#faf8f4;--bg2:#f5f0e8;--surface:#ffffff;--surface2:#faf8f4;
+  --border:#e8e0d4;--border2:#d4c8b8;
+  --text:#2c1810;--text2:#6b5b4e;--text3:#a09080;
+  --shadow:0 4px 20px rgba(60,40,20,.08);--shadow-lg:0 12px 40px rgba(60,40,20,.12);
+  --r:18px;--rs:12px;--rxs:8px;
+  --grad-leaf:linear-gradient(135deg,#3a7d1a,#5bb832);--grad-sun:linear-gradient(135deg,#f0a830,#f5c842);
+  --grad-earth:linear-gradient(135deg,#5c4033,#8b6f4e);--grad-sky:linear-gradient(135deg,#87CEEB,#64B5F6);
+}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+h1,h2,h3{font-family:'Playfair Display',serif;font-weight:600}
+.mono{font-family:'JetBrains Mono',monospace}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--earth3);border-radius:3px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes ripple{0%{transform:scale(.8);opacity:.5}100%{transform:scale(2.5);opacity:0}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+@keyframes slideDown{from{opacity:0;max-height:0;transform:translateY(-8px)}to{opacity:1;max-height:500px;transform:translateY(0)}}
+
+.a-up{animation:fadeUp .45s ease both}.a-in{animation:fadeIn .3s ease both}.a-rt{animation:slideIn .4s ease both}.a-sc{animation:scaleIn .4s ease both}
+.d1{animation-delay:.06s}.d2{animation-delay:.12s}.d3{animation-delay:.18s}.d4{animation-delay:.24s}.d5{animation-delay:.3s}.d6{animation-delay:.36s}
+
+/* ===== BUTTONS ===== */
+.btn{padding:8px 16px;border-radius:var(--rs);font-size:.8rem;font-weight:700;cursor:pointer;transition:all .25s;border:none;display:inline-flex;align-items:center;gap:6px;font-family:'Be Vietnam Pro',sans-serif;white-space:nowrap}
+.btn-leaf{background:var(--grad-leaf);color:#fff;box-shadow:0 3px 12px rgba(58,125,26,.2)}
+.btn-leaf:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(58,125,26,.3)}
+.btn-sun{background:var(--grad-sun);color:#3d2800}
+.btn-sun:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(240,168,48,.3)}
+.btn-outline{background:transparent;border:1.5px solid var(--border2);color:var(--text2)}
+.btn-outline:hover{border-color:var(--leaf);color:var(--leaf);background:var(--leaf-pale)}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{opacity:.9;transform:translateY(-1px)}
+.btn-sm{padding:5px 10px;font-size:.72rem;border-radius:var(--rxs)}
+.btn-xs{padding:3px 8px;font-size:.68rem;border-radius:6px}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.btn-ghost{background:transparent;border:none;color:var(--text3);padding:6px 10px}.btn-ghost:hover{color:var(--text);background:var(--bg2)}
+
+/* ===== NAV ===== */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;gap:12px}
+.topbar-logo{display:flex;align-items:center;gap:8px;font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--leaf);font-weight:700;cursor:pointer;flex-shrink:0}
+.topbar-search{flex:1;max-width:380px;margin:0 auto;position:relative}
+.topbar-search input{width:100%;padding:8px 12px 8px 34px;background:var(--bg2);border:2px solid transparent;border-radius:var(--rxs);color:var(--text);font-size:.82rem;outline:none;transition:all .3s;font-family:'Be Vietnam Pro',sans-serif}
+.topbar-search input:focus{border-color:var(--leaf);background:var(--surface);box-shadow:0 0 0 3px rgba(58,125,26,.06)}
+.topbar-search .si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:.82rem}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tb{width:36px;height:36px;border-radius:var(--rxs);border:1.5px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;position:relative;font-size:.85rem}
+.tb:hover{background:var(--leaf-pale);color:var(--leaf);border-color:var(--leaf)}
+.tb .bdg{position:absolute;top:-3px;right:-3px;width:15px;height:15px;background:var(--red);border-radius:50%;font-size:.52rem;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}
+
+.sidebar{position:fixed;left:0;top:56px;bottom:0;width:62px;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:3px;z-index:90}
+.ni{width:42px;height:42px;border-radius:var(--rs);border:none;background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:.5rem;font-weight:700;position:relative}
+.ni svg{width:18px;height:18px}
+.ni:hover{background:var(--leaf-pale);color:var(--leaf)}
+.ni.on{background:var(--leaf-light);color:var(--leaf);box-shadow:0 2px 8px rgba(58,125,26,.08)}
+.ni.on::before{content:'';position:absolute;left:-12px;width:3px;height:20px;background:var(--leaf);border-radius:0 3px 3px 0}
+.nd{width:24px;height:1px;background:var(--border);margin:4px 0}
+
+.main{margin-left:62px;margin-top:56px;min-height:calc(100vh - 56px);background:var(--bg)}
+.page{padding:20px 24px;max-width:1400px;margin:0 auto}
+.ph{margin-bottom:20px;animation:fadeUp .4s ease both}
+.ph h1{font-size:1.5rem;margin-bottom:2px}.ph p{color:var(--text3);font-size:.82rem}
+
+/* ===== COMPONENTS ===== */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:all .25s}
+.card:hover{border-color:var(--leaf);box-shadow:var(--shadow)}
+.card-body{padding:18px}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.card-header h4{font-size:.88rem;font-family:'Nunito',sans-serif;font-weight:800}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;background:var(--bg2);border-radius:var(--rs);padding:3px;margin-bottom:18px}
+.tab{padding:9px 18px;border:none;background:transparent;color:var(--text3);cursor:pointer;border-radius:var(--rxs);font-size:.8rem;font-weight:700;transition:all .2s;font-family:'Nunito',sans-serif;position:relative;white-space:nowrap}
+.tab:hover{color:var(--text2)}.tab.active{background:var(--surface);color:var(--leaf);box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.tab .cnt{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:20px;background:var(--red);color:#fff;font-size:.58rem;font-weight:800;margin-left:5px}
+
+/* Badge/Status */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:.65rem;font-weight:800;white-space:nowrap}
+.badge-green{background:var(--leaf-light);color:var(--leaf)}
+.badge-sun{background:var(--sun-light);color:#9a7000}
+.badge-red{background:var(--red-light);color:var(--red)}
+.badge-gray{background:var(--bg2);color:var(--text3)}
+.badge-blue{background:var(--water-light);color:var(--water)}
+
+/* Tables */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead th{text-align:left;padding:10px 14px;color:var(--text3);font-weight:800;border-bottom:2px solid var(--border);font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+tbody td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:var(--leaf-pale)}
+tbody tr.selected{background:var(--leaf-light);border-left:3px solid var(--leaf)}
+td .user-cell{display:flex;align-items:center;gap:10px}
+td .user-av{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:#fff;flex-shrink:0}
+td .user-name{font-weight:700;font-size:.82rem}.td .user-sub{font-size:.68rem;color:var(--text3)}
+td .actions{display:flex;gap:4px;flex-wrap:nowrap}
+
+/* Stats */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;transition:all .25s;position:relative;overflow:hidden}
+.stat-card:hover{border-color:var(--leaf);box-shadow:var(--shadow)}
+.stat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;opacity:.6}
+.stat-card:nth-child(1)::after{background:var(--grad-leaf)}.stat-card:nth-child(2)::after{background:var(--grad-sky)}
+.stat-card:nth-child(3)::after{background:var(--grad-sun)}.stat-card:nth-child(4)::after{background:var(--grad-earth)}
+.stat-icon{width:36px;height:36px;border-radius:var(--rxs);display:flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:8px}
+.stat-val{font-size:1.4rem;font-weight:700;font-family:'Playfair Display',serif;color:var(--text)}
+.stat-label{font-size:.72rem;color:var(--text3);font-weight:600}
+.stat-trend{display:inline-flex;align-items:center;gap:3px;margin-top:4px;padding:2px 7px;border-radius:6px;font-size:.62rem;font-weight:800}
+.stat-trend.up{background:var(--leaf-light);color:var(--leaf)}
+.stat-trend.down{background:var(--red-light);color:var(--red)}
+
+/* Grid */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+.g12{display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-bottom:16px}
+
+/* Chart */
+.chart-box{position:relative;height:240px}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s ease}
+.modal{background:var(--surface);border-radius:var(--r);width:100%;max-width:520px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15);animation:scaleIn .25s ease}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1}
+.modal-header h3{font-size:1rem}.modal-close{width:30px;height:30px;border-radius:var(--rxs);border:none;background:var(--bg2);color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:all .2s}.modal-close:hover{background:var(--red-light);color:var(--red)}
+.modal-body{padding:20px}.modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--border);background:var(--surface2)}
+
+/* Form */
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:.78rem;color:var(--text2);margin-bottom:4px;font-weight:700}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;background:var(--bg);border:2px solid var(--border);border-radius:var(--rxs);color:var(--text);font-size:.85rem;outline:none;transition:all .3s;font-family:'Nunito',sans-serif}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--leaf);box-shadow:0 0 0 3px rgba(58,125,26,.06);background:var(--surface)}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* Toast */
+.toast-box{position:fixed;bottom:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:6px}
+.toast{padding:10px 16px;border-radius:var(--rs);background:var(--surface);border:2px solid var(--leaf);color:var(--text);font-size:.82rem;box-shadow:var(--shadow-lg);animation:fadeUp .3s ease both;display:flex;align-items:center;gap:8px;font-weight:600}
+.toast.red{border-color:var(--red)}.toast.sun{border-color:var(--sun)}
+
+/* Live dot */
+.live{width:7px;height:7px;border-radius:50%;background:var(--leaf);display:inline-block;animation:pulse 2s ease infinite}
+.live-red{background:var(--red)}
+
+/* Activity log */
+.activity{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.78rem;align-items:flex-start}
+.activity:last-child{border:none}
+.activity-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;flex-shrink:0}
+.activity-text{flex:1}.activity-time{font-size:.65rem;color:var(--text3);white-space:nowrap;margin-top:2px}
+
+/* Selection bar */
+.selection-bar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--leaf-light);border:1px solid var(--leaf);border-radius:var(--rs);margin-bottom:14px;animation:slideDown .2s ease}
+.selection-bar .cnt{font-size:.82rem;font-weight:700;color:var(--leaf)}
+
+/* Checkbox */
+.checkbox{width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.checkbox:hover{border-color:var(--leaf)}
+.checkbox.checked{background:var(--leaf);border-color:var(--leaf);color:#fff}
+.checkbox svg{width:10px;height:10px}
+
+/* Empty state */
+.empty{text-align:center;padding:48px 20px;color:var(--text3)}
+.empty-icon{font-size:2.5rem;margin-bottom:12px;opacity:.5}
+.empty h4{font-size:1rem;margin-bottom:4px;color:var(--text2);font-family:'Nunito',sans-serif;font-weight:800}
+.empty p{font-size:.82rem}
+
+/* Pagination */
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.page-info{font-size:.78rem;color:var(--text3);font-weight:600}
+.page-btns{display:flex;gap:4px}
+.page-btn{width:32px;height:32px;border-radius:var(--rxs);border:1.5px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;transition:all .2s;font-family:'Nunito',sans-serif}
+.page-btn:hover{border-color:var(--leaf);color:var(--leaf);background:var(--leaf-pale)}
+.page-btn.active{background:var(--leaf);color:#fff;border-color:var(--leaf)}
+
+/* Confirm dialog */
+.confirm-body{text-align:center;padding:20px 0}
+.confirm-body .big-icon{font-size:2.5rem;margin-bottom:12px}
+.confirm-body h3{margin-bottom:6px}
+.confirm-body p{color:var(--text2);font-size:.88rem}
+
+/* Progress bar */
+.progress{height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;border-radius:3px;transition:width .8s ease}
+
+/* Responsive */
+@media(max-width:1100px){.stat-grid{grid-template-columns:repeat(2,1fr)}.g2,.g21,.g12{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0}.topbar-search{display:none}.stat-grid{grid-template-columns:1fr}.g3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app">
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-logo">
+    <svg viewBox="0 0 36 36" width="28" height="28"><circle cx="18" cy="18" r="16" fill="#e8f5e0" stroke="#3a7d1a" stroke-width="2"/><path d="M18 8 C18 8,10 14,10 22 C10 28,14 32,18 32 C22 32,26 28,26 22 C26 14,18 8,18 8Z" fill="#4a9a28" opacity=".7"/><path d="M18 10 L18 28 M14 18 L18 14 M22 18 L18 14" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity=".8"/></svg>
+    Greenova <span style="font-family:'Nunito';font-size:.65rem;background:var(--leaf-light);color:var(--leaf);padding:2px 8px;border-radius:20px;font-weight:800">ADMIN</span>
+  </div>
+  <div class="topbar-search"><span class="si">🔍</span><input placeholder="Tìm người dùng, sản phẩm, đơn hàng..." v-model="globalSearch" @keyup.enter="handleGlobalSearch"></div>
+  <div class="topbar-right">
+    <button class="tb" title="Đăng xuất" @click="logout" style="font-size:.75rem">⏻</button>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <button v-for="n in navItems" :key="n.id" class="ni" :class="{on:activePage===n.id}" @click="activePage=n.id" :title="n.label">
+    <span style="font-size:1.1rem">{{n.icon}}</span>
+  </button>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+<div class="page">
+
+<!-- ====== PAGE: TỔNG QUAN ====== -->
+<template v-if="activePage==='overview'">
+  <div class="ph"><h1>📊 Tổng quan hệ thống</h1><p>Cập nhật thời gian thực · <span class="live"></span> Tất cả dịch vụ hoạt động bình thường</p></div>
+
+  <!-- KPI Cards -->
+  <div class="stat-grid">
+    <div class="stat-card a-up d1">
+      <div class="stat-icon" style="background:var(--leaf-light)">👥</div>
+      <div class="stat-val">{{stats.totalUsers.toLocaleString()}}</div>
+      <div class="stat-label">Tổng người dùng</div>
+      <span class="stat-trend up">↑ +{{stats.newUsersToday}} hôm nay</span>
+    </div>
+    <div class="stat-card a-up d2">
+      <div class="stat-icon" style="background:var(--water-light);color:var(--water)">📡</div>
+      <div class="stat-val">{{stats.iotOnline}}</div>
+      <div class="stat-label">Thiết bị IoT đang kết nối</div>
+      <span class="stat-trend up">↑ {{stats.iotUptime}}% thời gian hoạt động</span>
+    </div>
+    <div class="stat-card a-up d3">
+      <div class="stat-icon" style="background:var(--sun-light)">💰</div>
+      <div class="stat-val">₫{{stats.revenue}}</div>
+      <div class="stat-label">Doanh thu tháng</div>
+      <span class="stat-trend" :class="stats.revenueTrend>0?'up':'down'">{{stats.revenueTrend>0?'↑':'↓'}} {{Math.abs(stats.revenueTrend)}}%</span>
+    </div>
+    <div class="stat-card a-up d4">
+      <div class="stat-icon" style="background:var(--red-light);color:var(--red)">⚠️</div>
+      <div class="stat-val">{{stats.pendingActions}}</div>
+      <div class="stat-label">Cần xử lý</div>
+      <span class="stat-trend down" v-if="stats.pendingActions>10">↑ Cần xử lý</span>
+      <span class="stat-trend up" v-else>Ổn định</span>
+    </div>
+  </div>
+
+  <!-- Charts + Activity -->
+  <div class="g21">
+    <div class="card a-up d4">
+      <div class="card-header"><h4>📈 Người dùng & Giao dịch (7 ngày)</h4></div>
+      <div class="card-body"><div class="chart-box"><canvas id="chartOverview"></canvas></div></div>
+    </div>
+    <div class="card a-up d5">
+      <div class="card-header"><h4>🕐 Hoạt động gần đây</h4></div>
+      <div class="card-body">
+        <div v-for="a in recentActivities" :key="a.id" class="activity">
+          <div class="activity-icon" :style="{background:a.bg}">{{a.icon}}</div>
+          <div class="activity-text"><span style="font-weight:700">{{a.user}}</span> {{a.action}}<div class="activity-time">{{a.time}}</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role breakdown + System health -->
+  <div class="g2">
+    <div class="card a-up d5">
+      <div class="card-header"><h4>👥 Phân bổ vai trò</h4></div>
+      <div class="card-body">
+        <div v-for="r in roleBreakdown" :key="r.role" style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:.82rem;font-weight:700">{{r.icon}} {{r.role}}</span>
+            <span style="font-size:.78rem;color:var(--text3)">{{r.count}} ({{r.pct}}%)</span>
+          </div>
+          <div class="progress"><div class="progress-fill" :style="{width:r.pct+'%',background:r.color}"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card a-up d6">
+      <div class="card-header"><h4>🖥️ Sức khỏe hệ thống</h4></div>
+      <div class="card-body">
+        <div v-for="s in systemHealth" :key="s.name" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:1rem">{{s.icon}}</span>
+          <div style="flex:1">
+            <div style="font-size:.82rem;font-weight:700;display:flex;justify-content:space-between">
+              <span>{{s.name}}</span>
+              <span :style="{color:s.ok?'var(--leaf)':'var(--red)'}">{{s.ok?'● Hoạt động':'● Cảnh báo'}}</span>
+            </div>
+            <div class="progress"><div class="progress-fill" :style="{width:s.load+'%',background:s.load>80?'var(--red)':s.load>60?'var(--sun)':'var(--leaf)'}"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- ====== PAGE: QUẢN LÝ NGƯỜI DÙNG ====== -->
+<template v-if="activePage==='users'">
+  <div class="ph"><h1>👥 Quản lý người dùng</h1><p>Phê duyệt, phân quyền, khóa/mở tài khoản</p></div>
+
+  <!-- Tabs: All | Pending | Active | Locked -->
+  <div class="tabs">
+    <button class="tab" :class="{active:userTab==='all'}" @click="userTab='all'">Tất cả <span class="cnt">{{usersAll.length}}</span></button>
+    <button class="tab" :class="{active:userTab==='pending'}" @click="userTab='pending'">Chờ duyệt <span class="cnt" v-if="pendingCount>0">{{pendingCount}}</span></button>
+    <button class="tab" :class="{active:userTab==='active'}" @click="userTab='active'">Đang hoạt động</button>
+    <button class="tab" :class="{active:userTab==='locked'}" @click="userTab='locked'">Đã khóa</button>
+  </div>
+
+  <!-- Bulk Actions -->
+  <div v-if="selectedUsers.length>0" class="selection-bar">
+    <span class="cnt">Đã chọn {{selectedUsers.length}} người</span>
+    <button class="btn btn-sm btn-leaf" @click="bulkApprove" v-if="userTab==='pending'">✅ Duyệt tất cả</button>
+    <button class="btn btn-sm btn-red" @click="showBulkReject=true">❌ Từ chối</button>
+    <button class="btn btn-sm btn-ghost" @click="selectedUsers=[]">Bỏ chọn</button>
+  </div>
+
+  <!-- Search & Filter -->
+  <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <input placeholder="🔍 Tìm theo tên, email, khu vực..." v-model="userSearch" style="flex:1;min-width:200px;padding:8px 14px;border:2px solid var(--border);border-radius:var(--rxs);font-size:.82rem;outline:none;font-family:'Nunito',sans-serif;transition:all .3s" @focus="$event.target.style.borderColor='var(--leaf)'" @blur="$event.target.style.borderColor='var(--border)'">
+    <select v-model="userRoleFilter" style="padding:8px 14px;border:2px solid var(--border);border-radius:var(--rxs);font-size:.82rem;outline:none;font-family:'Nunito',sans-serif;background:var(--surface);cursor:pointer">
+      <option value="">Tất cả vai trò</option>
+      <option value="farmer">🌾 Nông dân</option>
+      <option value="engineer">🔬 Kỹ sư</option>
+      <option value="distributor">🏪 Đại lý</option>
+      <option value="buyer">🏢 Thu mua</option>
+    </select>
+    <button class="btn btn-outline" @click="exportUsers">📥 Export CSV</button>
+  </div>
+
+  <!-- Users Table -->
+  <div class="card a-up d1">
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30px"><div class="checkbox" :class="{checked:allSelected}" @click="toggleAllUsers"><svg v-if="allSelected" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2"><path d="M2 6l3 3 5-5"/></svg></div></th>
+            <th>Người dùng</th>
+            <th>Vai trò</th>
+            <th>Khu vực</th>
+            <th>Ngày đăng ký</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="u in filteredUsers" :key="u.id" :class="{selected:selectedUsers.includes(u.id)}">
+            <td><div class="checkbox" :class="{checked:selectedUsers.includes(u.id)}" @click="toggleUserSelect(u.id)"><svg v-if="selectedUsers.includes(u.id)" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2"><path d="M2 6l3 3 5-5"/></svg></div></td>
+            <td>
+              <div class="user-cell">
+                <div class="user-av" :style="{background:u.avBg}">{{u.initials}}</div>
+                <div><div class="user-name">{{u.name}}</div><div style="font-size:.68rem;color:var(--text3)">{{u.email}}</div></div>
+              </div>
+            </td>
+            <td><span style="font-size:.72rem">{{u.roleIcon}} {{u.roleName}}</span></td>
+            <td style="font-size:.78rem">{{u.area}}</td>
+            <td style="font-size:.78rem;color:var(--text3)">{{u.joinDate}}</td>
+            <td>
+              <span class="badge" :class="{
+                'badge-green':u.status==='active',
+                'badge-sun':u.status==='pending',
+                'badge-red':u.status==='locked'
+              }">{{statusLabel(u.status)}}</span>
+            </td>
+            <td>
+              <div class="actions">
+                <template v-if="u.status==='pending'">
+                  <button class="btn btn-xs btn-leaf" @click="approveUser(u)" title="Duyệt">✅ Duyệt</button>
+                  <button class="btn btn-xs btn-red" @click="rejectUser(u)" title="Từ chối">❌</button>
+                </template>
+                <template v-else>
+                  <button class="btn btn-xs btn-outline" @click="viewUser(u)" title="Xem chi tiết">👁️</button>
+                  <button v-if="u.status==='active'" class="btn btn-xs btn-red" @click="confirmLockUser(u)" title="Khóa tài khoản">🔒</button>
+                  <button v-if="u.status==='locked'" class="btn btn-xs btn-leaf" @click="unlockUser(u)" title="Mở khóa">🔓</button>
+                </template>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination" style="padding:10px 14px">
+      <span class="page-info">Hiển thị {{filteredUsers.length}} / {{usersAll.length}} người dùng</span>
+      <div class="page-btns">
+        <button class="page-btn" v-for="p in totalPages" :key="p" :class="{active:p===currentP}">{{p}}</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- ====== PAGE: DUYỆT SÀN ====== -->
+<template v-if="activePage==='marketplace'">
+  <div class="ph"><h1>🛒 Kiểm duyệt sàn giao dịch</h1><p>Duyệt sản phẩm, xử lý báo cáo, quản lý khiếu nại</p></div>
+
+  <div class="tabs">
+    <button class="tab" :class="{active:mktTab==='pending'}" @click="mktTab='pending'">Chờ duyệt <span class="cnt" v-if="mktPendingProducts.length>0">{{mktPendingProducts.length}}</span></button>
+    <button class="tab" :class="{active:mktTab==='active'}" @click="mktTab='active'">Đang bán</button>
+    <button class="tab" :class="{active:mktTab==='reports'}" @click="mktTab='reports'">Báo cáo vi phạm <span class="cnt" v-if="mktReports.length>0">{{mktReports.length}}</span></button>
+    <button class="tab" :class="{active:mktTab==='disputes'}" @click="mktTab='disputes'">Khiếu nại <span class="cnt" style="background:var(--sun);color:#3d2800" v-if="mktDisputes.length>0">{{mktDisputes.length}}</span></button>
+  </div>
+
+  <!-- Pending Products -->
+  <template v-if="mktTab==='pending'">
+    <div v-if="mktPendingProducts.length===0" class="empty"><div class="empty-icon">🎉</div><h4>Tuyệt vời!</h4><p>Không có sản phẩm nào chờ duyệt.</p></div>
+    <div v-for="p in mktPendingProducts" :key="p.id" class="card a-up" style="margin-bottom:12px">
+      <div class="card-body" style="display:flex;gap:16px;align-items:center">
+        <div style="width:80px;height:80px;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0" :style="{background:p.bg}">{{p.icon}}</div>
+        <div style="flex:1">
+          <div style="font-size:1rem;font-weight:800;margin-bottom:2px">{{p.name}}</div>
+          <div style="font-size:.78rem;color:var(--text3);margin-bottom:6px">{{p.shop}} · Đăng: {{p.date}}</div>
+          <div style="display:flex;gap:12px;font-size:.78rem">
+            <span>💰 <b style="font-family:'JetBrains Mono'">{{p.price}}</b></span>
+            <span>📦 {{p.stock}} {{p.unit}}</span>
+            <span class="badge" :class="p.certified?'badge-green':'badge-sun'">{{p.certified?'✅ Chứng nhận':'⚠️ Chưa có CN'}}</span>
+          </div>
+          <div v-if="p.notes" style="margin-top:6px;padding:6px 10px;background:var(--sun-light);border-radius:var(--rxs);font-size:.72rem;color:#9a7000">⚠️ {{p.notes}}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+          <button class="btn btn-sm btn-leaf" @click="approveProduct(p)">✅ Duyệt</button>
+          <button class="btn btn-sm btn-outline" @click="requestEdit(p)">📝 Yêu cầu sửa</button>
+          <button class="btn btn-sm btn-red" @click="rejectProduct(p)">❌ Từ chối</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- Active listings -->
+  <template v-if="mktTab==='active'">
+    <div class="card a-up d1">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Sản phẩm</th><th>Người bán</th><th>Giá</th><th>Đã bán</th><th>Đánh giá</th><th>Hành động</th></tr></thead>
+          <tbody>
+            <tr v-for="p in mktActiveProducts" :key="p.id">
+              <td style="font-weight:700">{{p.name}}</td>
+              <td style="font-size:.78rem">{{p.shop}}</td>
+              <td style="font-family:'JetBrains Mono';font-size:.82rem;font-weight:600">{{p.price}}</td>
+              <td>{{p.sold}}</td>
+              <td>⭐ {{p.rating}}</td>
+              <td><div class="actions"><button class="btn btn-xs btn-outline" @click="viewProductDetail(p)">👁️</button><button class="btn btn-xs btn-red" @click="delistProduct(p)">🛑 Gỡ</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </template>
+
+  <!-- Reports -->
+  <template v-if="mktTab==='reports'">
+    <div v-if="mktReports.length===0" class="empty"><div class="empty-icon">✅</div><h4>Không có báo cáo vi phạm</h4></div>
+    <div v-for="r in mktReports" :key="r.id" class="card a-up" style="margin-bottom:12px">
+      <div class="card-body" style="display:flex;gap:14px;align-items:start">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--red-light);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">🚨</div>
+        <div style="flex:1">
+          <div style="font-size:.88rem;font-weight:800;margin-bottom:2px">{{r.title}}</div>
+          <div style="font-size:.78rem;color:var(--text2);margin-bottom:4px">{{r.desc}}</div>
+          <div style="font-size:.72rem;color:var(--text3)">Báo cáo bởi: {{r.reporter}} · {{r.time}}</div>
+        </div>
+        <div class="actions" style="flex-shrink:0">
+          <button class="btn btn-xs btn-leaf" @click="dismissReport(r)">Bỏ qua</button>
+          <button class="btn btn-xs btn-red" @click="handleReport(r)">Xử lý</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- Disputes -->
+  <template v-if="mktTab==='disputes'">
+    <div v-for="d in mktDisputes" :key="d.id" class="card a-up" style="margin-bottom:12px">
+      <div class="card-body">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:.88rem;font-weight:800">📋 {{d.title}}</div>
+          <span class="badge" :class="d.urgency==='high'?'badge-red':d.urgency==='med'?'badge-sun':'badge-gray'">{{d.urgency==='high'?'Khẩn cấp':d.urgency==='med'?'Trung bình':'Thấp'}}</span>
+        </div>
+        <div style="font-size:.82rem;color:var(--text2);margin-bottom:8px">{{d.desc}}</div>
+        <div style="font-size:.75rem;color:var(--text3);margin-bottom:10px">Người mua: {{d.buyer}} · Người bán: {{d.seller}} · {{d.date}}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-leaf" @click="resolveDispute(d,'buyer')">🏆 Ưu tiên người mua</button>
+          <button class="btn btn-sm btn-sun" @click="resolveDispute(d,'seller')">🏆 Ưu tiên người bán</button>
+          <button class="btn btn-sm btn-outline" @click="resolveDispute(d,'split')">🤝 Chia đều</button>
+          <button class="btn btn-sm btn-outline">💬 Nhắn 2 bên</button>
+        </div>
+      </div>
+    </div>
+  </template>
+</template>
+
+<!-- ====== PAGE: KIỂM DUYỆT NỘI DUNG ====== -->
+<template v-if="activePage==='content'">
+  <div class="ph"><h1>📝 Kiểm duyệt nội dung</h1><p>Quản lý bài viết, báo cáo spam, cảnh báo sai thông tin</p></div>
+
+  <div class="tabs">
+    <button class="tab" :class="{active:contentTab==='reported'}" @click="contentTab='reported'">Bị báo cáo <span class="cnt" v-if="reportedPosts.length>0">{{reportedPosts.length}}</span></button>
+    <button class="tab" :class="{active:contentTab==='all'}" @click="contentTab='all'">Tất cả bài viết</button>
+    <button class="tab" :class="{active:contentTab==='warnings'}" @click="contentTab='warnings'">Cảnh báo AI <span class="cnt" style="background:var(--sun);color:#3d2800">{{aiWarnings.length}}</span></button>
+  </div>
+
+  <!-- Reported Posts -->
+  <template v-if="contentTab==='reported'">
+    <div v-for="p in reportedPosts" :key="p.id" class="card a-up" style="margin-bottom:12px">
+      <div class="card-body">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+          <div style="width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;color:#fff" :style="{background:p.avBg}">{{p.av}}</div>
+          <div style="flex:1"><div style="font-weight:800;font-size:.88rem">{{p.author}}</div><div style="font-size:.72rem;color:var(--text3)">{{p.time}} · {{p.reporters}} người báo cáo</div></div>
+          <span class="badge badge-red">{{p.reason}}</span>
+        </div>
+        <div style="padding:12px;background:var(--bg);border-radius:var(--rxs);margin-bottom:10px;font-size:.85rem;line-height:1.6">{{p.content}}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-leaf" @click="approvePost(p)">✅ Giữ bài</button>
+          <button class="btn btn-sm btn-outline" @click="warnUser(p)">⚠️ Cảnh cáo</button>
+          <button class="btn btn-sm btn-red" @click="removePost(p)">🗑️ Gỡ bài</button>
+          <button class="btn btn-sm btn-red" style="background:#6b2020" @click="banUser(p)">🚫 Khóa TK</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- AI Warnings -->
+  <template v-if="contentTab==='warnings'">
+    <div v-for="w in aiWarnings" :key="w.id" class="card a-up" style="margin-bottom:12px">
+      <div class="card-body" style="display:flex;gap:12px;align-items:start">
+        <div style="width:36px;height:36px;border-radius:var(--rxs);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0" :style="{background:w.type==='misinfo'?'var(--sun-light)':'var(--red-light)'}">{{w.type==='misinfo'?'📢':'🛡️'}}</div>
+        <div style="flex:1">
+          <div style="font-size:.85rem;font-weight:800;margin-bottom:2px">{{w.title}}</div>
+          <div style="font-size:.78rem;color:var(--text2);margin-bottom:6px">{{w.desc}}</div>
+          <div style="font-size:.72rem;color:var(--text3)">Tác giả: {{w.author}} · Độ tin cậy AI: <b style="color:var(--red)">{{w.confidence}}%</b></div>
+        </div>
+        <div class="actions" style="flex-shrink:0">
+          <button class="btn btn-xs btn-leaf" @click="dismissWarning(w)">Bỏ qua</button>
+          <button class="btn btn-xs btn-outline">Gắn cờ</button>
+        </div>
+      </div>
+    </div>
+  </template>
+</template>
+
+<!-- ====== PAGE: CẤU HÌNH HỆ THỐNG ====== -->
+<template v-if="activePage==='config'">
+  <div class="ph"><h1>⚙️ Cấu hình hệ thống</h1><p>Thiết lập tham số nền tảng, thông báo, hoa hồng, ngưỡng AI</p></div>
+
+  <div class="g2">
+    <!-- General Settings -->
+    <div class="card a-up d1">
+      <div class="card-header"><h4>🏠 Cài đặt chung</h4></div>
+      <div class="card-body">
+        <div class="form-group"><label>Tên nền tảng</label><input v-model="config.platformName"></div>
+        <div class="form-group"><label>Ngôn ngữ mặc định</label>
+          <select v-model="config.language"><option value="vi">Tiếng Việt</option><option value="en">English</option></select>
+        </div>
+        <div class="form-group"><label>Khu vực hoạt động chính</label><input v-model="config.region"></div>
+        <div class="form-group"><label>Bản đồ hiển thị mặc định</label>
+          <select v-model="config.mapDefault"><option value="vn">Việt Nam</option><option value="mekong">ĐBSCL</option><option value="southeast">Đông Nam Bộ</option></select>
+        </div>
+        <button class="btn btn-leaf" @click="saveConfig('general')">💾 Lưu thay đổi</button>
+      </div>
+    </div>
+
+    <!-- Business Rules -->
+    <div class="card a-up d2">
+      <div class="card-header"><h4>💰 Quy tắc kinh doanh</h4></div>
+      <div class="card-body">
+        <div class="form-group"><label>Hoa hồng sàn (%)</label><input type="number" v-model.number="config.commissionRate" min="0" max="30"></div>
+        <div class="form-group"><label>Thời gian giữ tiền Escrow (ngày)</label><input type="number" v-model.number="config.escrowDays" min="1" max="30"></div>
+        <div class="form-group"><label>Giá trị đơn tối đa không cần KYC (VNĐ)</label><input type="number" v-model.number="config.noKycLimit"></div>
+        <div class="form-group"><label>Phí vận chuyển mặc định (VNĐ/km)</label><input type="number" v-model.number="config.shippingRate"></div>
+        <button class="btn btn-leaf" @click="saveConfig('business')">💾 Lưu thay đổi</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <!-- AI Settings -->
+    <div class="card a-up d3">
+      <div class="card-header"><h4>🤖 Cài đặt AI</h4></div>
+      <div class="card-body">
+        <div class="form-group"><label>Ngưỡng tin cậy chẩn đoán bệnh (%)</label><input type="number" v-model.number="config.aiDiagnosisThreshold" min="50" max="100">
+          <div style="font-size:.72rem;color:var(--text3);margin-top:4px">Khuyến nghị: ≥ 85% để hiển thị kết quả cho nông dân</div>
+        </div>
+        <div class="form-group"><label>Tự động cảnh báo dịch tễ</label>
+          <select v-model="config.autoEpidemicAlert"><option :value="true">Bật</option><option :value="false">Tắt</option></select>
+        </div>
+        <div class="form-group"><label>Ngưỡng cảnh báo IoT — Độ ẩm đất thấp (%)</label><input type="number" v-model.number="config.soilHumidWarning" min="0" max="100"></div>
+        <div class="form-group"><label>Mô hình AI phiên bản</label><input v-model="config.aiModelVersion" disabled style="background:var(--bg2);cursor:not-allowed"></div>
+        <button class="btn btn-leaf" @click="saveConfig('ai')">💾 Lưu thay đổi</button>
+      </div>
+    </div>
+
+    <!-- Notification Templates -->
+    <div class="card a-up d4">
+      <div class="card-header"><h4>🔔 Mẫu thông báo</h4></div>
+      <div class="card-body">
+        <div v-for="n in notifTemplates" :key="n.id" style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:var(--rxs);margin-bottom:8px;transition:all .2s;cursor:pointer" @click="editNotif(n)" :style="{borderColor:n.editing?'var(--leaf)':''}">
+          <span style="font-size:1.1rem">{{n.icon}}</span>
+          <div style="flex:1"><div style="font-size:.82rem;font-weight:700">{{n.title}}</div><div style="font-size:.68rem;color:var(--text3)">{{n.preview}}</div></div>
+          <span class="badge" :class="n.enabled?'badge-green':'badge-gray'">{{n.enabled?'Bật':'Tắt'}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Danger Zone -->
+  <div class="card a-up d5" style="border-color:var(--red)">
+    <div class="card-header" style="background:var(--red-light)"><h4 style="color:var(--red)">⚠️ Vùng nguy hiểm</h4></div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+        <div style="padding:16px;border:2px dashed var(--red);border-radius:var(--rs);text-align:center">
+          <div style="font-size:1.5rem;margin-bottom:8px">🔄</div>
+          <div style="font-size:.82rem;font-weight:800;margin-bottom:4px">Reset Cache AI</div>
+          <div style="font-size:.72rem;color:var(--text3);margin-bottom:8px">Xóa bộ nhớ đệm mô hình AI</div>
+          <button class="btn btn-sm btn-red" @click="dangerAction('reset-ai')">Reset</button>
+        </div>
+        <div style="padding:16px;border:2px dashed var(--red);border-radius:var(--rs);text-align:center">
+          <div style="font-size:1.5rem;margin-bottom:8px">📦</div>
+          <div style="font-size:.82rem;font-weight:800;margin-bottom:4px">Dọn dẹp dữ liệu cũ</div>
+          <div style="font-size:.72rem;color:var(--text3);margin-bottom:8px">Xóa log & dữ liệu trên 90 ngày</div>
+          <button class="btn btn-sm btn-red" @click="dangerAction('cleanup')">Dọn dẹp</button>
+        </div>
+        <div style="padding:16px;border:2px dashed var(--red);border-radius:var(--rs);text-align:center">
+          <div style="font-size:1.5rem;margin-bottom:8px">🛡️</div>
+          <div style="font-size:.82rem;font-weight:800;margin-bottom:4px">Chế độ bảo trì</div>
+          <div style="font-size:.72rem;color:var(--text3);margin-bottom:8px">Tạm khóa hệ thống để nâng cấp</div>
+          <button class="btn btn-sm btn-red" @click="dangerAction('maintenance')">Kích hoạt</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- ====== PAGE: NHẬT KÝ HỆ THỐNG ====== -->
+<template v-if="activePage==='logs'">
+  <div class="ph"><h1>📋 Nhật ký hệ thống</h1><p>Lịch sử thao tác của admin và sự kiện hệ thống</p></div>
+
+  <!-- Filters -->
+  <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <select v-model="logFilter" style="padding:8px 14px;border:2px solid var(--border);border-radius:var(--rxs);font-size:.82rem;outline:none;font-family:'Nunito',sans-serif;background:var(--surface)">
+      <option value="">Tất cả loại</option>
+      <option value="auth">🔐 Xác thực</option>
+      <option value="approve">✅ Duyệt</option>
+      <option value="ban">🚫 Khóa</option>
+      <option value="config">⚙️ Cấu hình</option>
+      <option value="error">❌ Lỗi</option>
+    </select>
+    <input type="date" v-model="logDateFrom" style="padding:8px 14px;border:2px solid var(--border);border-radius:var(--rxs);font-size:.82rem;outline:none;font-family:'Nunito',sans-serif">
+    <input type="date" v-model="logDateTo" style="padding:8px 14px;border:2px solid var(--border);border-radius:var(--rxs);font-size:.82rem;outline:none;font-family:'Nunito',sans-serif">
+    <button class="btn btn-outline" @click="exportLogs">📥 Export</button>
+  </div>
+
+  <div class="card a-up d1">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Thời gian</th><th>Loại</th><th>Người thực hiện</th><th>Hành động</th><th>Chi tiết</th><th>IP</th></tr></thead>
+        <tbody>
+          <tr v-for="l in filteredLogs" :key="l.id">
+            <td style="font-size:.72rem;font-family:'JetBrains Mono';color:var(--text3);white-space:nowrap">{{l.time}}</td>
+            <td><span class="badge" :class="logBadgeClass(l.type)">{{l.typeIcon}} {{l.typeLabel}}</span></td>
+            <td style="font-weight:700;font-size:.82rem">{{l.user}}</td>
+            <td style="font-size:.82rem">{{l.action}}</td>
+            <td style="font-size:.78rem;color:var(--text3);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{l.detail}}</td>
+            <td style="font-size:.72rem;font-family:'JetBrains Mono';color:var(--text3)">{{l.ip}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
+
+</div><!-- end .page -->
+</main>
+
+<!-- ===== MODALS ===== -->
+<!-- User Detail Modal -->
+<div v-if="showUserModal" class="modal-overlay" @click.self="showUserModal=false">
+  <div class="modal">
+    <div class="modal-header"><h3>👤 Chi tiết người dùng</h3><button class="modal-close" @click="showUserModal=false">✕</button></div>
+    <div class="modal-body">
+      <div style="display:flex;gap:14px;align-items:center;margin-bottom:18px">
+        <div style="width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;color:#fff" :style="{background:selectedUser?.avBg}">{{selectedUser?.initials}}</div>
+        <div><div style="font-size:1.1rem;font-weight:800">{{selectedUser?.name}}</div><div style="font-size:.82rem;color:var(--text3)">{{selectedUser?.email}}</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <div style="padding:10px;background:var(--bg);border-radius:var(--rxs)"><div style="font-size:.68rem;color:var(--text3);text-transform:uppercase">Vai trò</div><div style="font-size:.88rem;font-weight:700">{{selectedUser?.roleIcon}} {{selectedUser?.roleName}}</div></div>
+        <div style="padding:10px;background:var(--bg);border-radius:var(--rxs)"><div style="font-size:.68rem;color:var(--text3);text-transform:uppercase">Khu vực</div><div style="font-size:.88rem;font-weight:700">{{selectedUser?.area}}</div></div>
+        <div style="padding:10px;background:var(--bg);border-radius:var(--rxs)"><div style="font-size:.68rem;color:var(--text3);text-transform:uppercase">Ngày đăng ký</div><div style="font-size:.88rem;font-weight:700">{{selectedUser?.joinDate}}</div></div>
+        <div style="padding:10px;background:var(--bg);border-radius:var(--rxs)"><div style="font-size:.68rem;color:var(--text3);text-transform:uppercase">Trạng thái</div><div style="font-size:.88rem;font-weight:700"><span class="badge" :class="selectedUser?.status==='active'?'badge-green':selectedUser?.status==='pending'?'badge-sun':'badge-red'">{{statusLabel(selectedUser?.status)}}</span></div></div>
+      </div>
+      <div class="form-group"><label>Admin ghi chú</label><textarea placeholder="Nhập ghi chú về tài khoản này..." v-model="adminNote"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" @click="showUserModal=false">Đóng</button>
+      <button class="btn btn-leaf" @click="saveUserNote">💾 Lưu ghi chú</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div v-if="showConfirm" class="modal-overlay" @click.self="showConfirm=false">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header"><h3>Xác nhận</h3><button class="modal-close" @click="showConfirm=false">✕</button></div>
+    <div class="modal-body">
+      <div class="confirm-body">
+        <div class="big-icon">{{confirmIcon}}</div>
+        <h3>{{confirmTitle}}</h3>
+        <p>{{confirmMsg}}</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" @click="showConfirm=false">Hủy</button>
+      <button class="btn" :class="confirmDanger?'btn-red':'btn-leaf'" @click="confirmAction">Xác nhận</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-box">
+  <div v-for="t in toasts" :key="t.id" class="toast" :class="t.type||''">{{t.m}}</div>
+</div>
+
+</div>
+
+<script>
+const{createApp,ref,reactive,computed,onMounted,nextTick,watch}=Vue;
+
+createApp({
+  setup(){
+    // ===== STATE =====
+    const activePage=ref('overview');
+    const globalSearch=ref('');
+    const toasts=ref([]);
+    const showConfirm=ref(false);
+    const confirmTitle=ref('');
+    const confirmMsg=ref('');
+    const confirmIcon=ref('');
+    const confirmDanger=ref(false);
+    let confirmCb=null;
+
+    // ===== NAV ITEMS =====
+    const navItems = [
+      { id: 'overview', label: 'Tổng quan', icon: '📊' },
+      { id: 'users', label: 'Người dùng', icon: '👥' },
+      { id: 'marketplace', label: 'Sàn GD', icon: '🛒' },
+      { id: 'content', label: 'Nội dung', icon: '📝' },
+      { id: 'config', label: 'Cấu hình', icon: '⚙️' },
+      { id: 'logs', label: 'Nhật ký', icon: '📋' }
+    ];
+
+    // ===== GLOBAL SEARCH / TOPBAR =====
+    const handleGlobalSearch = () => {
+      showToast('Đang tìm kiếm toàn cục: ' + globalSearch.value);
+    };
+    const logout = () => {
+      showConfirmModal('Đăng xuất', 'Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?', '⏻', false, () => {
+        showToast('Đăng xuất thành công.');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
+      });
+    };
+
+    // ===== OVERVIEW / STATS =====
+    const stats = reactive({
+      totalUsers: 12847,
+      newUsersToday: 32,
+      iotOnline: 48,
+      iotUptime: 99.9,
+      revenue: '135.000.000',
+      revenueTrend: 15.4,
+      pendingActions: 7
+    });
+
+    const recentActivities = ref([
+      { id: 1, icon: '🌾', bg: 'var(--leaf-light)', user: 'Nguyễn Văn An', action: 'vừa cập nhật nhật ký canh tác', time: '2 phút trước' },
+      { id: 2, icon: '🚨', bg: 'var(--red-light)', user: 'Trần Thị Bích', action: 'báo cáo tranh chấp đơn hàng #ord002', time: '15 phút trước' },
+      { id: 3, icon: '🏪', bg: 'var(--sun-light)', user: 'Đại lý Út Chanh', action: 'đăng ký tài khoản KYC mới', time: '1 giờ trước' },
+      { id: 4, icon: '📢', bg: 'var(--water-light)', user: 'Hệ thống AI', action: 'cảnh báo rầy nâu tại Bến Lức, Long An', time: '2 giờ trước' }
+    ]);
+
+    const roleBreakdown = ref([
+      { icon: '🌾', role: 'Nông dân', count: 8350, pct: 65, color: 'var(--leaf)' },
+      { icon: '🔬', role: 'Kỹ sư', count: 115, pct: 10, color: 'var(--water)' },
+      { icon: '🏪', role: 'Đại lý', count: 420, pct: 15, color: 'var(--sun)' },
+      { icon: '🏢', role: 'Thu mua', count: 120, pct: 10, color: 'var(--earth)' }
+    ]);
+
+    const systemHealth = ref([
+      { name: 'Máy chủ API', icon: '🖥️', ok: true, load: 45 },
+      { name: 'Cơ sở dữ liệu', icon: '🗄️', ok: true, load: 62 },
+      { name: 'Dịch vụ AI chẩn đoán', icon: '🤖', ok: true, load: 85 },
+      { name: 'IoT Telemetry Gateway', icon: '📡', ok: true, load: 30 }
+    ]);
+
+    // ===== USER MANAGEMENT =====
+    const userTab = ref('all');
+    const userSearch = ref('');
+    const userRoleFilter = ref('');
+    const selectedUsers = ref([]);
+    const showUserModal = ref(false);
+    const selectedUser = ref(null);
+    const adminNote = ref('');
+    const currentP = ref(1);
+    const itemsPerPage = 5;
+
+    const usersAll = ref([
+      { id: 1, name: 'Ngô Hoàng Trường Đạt', email: 'datnh@greenova.vn', role: 'farmer', roleIcon: '🌾', roleName: 'Nông dân', area: 'Bến Lức, Long An', joinDate: '2026-06-01', status: 'active', avBg: 'var(--leaf)', initials: 'TĐ', note: 'Nông dân tích cực tham gia chương trình chanh không hạt.' },
+      { id: 2, name: 'Trần Thị Bích', email: 'bichtran@gmail.com', role: 'farmer', roleIcon: '🌾', roleName: 'Nông dân', area: 'Cần Giuộc, Long An', joinDate: '2026-05-20', status: 'pending', avBg: 'var(--earth2)', initials: 'TB', note: '' },
+      { id: 3, name: 'Đại lý Út Chanh', email: 'utchanh@gmail.com', role: 'distributor', roleIcon: '🏪', roleName: 'Đại lý', area: 'Bến Lức, Long An', joinDate: '2026-06-10', status: 'pending', avBg: 'var(--sun)', initials: 'UC', note: '' },
+      { id: 4, name: 'Lê Hữu Phước', email: 'phuocle@gmail.com', role: 'engineer', roleIcon: '🔬', roleName: 'Kỹ sư', area: 'Tân An, Long An', joinDate: '2026-04-15', status: 'active', avBg: 'var(--water)', initials: 'HP', note: 'Chuyên gia bệnh lý học cây trồng tại Long An.' },
+      { id: 5, name: 'Agri Export Co.', email: 'contact@agriexport.vn', role: 'buyer', roleIcon: '🏢', roleName: 'Thu mua', area: 'Tân Trụ, Long An', joinDate: '2026-05-01', status: 'active', avBg: 'var(--earth)', initials: 'AE', note: 'Doanh nghiệp thu mua nông sản sỉ phục vụ xuất khẩu.' },
+      { id: 6, name: 'Nguyễn Văn Hải', email: 'hainv@gmail.com', role: 'farmer', roleIcon: '🌾', roleName: 'Nông dân', area: 'Thạnh Hóa, Long An', joinDate: '2026-03-22', status: 'locked', avBg: 'var(--red)', initials: 'VH', note: 'Tài khoản bị khóa do đăng tải thông tin sai lệch nhiều lần.' }
+    ]);
+
+    const pendingCount = computed(() => usersAll.value.filter(u => u.status === 'pending').length);
+
+    // Filtered users before pagination
+    const filteredUsersRaw = computed(() => {
+      return usersAll.value.filter(u => {
+        const matchesTab = userTab.value === 'all' || u.status === userTab.value;
+        const matchesSearch = !userSearch.value || 
+          u.name.toLowerCase().includes(userSearch.value.toLowerCase()) || 
+          u.email.toLowerCase().includes(userSearch.value.toLowerCase()) || 
+          u.area.toLowerCase().includes(userSearch.value.toLowerCase());
+        const matchesRole = !userRoleFilter.value || u.role === userRoleFilter.value;
+        return matchesTab && matchesSearch && matchesRole;
+      });
+    });
+
+    // Sliced users for the current page
+    const filteredUsers = computed(() => {
+      const start = (currentP.value - 1) * itemsPerPage;
+      return filteredUsersRaw.value.slice(start, start + itemsPerPage);
+    });
+
+    const totalPages = computed(() => Math.ceil(filteredUsersRaw.value.length / itemsPerPage) || 1);
+
+    const allSelected = computed({
+      get() {
+        return filteredUsers.value.length > 0 && filteredUsers.value.every(u => selectedUsers.value.includes(u.id));
+      },
+      set(value) {
+        if (value) {
+          const currentIds = filteredUsers.value.map(u => u.id);
+          selectedUsers.value = [...new Set([...selectedUsers.value, ...currentIds])];
+        } else {
+          const currentIds = filteredUsers.value.map(u => u.id);
+          selectedUsers.value = selectedUsers.value.filter(id => !currentIds.includes(id));
+        }
+      }
+    });
+
+    const toggleAllUsers = () => {
+      allSelected.value = !allSelected.value;
+    };
+
+    const toggleUserSelect = (id) => {
+      const idx = selectedUsers.value.indexOf(id);
+      if (idx > -1) {
+        selectedUsers.value.splice(idx, 1);
+      } else {
+        selectedUsers.value.push(id);
+      }
+    };
+
+    const bulkApprove = () => {
+      const count = selectedUsers.value.length;
+      showConfirmModal('✅ Phê duyệt hàng loạt', `Bạn có chắc muốn phê duyệt ${count} người dùng đã chọn?`, '✅', false, () => {
+        selectedUsers.value.forEach(id => {
+          const u = usersAll.value.find(user => user.id === id);
+          if (u && u.status === 'pending') {
+            u.status = 'active';
+            addLog('approve', 'Duyệt người dùng (Bulk)', `Duyệt tài khoản ${u.email}`);
+          }
+        });
+        showToast(`Đã duyệt thành công ${count} tài khoản.`);
+        selectedUsers.value = [];
+      });
+    };
+
+    const showBulkReject = ref(false);
+    watch(showBulkReject, (newVal) => {
+      if (newVal) {
+        const count = selectedUsers.value.length;
+        showConfirmModal('❌ Từ chối phê duyệt hàng loạt', `Bạn có chắc muốn từ chối phê duyệt ${count} người dùng đã chọn?`, '⚠️', true, () => {
+          selectedUsers.value.forEach(id => {
+            const u = usersAll.value.find(user => user.id === id);
+            if (u && u.status === 'pending') {
+              u.status = 'locked';
+              addLog('ban', 'Từ chối (Bulk)', `Từ chối duyệt tài khoản ${u.email}`);
+            }
+          });
+          showToast(`Đã từ chối duyệt ${count} tài khoản.`);
+          selectedUsers.value = [];
+        });
+        showBulkReject.value = false;
+      }
+    });
+
+    const approveUser = (u) => {
+      u.status = 'active';
+      showToast(`Đã duyệt tài khoản của ${u.name}`);
+      addLog('approve', `Phê duyệt người dùng`, `Kích hoạt tài khoản ${u.email}`);
+    };
+
+    const rejectUser = (u) => {
+      showConfirmModal('❌ Từ chối tài khoản', `Từ chối đăng ký của người dùng ${u.name}?`, '⚠️', true, () => {
+        u.status = 'locked';
+        showToast(`Đã từ chối duyệt tài khoản của ${u.name}`);
+        addLog('ban', `Từ chối người dùng`, `Từ chối tài khoản ${u.email}`);
+      });
+    };
+
+    const viewUser = (u) => {
+      selectedUser.value = u;
+      adminNote.value = u.note || '';
+      showUserModal.value = true;
+    };
+
+    const saveUserNote = () => {
+      if (selectedUser.value) {
+        selectedUser.value.note = adminNote.value;
+        showUserModal.value = false;
+        showToast('Đã lưu ghi chú thành công.');
+      }
+    };
+
+    const confirmLockUser = (u) => {
+      showConfirmModal('🔒 Khóa tài khoản', `Bạn có chắc chắn muốn khóa tài khoản của ${u.name}?`, '🔒', true, () => {
+        u.status = 'locked';
+        showToast(`Đã khóa tài khoản của ${u.name}`);
+        addLog('ban', `Khóa tài khoản`, `Khóa tài khoản ${u.email}`);
+      });
+    };
+
+    const unlockUser = (u) => {
+      u.status = 'active';
+      showToast(`Đã mở khóa tài khoản của ${u.name}`);
+      addLog('approve', `Mở khóa tài khoản`, `Mở khóa tài khoản ${u.email}`);
+    };
+
+    const statusLabel = (status) => {
+      const map = {
+        active: 'Hoạt động',
+        pending: 'Chờ duyệt',
+        locked: 'Đã khóa'
+      };
+      return map[status] || status;
+    };
+
+    const exportUsers = () => {
+      showToast('Đang xuất danh sách người dùng ra file CSV...');
+    };
+
+    // ===== MARKETPLACE MODERATION =====
+    const mktTab = ref('pending');
+    const mktPendingProducts = ref([
+      { id: 1, name: 'Phân bón Kali KCl 60% nhập khẩu', shop: 'Đại lý Út Chanh', date: '2026-06-25', price: '490.000 ₫', stock: 120, unit: 'bao', certified: true, notes: '', icon: '📦', bg: 'var(--leaf-pale)' },
+      { id: 2, name: 'Thuốc trừ sâu hữu cơ thảo mộc Neem', shop: 'Cơ sở nông nghiệp sạch Bến Lức', date: '2026-06-24', price: '120.000 ₫', stock: 50, unit: 'chai', certified: false, notes: 'Mô tả thiếu thông tin an sau bệnh, ảnh bao bì bị mờ.', icon: '🧪', bg: 'var(--red-light)' }
+    ]);
+
+    const mktActiveProducts = ref([
+      { id: 101, name: 'Phân NPK 20-20-15 Bầu Trời', shop: 'Đại lý Út Chanh', price: '580.000 ₫', sold: 1250, rating: 4.8 },
+      { id: 102, name: 'Thuốc trừ sâu Abamectin 3.6EC', shop: 'Đại lý xanh Long An', price: '145.000 ₫', sold: 890, rating: 4.6 }
+    ]);
+
+    const mktReports = ref([
+      { id: 1, title: 'Sản phẩm hết hạn / nhái nhãn mác', desc: 'Đầu bón NPK của Minh Đức có vỏ bao bì in sai phông chữ, nghi là hàng giả thương hiệu.', reporter: 'Nguyễn Văn An', time: '10:30 Hôm nay' },
+      { id: 2, title: 'Giá bán sai lệch nghiêm trọng', desc: 'Đăng bán 1 chai vi sinh với giá gấp 10 lần giá niêm yết trên thị trường.', reporter: 'Trần Thị Bích', time: 'Hôm qua' }
+    ]);
+
+    const mktDisputes = ref([
+      { id: 1, title: 'Tranh chấp đơn hàng #ord002 - Thiếu hàng & Hỏng hóc', urgency: 'high', desc: 'Người mua báo cáo 5 chai Abamectin nhận được có 2 chai bị rò rỉ và nứt vỏ hộp. Người bán từ chối đền bù do cho rằng lỗi vận chuyển.', buyer: 'Trần Thị Bích', seller: 'Đại lý xanh Long An', date: '2026-06-25' }
+    ]);
+
+    const approveProduct = (p) => {
+      mktActiveProducts.value.unshift({
+        id: p.id,
+        name: p.name,
+        shop: p.shop,
+        price: p.price,
+        sold: 0,
+        rating: 5.0
+      });
+      mktPendingProducts.value = mktPendingProducts.value.filter(item => item.id !== p.id);
+      showToast(`Đã duyệt bán sản phẩm: ${p.name}`);
+      addLog('approve', `Duyệt sản phẩm`, `Phê duyệt bán sản phẩm ${p.name}`);
+    };
+
+    const requestEdit = (p) => {
+      showConfirmModal('📝 Yêu cầu sửa', `Gửi yêu cầu chỉnh sửa thông tin cho shop "${p.shop}" về sản phẩm "${p.name}"?`, '📝', false, () => {
+        showToast(`Đã gửi yêu cầu chỉnh sửa cho ${p.shop}.`);
+      });
+    };
+
+    const rejectProduct = (p) => {
+      showConfirmModal('❌ Từ chối sản phẩm', `Bạn có chắc chắn muốn từ chối duyệt sản phẩm "${p.name}"?`, '⚠️', true, () => {
+        mktPendingProducts.value = mktPendingProducts.value.filter(item => item.id !== p.id);
+        showToast(`Đã từ chối duyệt sản phẩm.`);
+      });
+    };
+
+    const viewProductDetail = (p) => {
+      showToast(`Chi tiết sản phẩm: ${p.name}`);
+    };
+
+    const delistProduct = (p) => {
+      showConfirmModal('🛑 Gỡ sản phẩm', `Bạn có chắc muốn gỡ sản phẩm "${p.name}" khỏi sàn thương mại?`, '🛑', true, () => {
+        mktActiveProducts.value = mktActiveProducts.value.filter(item => item.id !== p.id);
+        showToast(`Đã gỡ sản phẩm khỏi sàn.`);
+        addLog('ban', `Gỡ sản phẩm`, `Gỡ sản phẩm ${p.name} khỏi marketplace`);
+      });
+    };
+
+    const dismissReport = (r) => {
+      mktReports.value = mktReports.value.filter(item => item.id !== r.id);
+      showToast('Đã bỏ qua báo cáo vi phạm.');
+    };
+
+    const handleReport = (r) => {
+      showConfirmModal('🚨 Xử lý vi phạm', `Xử lý cảnh cáo và ẩn sản phẩm theo báo cáo: "${r.title}"?`, '🚨', true, () => {
+        mktReports.value = mktReports.value.filter(item => item.id !== r.id);
+        showToast('Đã áp dụng hình thức xử lý vi phạm.');
+      });
+    };
+
+    const resolveDispute = (d, winner) => {
+      let resolution = '';
+      if (winner === 'buyer') resolution = 'Hoàn trả 100% tiền ký quỹ cho Người mua';
+      else if (winner === 'seller') resolution = 'Giải ngân 100% tiền ký quỹ cho Người bán';
+      else resolution = 'Chia đôi tiền ký quỹ 50/50 cho cả hai bên';
+
+      showConfirmModal('⚖️ Giải quyết tranh chấp', `Quyết định trọng tài: ${resolution}?`, '⚖️', false, () => {
+        mktDisputes.value = mktDisputes.value.filter(item => item.id !== d.id);
+        showToast('Đã xử lý tranh chấp thành công.');
+        addLog('approve', `Xử lý tranh chấp`, `Giải quyết tranh chấp đơn hàng #ord002. Kết quả: ${resolution}`);
+      });
+    };
+
+    // ===== CONTENT MODERATION =====
+    const contentTab = ref('reported');
+    const reportedPosts = ref([
+      { id: 1, author: 'Nguyễn Văn Hải', time: '2 giờ trước', reporters: 3, reason: 'Tin đồn thất thiệt', content: 'Dịch rầy nâu bùng phát phá hủy hoàn toàn 100% diện tích chanh tại xã Thạnh Hòa, khuyên bà con chặt bỏ vườn ngay lập tức để nhận hỗ trợ!', av: 'VH', avBg: 'var(--red)' }
+    ]);
+    const aiWarnings = ref([
+      { id: 1, type: 'misinfo', title: 'Nội dung có nguy cơ chứa thông tin sai lệch', desc: 'Bài viết có cụm từ "rầy nâu phá hủy 100%" nhưng dữ liệu trạm quan trắc độ ẩm & sâu bệnh báo về vẫn nằm trong ngưỡng an toàn.', author: 'Nguyễn Văn Hải', confidence: 92 }
+    ]);
+
+    const approvePost = (p) => {
+      reportedPosts.value = reportedPosts.value.filter(item => item.id !== p.id);
+      showToast('Đã phê duyệt giữ lại bài viết.');
+    };
+
+    const warnUser = (p) => {
+      showToast(`Đã gửi thông báo cảnh cáo chính thức tới tài khoản ${p.author}.`);
+    };
+
+    const removePost = (p) => {
+      showConfirmModal('🗑️ Gỡ bài viết', 'Bạn có chắc chắn muốn xóa bài viết vi phạm này?', '🗑️', true, () => {
+        reportedPosts.value = reportedPosts.value.filter(item => item.id !== p.id);
+        showToast('Đã xóa bài viết vi phạm.');
+        addLog('ban', `Gỡ bài viết`, `Xóa bài viết của tác giả ${p.author}`);
+      });
+    };
+
+    const banUser = (p) => {
+      showConfirmModal('🚫 Khóa tài khoản tác giả', `Bạn có chắc muốn khóa vĩnh viễn tài khoản của ${p.author}?`, '🚫', true, () => {
+        const u = usersAll.value.find(user => user.name === p.author);
+        if (u) u.status = 'locked';
+        reportedPosts.value = reportedPosts.value.filter(item => item.id !== p.id);
+        showToast(`Đã khóa tài khoản của ${p.author}`);
+        addLog('ban', `Khóa tài khoản`, `Khóa tài khoản vi phạm của ${p.author}`);
+      });
+    };
+
+    const dismissWarning = (w) => {
+      aiWarnings.value = aiWarnings.value.filter(item => item.id !== w.id);
+      showToast('Đã bỏ qua cảnh báo của AI.');
+    };
+
+    // ===== SYSTEM CONFIG =====
+    const config = reactive({
+      platformName: 'Greenova',
+      language: 'vi',
+      region: 'Bến Lức, Long An, Việt Nam',
+      mapDefault: 'mekong',
+      commissionRate: 3,
+      escrowDays: 2,
+      noKycLimit: 50000000,
+      shippingRate: 15000,
+      aiDiagnosisThreshold: 85,
+      autoEpidemicAlert: true,
+      soilHumidWarning: 35,
+      aiModelVersion: 'Gemini 1.5 Flash - AgriVision v2.5'
+    });
+
+    const notifTemplates = ref([
+      { id: 1, icon: '🚨', title: 'Cảnh báo dịch tễ tự động', preview: 'Phát hiện ổ dịch [bệnh_dịch] tại khu vực [tên_khu_vực]...', enabled: true, editing: false },
+      { id: 2, icon: '🛡️', title: 'Xác minh KYC thành công', preview: 'Chúc mừng! Hồ sơ KYC của bạn đã được phê duyệt...', enabled: true, editing: false }
+    ]);
+
+    const saveConfig = (section) => {
+      showToast(`Đã lưu cài đặt phân hệ "${section}" thành công.`);
+      addLog('config', `Thay đổi cấu hình`, `Cập nhật cấu hình phân hệ ${section}`);
+    };
+
+    const editNotif = (n) => {
+      n.editing = !n.editing;
+      if (!n.editing) {
+        showToast(`Đã cập nhật mẫu thông báo: ${n.title}`);
+      }
+    };
+
+    const dangerAction = (action) => {
+      let title = '';
+      let desc = '';
+      let logAction = '';
+      if (action === 'reset-ai') {
+        title = 'Reset Cache AI';
+        desc = 'Thao tác này sẽ dọn dẹp toàn bộ bộ nhớ đệm chẩn đoán hình ảnh của mô hình AI.';
+        logAction = 'Làm sạch bộ nhớ đệm AI';
+      } else if (action === 'cleanup') {
+        title = 'Dọn dẹp nhật ký cũ';
+        desc = 'Hệ thống sẽ tiến hành lưu trữ và xóa sạch logs thao tác có tuổi đời hơn 90 ngày.';
+        logAction = 'Dọn dẹp logs > 90 ngày';
+      } else if (action === 'maintenance') {
+        title = 'Chế độ bảo trì hệ thống';
+        desc = 'Kích hoạt trang thông báo bảo trì, khóa các luồng đăng nhập và giao dịch của người dùng.';
+        logAction = 'Kích hoạt bảo trì hệ thống';
+      }
+
+      showConfirmModal(title, desc, '⚠️', true, () => {
+        showToast(`Đã thực hiện: ${title}`);
+        addLog('error', `Hành động khẩn cấp`, logAction);
+      });
+    };
+
+    // ===== SYSTEM LOGS =====
+    const logFilter = ref('');
+    const logDateFrom = ref('');
+    const logDateTo = ref('');
+
+    const logs = ref([
+      { id: 1, time: '2026-06-26 11:22:05', type: 'auth', typeIcon: '🔐', typeLabel: 'Xác thực', user: 'Admin System', action: 'Đăng nhập hệ thống', detail: 'Đăng nhập thành công từ IP 192.168.1.10', ip: '192.168.1.10' },
+      { id: 2, time: '2026-06-26 10:15:30', type: 'approve', typeIcon: '✅', typeLabel: 'Duyệt', user: 'Admin System', action: 'Phê duyệt KYC', detail: 'Duyệt tài khoản Nông dân Ngô Hoàng Trường Đạt', ip: '192.168.1.10' },
+      { id: 3, time: '2026-06-26 09:05:12', type: 'config', typeIcon: '⚙️', typeLabel: 'Cấu hình', user: 'Admin System', action: 'Thay đổi commissionRate', detail: 'Cập nhật phí hoa hồng sàn từ 2% -> 3%', ip: '192.168.1.10' }
+    ]);
+
+    const filteredLogs = computed(() => {
+      return logs.value.filter(l => {
+        const matchesType = !logFilter.value || l.type === logFilter.value;
+        const matchesDateFrom = !logDateFrom.value || new Date(l.time.split(' ')[0]) >= new Date(logDateFrom.value);
+        const matchesDateTo = !logDateTo.value || new Date(l.time.split(' ')[0]) <= new Date(logDateTo.value);
+        return matchesType && matchesDateFrom && matchesDateTo;
+      });
+    });
+
+    const logBadgeClass = (type) => {
+      const map = {
+        auth: 'badge-blue',
+        approve: 'badge-green',
+        ban: 'badge-red',
+        config: 'badge-sun',
+        error: 'badge-red'
+      };
+      return map[type] || 'badge-gray';
+    };
+
+    const exportLogs = () => {
+      showToast('Đang xuất nhật ký hệ thống ra file CSV...');
+    };
+
+    // ===== CONFIRM MODAL HELPER =====
+    const showConfirmModal = (title, msg, icon, danger, cb) => {
+      confirmTitle.value = title;
+      confirmMsg.value = msg;
+      confirmIcon.value = icon;
+      confirmDanger.value = danger;
+      confirmCb = cb;
+      showConfirm.value = true;
+    };
+
+    const confirmAction = () => {
+      if (confirmCb) confirmCb();
+      showConfirm.value = false;
+    };
+
+    // ===== TOASTS & LOGGERS =====
+    const showToast = (msg, type = 'leaf') => {
+      const id = Date.now();
+      toasts.value.push({ id, m: msg, type });
+      setTimeout(() => {
+        toasts.value = toasts.value.filter(t => t.id !== id);
+      }, 3000);
+    };
+
+    const addLog = (type, action, detail) => {
+      const pad = (n) => n.toString().padStart(2, '0');
+      const now = new Date();
+      const timeStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+      
+      const typeIcons = { auth: '🔐', approve: '✅', ban: '🚫', config: '⚙️', error: '❌' };
+      const typeLabels = { auth: 'Xác thực', approve: 'Duyệt', ban: 'Khóa', config: 'Cấu hình', error: 'Lỗi' };
+      
+      logs.value.unshift({
+        id: logs.value.length + 1,
+        time: timeStr,
+        type,
+        typeIcon: typeIcons[type] || '📝',
+        typeLabel: typeLabels[type] || 'Khác',
+        user: 'Admin System',
+        action,
+        detail,
+        ip: '127.0.0.1'
+      });
+    };
+
+    // ===== CHART INITIALIZATION =====
+    let chartInstance = null;
+    const initChart = () => {
+      setTimeout(() => {
+        const ctx = document.getElementById('chartOverview');
+        if (ctx) {
+          if (chartInstance) chartInstance.destroy();
+          chartInstance = new Chart(ctx, {
+            type: 'line',
+          data: {
+            labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+            datasets: [
+              {
+                label: 'Người dùng hoạt động',
+                data: [12200, 12350, 12400, 12500, 12620, 12750, 12847],
+                borderColor: '#3a7d1a',
+                backgroundColor: 'rgba(58, 125, 26, 0.08)',
+                fill: true,
+                tension: 0.4
+              },
+              {
+                label: 'Giao dịch giao thương',
+                data: [450, 520, 480, 610, 750, 890, 950],
+                borderColor: '#2196F3',
+                backgroundColor: 'rgba(33, 150, 243, 0.08)',
+                fill: true,
+                tension: 0.4
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  font: {
+                    family: 'Nunito',
+                    weight: 'bold'
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(212, 200, 184, 0.4)'
+                },
+                ticks: {
+                  font: {
+                    family: 'Nunito'
+                  }
+                }
+              },
+              x: {
+                grid: {
+                  display: false
+                },
+                ticks: {
+                  font: {
+                    family: 'Nunito'
+                  }
+                }
+              }
+            }
+            }
+          });
+        }
+      }, 100);
+    };
+
+    onMounted(() => {
+      initChart();
+    });
+
+    watch(activePage, (newPage) => {
+      if (newPage === 'overview') {
+        initChart();
+      }
+    });
+
+    return {
+      activePage,
+      globalSearch,
+      toasts,
+      showConfirm,
+      confirmTitle,
+      confirmMsg,
+      confirmIcon,
+      confirmDanger,
+      confirmAction,
+      
+      navItems,
+      handleGlobalSearch,
+      logout,
+      
+      stats,
+      recentActivities,
+      roleBreakdown,
+      systemHealth,
+      
+      userTab,
+      userSearch,
+      userRoleFilter,
+      selectedUsers,
+      usersAll,
+      pendingCount,
+      allSelected,
+      toggleAllUsers,
+      toggleUserSelect,
+      statusLabel,
+      approveUser,
+      rejectUser,
+      viewUser,
+      saveUserNote,
+      confirmLockUser,
+      unlockUser,
+      totalPages,
+      currentP,
+      filteredUsers,
+      exportUsers,
+      bulkApprove,
+      showBulkReject,
+      
+      mktTab,
+      mktPendingProducts,
+      approveProduct,
+      requestEdit,
+      rejectProduct,
+      mktActiveProducts,
+      viewProductDetail,
+      delistProduct,
+      mktReports,
+      dismissReport,
+      handleReport,
+      mktDisputes,
+      resolveDispute,
+      
+      contentTab,
+      reportedPosts,
+      approvePost,
+      warnUser,
+      removePost,
+      banUser,
+      aiWarnings,
+      dismissWarning,
+      
+      config,
+      saveConfig,
+      notifTemplates,
+      editNotif,
+      dangerAction,
+      
+      logFilter,
+      logDateFrom,
+      logDateTo,
+      filteredLogs,
+      logBadgeClass,
+      exportLogs,
+      
+      showUserModal,
+      selectedUser,
+      adminNote
+    };
+  }
+}).mount('#app');
+</script>
+</body>
+</html>

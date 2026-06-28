@@ -175,19 +175,21 @@ export function FeedPage({ state, setState, role, notify }) {
       </aside>
 
       <main className="fb-center-feed">
-        <div className="fb-stories">
-          {[
-            ['Vườn chanh', 'Độ ẩm thấp, van đã bật'],
-            ['Khóm ven kênh', 'Cần kiểm tra lá vàng'],
-            ['Kỹ sư Khoa', 'Mẹo phòng nấm lá'],
-          ].map(([title, desc]) => (
-            <article key={title} className="fb-story-card">
-              <div className="fb-story-avatar">{title.charAt(0)}</div>
-              <strong>{title}</strong>
-              <span>{desc}</span>
-            </article>
-          ))}
-        </div>
+        {role !== 'expert' && (
+          <div className="fb-stories">
+            {[
+              ['Vườn chanh', 'Độ ẩm thấp, van đã bật'],
+              ['Khóm ven kênh', 'Cần kiểm tra lá vàng'],
+              ['Kỹ sư Khoa', 'Mẹo phòng nấm lá'],
+            ].map(([title, desc]) => (
+              <article key={title} className="fb-story-card">
+                <div className="fb-story-avatar">{title.charAt(0)}</div>
+                <strong>{title}</strong>
+                <span>{desc}</span>
+              </article>
+            ))}
+          </div>
+        )}
 
         <article className="fb-composer">
           <div className="fb-composer-top">
@@ -214,9 +216,18 @@ export function FeedPage({ state, setState, role, notify }) {
             placeholder="Tag, cách nhau bằng dấu phẩy"
           />
           <div className="fb-composer-actions">
-            <button onClick={() => seedComposer('photo')}><Camera size={19} /> Ảnh vườn</button>
-            <button onClick={() => seedComposer('symptom')}><ImageIcon size={19} /> Triệu chứng</button>
-            <button onClick={() => seedComposer('mood')}><Smile size={19} /> Cảm nhận</button>
+            {role === 'expert' ? (
+              <>
+                <button onClick={() => seedComposer('photo')}><Camera size={19} /> Báo cáo hình ảnh</button>
+                <button onClick={() => seedComposer('symptom')}><AlertTriangle size={19} /> Cảnh báo diện rộng</button>
+              </>
+            ) : (
+              <>
+                <button onClick={() => seedComposer('photo')}><Camera size={19} /> Ảnh vườn</button>
+                <button onClick={() => seedComposer('symptom')}><ImageIcon size={19} /> Triệu chứng</button>
+                <button onClick={() => seedComposer('mood')}><Smile size={19} /> Cảm nhận</button>
+              </>
+            )}
             <button className="fb-post-button" onClick={createPost}><Send size={16} /> Đăng</button>
           </div>
         </article>

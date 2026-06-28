@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgriSup – Nông Cụ & Phân Bón</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f6f1eb;--bg2:#ede7df;--surface:#ffffff;--surface2:#faf7f3;
+  --border:#ddd5ca;--border2:#c9bfb2;
+  --accent:#2d6a4f;--accent2:#40916c;--accent3:#1b4332;--accent-light:#52b788;--accent-soft:#2d6a4f10;--accent-med:#2d6a4f22;
+  --green:#2d6a4f;--green-soft:#2d6a4f10;
+  --red:#d62828;--red-soft:#d6282810;
+  --blue:#1d3557;--blue-soft:#1d355710;
+  --amber:#e76f51;--amber-soft:#e76f5110;
+  --teal:#0a9396;--teal-soft:#0a939610;
+  --brown:#6b4226;--brown-soft:#6b422610;
+  --text:#1a1a1a;--text2:#5c564e;--text3:#9a9389;
+  --radius:14px;--rs:10px;--rxs:8px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06);--shadow:0 4px 16px rgba(0,0,0,.07);--shadow-lg:0 12px 40px rgba(0,0,0,.1);
+  --font-head:'Instrument Serif',serif;--font-body:'DM Sans',sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+html{font-size:15px}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 0% 0%,#2d6a4f08 0%,transparent 50%),radial-gradient(ellipse at 100% 100%,#e76f5106 0%,transparent 50%)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.au{animation:fadeUp .4s cubic-bezier(.22,1,.36,1) both}.ai{animation:fadeIn .3s ease both}.asc{animation:scaleIn .3s ease both}
+.d1{animation-delay:.05s}.d2{animation-delay:.1s}.d3{animation-delay:.15s}.d4{animation-delay:.2s}.d5{animation-delay:.25s}.d6{animation-delay:.3s}.d7{animation-delay:.35s}
+
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ===== BUTTONS ===== */
+.btn{padding:8px 16px;border-radius:var(--rxs);font-size:.76rem;font-weight:600;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:5px;font-family:var(--font-body);white-space:nowrap;letter-spacing:.01em}
+.btn-primary{background:var(--accent);color:#fff;font-weight:700}.btn-primary:hover{background:var(--accent3);transform:translateY(-1px);box-shadow:0 4px 12px rgba(45,106,79,.25)}
+.btn-amber{background:var(--amber);color:#fff;font-weight:700}.btn-amber:hover{opacity:.9;transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text2)}.btn-outline:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.btn-ghost{background:transparent;border:none;color:var(--text3);padding:5px 8px}.btn-ghost:hover{color:var(--accent);background:var(--accent-soft)}
+.btn-sm{padding:6px 12px;font-size:.72rem;border-radius:var(--rxs)}
+.btn-xs{padding:5px 10px;font-size:.65rem;border-radius:7px}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-icon{width:34px;height:34px;border-radius:var(--rxs);border:1.5px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:.75rem;color:var(--text2)}
+.btn-icon:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+/* ===== LAYOUT ===== */
+.shell{display:flex;min-height:100vh;position:relative;z-index:1}
+.side{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:90}
+.side-logo{padding:18px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.logo-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:var(--rxs);display:flex;align-items:center;justify-content:center;font-size:1rem;color:#fff;flex-shrink:0}
+.side-logo-text{font-family:var(--font-head);font-size:1.35rem;color:var(--accent);line-height:1.05}
+.side-logo-sub{font-size:.5rem;color:var(--text3);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.side-nav{flex:1;min-height:0;padding:8px 8px;overflow-y:auto;display:flex;flex-direction:column;gap:1px}
+.sn{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--rs);color:var(--text3);cursor:pointer;transition:all .15s;font-size:.78rem;font-weight:500;border:none;background:none;width:100%;text-align:left;font-family:var(--font-body)}
+.sn:hover{background:var(--accent-soft);color:var(--accent)}
+.sn.on{background:var(--accent-soft);color:var(--accent);font-weight:700;box-shadow:inset 3px 0 0 var(--accent)}
+.sn .ic{font-size:.9rem;width:20px;text-align:center}
+.sn .cnt{margin-left:auto;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:var(--red);color:#fff;font-size:.48rem;font-weight:800;padding:0 4px}
+.side-label{padding:16px 12px 4px;font-size:.52rem;color:var(--text3);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.side-profile{padding:12px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sp-av{width:32px;height:32px;border-radius:var(--rxs);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;font-family:var(--font-mono);flex-shrink:0}
+.sp-name{font-size:.76rem;font-weight:700}.sp-role{font-size:.56rem;color:var(--text3)}
+
+.main{flex:1;margin-left:240px;min-height:100vh}
+.topbar{height:54px;position:sticky;top:0;z-index:80;background:rgba(246,241,235,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:12px}
+.topbar-title{font-family:var(--font-head);font-size:1.15rem;flex:1}
+.topbar-right{display:flex;gap:6px;align-items:center}
+.topbar-right .btn-icon{position:relative}.topbar-right .btn-icon .dot{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--red);border:1.5px solid var(--surface)}
+
+.page{padding:20px 22px;max-width:1280px;margin:0 auto}
+.ph{margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.ph h1{font-family:var(--font-head);font-size:1.5rem}
+.ph p{color:var(--text3);font-size:.78rem}
+
+/* ===== COMPONENTS ===== */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);transition:all .2s}
+.card:hover{box-shadow:var(--shadow)}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border)}
+.ch h4{font-size:.82rem;font-weight:700;display:flex;align-items:center;gap:7px}
+.cb{padding:16px}
+
+/* Stat */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.st{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;transition:all .22s}
+.st:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
+.st::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:.7}
+.st-green::before{background:var(--accent)}.st-amber::before{background:var(--amber)}.st-blue::before{background:var(--blue)}.st-teal::before{background:var(--teal)}
+.st-ic{width:32px;height:32px;border-radius:var(--rxs);display:flex;align-items:center;justify-content:center;font-size:.85rem;margin-bottom:8px}
+.st-val{font-family:var(--font-head);font-size:1.45rem;line-height:1}
+.st-lbl{font-size:.66rem;color:var(--text3);font-weight:500;margin-top:2px}
+.st-tag{font-size:.55rem;font-weight:700;margin-top:4px;display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:6px}
+.st-tag.up{background:var(--green-soft);color:var(--accent)}.st-tag.dn{background:var(--red-soft);color:var(--red)}.st-tag.warn{background:var(--amber-soft);color:var(--amber)}
+
+/* Grids */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}.g21{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}.g31{display:grid;grid-template-columns:3fr 1fr;gap:12px;margin-bottom:12px}.g12{display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-bottom:12px}
+
+/* Table */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.76rem}
+thead th{text-align:left;padding:9px 14px;color:var(--text3);font-weight:700;font-size:.58rem;text-transform:uppercase;letter-spacing:.06em;border-bottom:2px solid var(--border);white-space:nowrap}
+tbody td{padding:9px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr{transition:background .12s}
+tbody tr:hover{background:var(--accent-soft)}
+
+/* Badge */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:.56rem;font-weight:700;white-space:nowrap}
+.badge-green{background:var(--green-soft);color:var(--accent);border:1px solid var(--accent-med)}
+.badge-red{background:var(--red-soft);color:var(--red);border:1px solid rgba(214,40,40,.15)}
+.badge-amber{background:var(--amber-soft);color:var(--amber);border:1px solid rgba(231,111,81,.15)}
+.badge-blue{background:var(--blue-soft);color:var(--blue);border:1px solid rgba(29,53,87,.12)}
+.badge-teal{background:var(--teal-soft);color:var(--teal);border:1px solid rgba(10,147,150,.12)}
+.badge-brown{background:var(--brown-soft);color:var(--brown);border:1px solid rgba(107,66,38,.12)}
+.badge-gray{background:var(--bg2);color:var(--text3);border:1px solid var(--border)}
+.badge-green-solid{background:var(--accent);color:#fff}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;background:var(--bg2);border-radius:var(--rs);padding:2px;margin-bottom:14px}
+.tab{padding:8px 16px;border:none;background:transparent;color:var(--text3);cursor:pointer;border-radius:var(--rxs);font-size:.74rem;font-weight:600;transition:all .15s;font-family:var(--font-body);white-space:nowrap}
+.tab:hover{color:var(--text2)}.tab.active{background:var(--surface);color:var(--accent);font-weight:700;box-shadow:var(--shadow-sm)}
+.tab .n{display:inline-flex;align-items:center;justify-content:center;min-width:15px;height:15px;border-radius:9px;background:var(--red);color:#fff;font-size:.46rem;font-weight:800;margin-left:4px;padding:0 4px}
+
+/* Chart */
+.chart-box{position:relative;height:220px}
+
+/* Order row */
+.orow{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);transition:all .15s;cursor:pointer;align-items:center}
+.orow:last-child{border-bottom:none}.orow:hover{background:var(--accent-soft)}
+.orow-ic{width:40px;height:40px;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.orow-info{flex:1;min-width:0}
+.orow-title{font-weight:700;font-size:.82rem;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.orow-meta{font-size:.66rem;color:var(--text3);display:flex;gap:10px;flex-wrap:wrap;margin-top:2px}
+
+/* Product card */
+.pcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);transition:all .22s;cursor:pointer}
+.pcard:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.pcard-img{height:130px;display:flex;align-items:center;justify-content:center;font-size:2.8rem;position:relative}
+.pcard-badges{position:absolute;top:8px;left:8px;display:flex;gap:3px;flex-wrap:wrap}
+.pcard-body{padding:12px 14px}
+.pcard-cat{font-size:.52rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:2px}
+.pcard-name{font-weight:700;font-size:.88rem;margin-bottom:4px;line-height:1.25}
+.pcard-desc{font-size:.68rem;color:var(--text2);margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pcard-price{display:flex;align-items:center;justify-content:space-between}
+.pcard-price-val{font-family:var(--font-head);font-size:1.15rem;color:var(--accent)}
+.pcard-stock{font-size:.58rem;font-weight:700;display:flex;align-items:center;gap:3px}
+.pcard-stock.ok{color:var(--accent)}.pcard-stock.low{color:var(--amber)}.pcard-stock.out{color:var(--red)}
+
+/* Progress */
+.prog{height:5px;background:var(--bg2);border-radius:3px;overflow:hidden}
+.prog-f{height:100%;border-radius:3px;transition:width .5s cubic-bezier(.22,1,.36,1)}
+
+/* Search */
+.search-box{flex:1;min-width:180px;padding:8px 14px;border:1.5px solid var(--border);border-radius:var(--rxs);font-size:.8rem;outline:none;background:var(--surface);color:var(--text);font-family:var(--font-body);transition:border .2s}
+.search-box:focus{border-color:var(--accent)}
+
+/* Select */
+.sel{padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--rxs);font-size:.78rem;font-family:var(--font-body);background:var(--surface);color:var(--text);cursor:pointer;outline:none}
+
+/* Modal */
+.modal-ov{position:fixed;inset:0;background:rgba(26,26,26,.4);z-index:200;display:flex;align-items:center;justify-content:center;animation:fadeIn .15s;backdrop-filter:blur(6px)}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:580px;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:fadeUp .25s cubic-bezier(.22,1,.36,1)}
+.modal-h{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1}
+.modal-h h3{font-family:var(--font-head);font-size:1.05rem}
+.modal-x{width:28px;height:28px;border-radius:var(--rxs);border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:var(--text3);transition:all .2s}.modal-x:hover{background:var(--red-soft);color:var(--red);border-color:var(--red)}
+.modal-b{padding:18px}
+.modal-f{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid var(--border);background:var(--bg2)}
+
+/* Form */
+.fg{margin-bottom:12px}.fg label{display:block;font-size:.7rem;color:var(--text2);margin-bottom:4px;font-weight:600}
+.fg input,.fg select,.fg textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--rxs);font-size:.82rem;color:var(--text);background:var(--surface);outline:none;transition:all .2s;font-family:var(--font-body)}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.fg textarea{resize:vertical;min-height:60px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* Toast */
+.toast-box{position:fixed;bottom:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:6px}
+.toast{padding:10px 16px;border-radius:var(--rs);background:var(--surface);border:1px solid var(--accent);color:var(--text);font-size:.78rem;box-shadow:var(--shadow-lg);animation:fadeUp .25s ease both;display:flex;align-items:center;gap:7px;font-weight:600}
+.toast.green{border-color:var(--accent)}.toast.red{border-color:var(--red)}.toast.amber{border-color:var(--amber)}
+
+/* Responsive */
+@media(max-width:1000px){
+  .side{display:none}.main{margin-left:0}
+  .stat-row{grid-template-columns:repeat(2,1fr)}
+  .g2,.g21,.g12{grid-template-columns:1fr}
+  .g3{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .stat-row{grid-template-columns:1fr}.g3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="shell">
+
+<!-- ===== SIDEBAR ===== -->
+<aside class="side">
+  <div class="side-logo">
+    <div class="logo-mark">🌱</div>
+    <div><div class="side-logo-text">AgriSup</div><div class="side-logo-sub">Nông cụ & Phân bón</div></div>
+  </div>
+  <nav class="side-nav">
+    <div class="side-label">Chính</div>
+    <button v-for="n in mainNav" :key="n.id" class="sn" :class="{on:page===n.id}" @click="page=n.id">
+      <span class="ic">{{n.icon}}</span>{{n.label}}<span v-if="n.badge" class="cnt">{{typeof n.badge==='function'?n.badge():n.badge}}</span>
+    </button>
+    <div class="side-label">Kinh doanh</div>
+    <button v-for="n in bizNav" :key="n.id" class="sn" :class="{on:page===n.id}" @click="page=n.id">
+      <span class="ic">{{n.icon}}</span>{{n.label}}<span v-if="n.badge" class="cnt">{{typeof n.badge==='function'?n.badge():n.badge}}</span>
+    </button>
+    <div class="side-label">Hệ thống</div>
+    <button v-for="n in sysNav" :key="n.id" class="sn" :class="{on:page===n.id}" @click="page=n.id">
+      <span class="ic">{{n.icon}}</span>{{n.label}}<span v-if="n.badge" class="cnt">{{typeof n.badge==='function'?n.badge():n.badge}}</span>
+    </button>
+  </nav>
+  <div class="side-profile" style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:8px">
+    <div style="display:flex;align-items:center;gap:10px;min-width:0">
+      <div class="sp-av">AS</div>
+      <div style="min-width:0"><div class="sp-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">AgriSup ĐBSCL</div><div class="sp-role">Cửa hàng nông nghiệp</div></div>
+    </div>
+    <button class="btn-icon btn-xs" title="Đăng xuất" @click="logout" style="color:var(--red);border-color:rgba(214,40,40,0.15);background:transparent;flex-shrink:0">⏻</button>
+  </div>
+</aside>
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+<header class="topbar">
+  <div class="topbar-title">{{pageTitle}}</div>
+  <div class="topbar-right">
+    <div class="btn-icon" title="Tìm kiếm">🔍</div>
+    <div class="btn-icon" title="Thông báo" @click="page='notifications'" style="position:relative">🔔<span v-if="unreadNotifs>0" class="dot"></span></div>
+    <div class="btn-icon" title="Cài đặt">⚙️</div>
+    <button class="btn-icon" title="Đăng xuất" @click="logout" style="color:var(--red);border-color:rgba(214,40,40,0.15)">⏻</button>
+  </div>
+</header>
+
+<div class="page">
+
+<!-- ========== TỔNG QUAN ========== -->
+<template v-if="page==='home'">
+  <div class="ph au d1"><div><h1>Xin chào, AgriSup 🌾</h1><p>{{todayStr}} · Mùa vụ: Đông Xuân 2026</p></div><button class="btn btn-primary" @click="showNewOrder=true">+ Đơn hàng mới</button></div>
+
+  <div class="stat-row">
+    <div class="st st-green au d1"><div class="st-ic" style="background:var(--green-soft)">🛒</div><div class="st-val">{{dash.todaySales}}</div><div class="st-lbl">Đơn hàng hôm nay</div><div class="st-tag up">↑ {{dash.todaySalesGrowth}}% vs hôm qua</div></div>
+    <div class="st st-amber au d2"><div class="st-ic" style="background:var(--amber-soft)">💰</div><div class="st-val">{{dash.todayRevenue}} tr</div><div class="st-lbl">Doanh thu hôm nay</div><div class="st-tag up">↑ {{dash.revenueGrowth}}% tuần này</div></div>
+    <div class="st st-blue au d3"><div class="st-ic" style="background:var(--blue-soft)">📦</div><div class="st-val">{{dash.totalProducts}}</div><div class="st-lbl">Sản phẩm đang bán</div><div class="st-tag" :class="dash.lowStock>0?'warn':'up'" v-if="dash.lowStock>0">⚠ {{dash.lowStock}} sắp hết hàng</div></div>
+    <div class="st st-teal au d4"><div class="st-ic" style="background:var(--teal-soft)">👥</div><div class="st-val">{{dash.customers}}</div><div class="st-lbl">Khách hàng tháng này</div><div class="st-tag up">+{{dash.newCustomers}} mới</div></div>
+  </div>
+
+  <div class="g21">
+    <div class="card au d3">
+      <div class="ch"><h4>🧾 Đơn hàng gần đây</h4><button class="btn btn-xs btn-outline" @click="page='orders'">Xem tất cả →</button></div>
+      <div v-for="o in orders.slice(0,7)" :key="o.id" class="orow" @click="openOrderDetail(o)">
+        <div class="orow-ic" :style="{background:o.custBg}">{{o.custIcon}}</div>
+        <div class="orow-info">
+          <div class="orow-title">{{o.id}} <span class="badge" :class="orderStatusBadge(o.status)">{{o.statusLabel}}</span></div>
+          <div class="orow-meta"><span>{{o.custIcon}} {{o.customer}}</span><span>📦 {{o.items.length}} sản phẩm</span><span>{{o.time}}</span></div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:var(--font-head);font-size:1rem;color:var(--accent)">{{formatPrice(o.total)}}</div>
+          <div style="font-size:.58rem;color:var(--text3)">{{o.paymentLabel}}</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card au d4">
+        <div class="ch"><h4>⚠️ Sắp hết hàng</h4></div>
+        <div class="cb">
+          <div v-for="p in lowStockProducts" :key="p.id" style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">
+            <div style="font-size:1rem">{{p.icon}}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:.76rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{p.name}}</div>
+              <div class="prog" style="margin-top:3px"><div class="prog-f" :style="{width:(p.stock/p.maxStock*100)+'%',background:p.stock<10?'var(--red)':'var(--amber)'}"></div></div>
+            </div>
+            <div style="font-size:.65rem;font-weight:700;min-width:45px;text-align:right" :style="{color:p.stock<10?'var(--red)':'var(--amber)'}">{{p.stock}} {{p.unit}}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card au d5">
+        <div class="ch"><h4>🌾 Nhu cầu theo mùa vụ</h4></div>
+        <div class="cb">
+          <div v-for="s in seasonalDemands" :key="s.name" style="display:flex;align-items:center;gap:8px;padding:6px 0">
+            <div style="font-size:.9rem;width:24px;text-align:center">{{s.icon}}</div>
+            <div style="flex:1"><div style="font-size:.72rem;font-weight:600">{{s.name}}</div></div>
+            <div class="prog" style="width:70px"><div class="prog-f" :style="{width:s.demand+'%',background:'var(--accent)'}"></div></div>
+            <div style="font-size:.62rem;font-weight:700;color:var(--accent);min-width:28px;text-align:right">{{s.demand}}%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue chart -->
+  <div class="card au d6">
+    <div class="ch"><h4>📈 Doanh thu & đơn hàng 7 ngày</h4>
+      <div style="display:flex;gap:3px">
+        <button v-for="v in ['revenue','orders']" :key="v" class="btn btn-xs" :class="chartView===v?'btn-primary':'btn-outline'" @click="chartView=v;initHomeChart()">{{v==='revenue'?'Doanh thu':'Đơn hàng'}}</button>
+      </div>
+    </div>
+    <div class="cb"><div class="chart-box"><canvas id="homeChart"></canvas></div></div>
+  </div>
+</template>
+
+<!-- ========== SẢN PHẨM ========== -->
+<template v-if="page==='products'">
+  <div class="ph"><div><h1>📦 Sản phẩm</h1><p>{{products.length}} sản phẩm · {{lowStockProducts.length}} sắp hết hàng</p></div>
+    <button class="btn btn-primary" @click="showNewProduct=true">+ Thêm sản phẩm</button>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <input class="search-box" placeholder="🔍 Tên sản phẩm, mã SKU, hoạt chất..." v-model="prodSearch" style="max-width:320px">
+    <select class="sel" v-model="prodCat"><option value="">Tất cả danh mục</option><option v-for="c in categories" :key="c" :value="c">{{c}}</option></select>
+    <select class="sel" v-model="prodStock"><option value="">Tất cả tồn kho</option><option value="low">Sắp hết</option><option value="out">Hết hàng</option></select>
+  </div>
+
+  <div class="tabs">
+    <button class="tab" :class="{active:prodTab==='grid'}" @click="prodTab='grid'">Lưới</button>
+    <button class="tab" :class="{active:prodTab==='table'}" @click="prodTab='table'">Bảng</button>
+  </div>
+
+  <!-- Grid view -->
+  <template v-if="prodTab==='grid'">
+    <div class="g3">
+      <div v-for="p in filteredProducts" :key="p.id" class="pcard au" @click="openProductDetail(p)">
+        <div class="pcard-img" :style="{background:p.bg}">
+          {{p.icon}}
+          <div class="pcard-badges">
+            <span v-if="p.isNew" class="badge badge-green-solid" style="font-size:.45rem">MỚI</span>
+            <span v-if="p.hot" class="badge" style="background:var(--amber);color:#fff;font-size:.45rem">BÁN CHẠY</span>
+            <span v-if="p.stock<10&&p.stock>0" class="badge badge-amber" style="font-size:.45rem">SẮP HẾT</span>
+            <span v-if="p.stock===0" class="badge badge-red" style="font-size:.45rem">HẾT HÀNG</span>
+          </div>
+        </div>
+        <div class="pcard-body">
+          <div class="pcard-cat">{{p.category}}</div>
+          <div class="pcard-name">{{p.name}}</div>
+          <div class="pcard-desc">{{p.desc}}</div>
+          <div class="pcard-price">
+            <div class="pcard-price-val">{{formatPrice(p.price)}}<span style="font-family:var(--font-body);font-size:.58rem;color:var(--text3)">/{{p.priceUnit}}</span></div>
+            <div class="pcard-stock" :class="p.stock===0?'out':p.stock<10?'low':'ok'">
+              ● {{p.stock}} {{p.unit}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- Table view -->
+  <template v-if="prodTab==='table'">
+    <div class="card au d1">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Sản phẩm</th><th>Danh mục</th><th>Giá bán</th><th>Tồn kho</th><th>Đã bán (tháng)</th><th>Nhà SX</th><th>Trạng thái</th><th></th></tr></thead>
+        <tbody>
+          <tr v-for="p in filteredProducts" :key="p.id">
+            <td><div style="display:flex;align-items:center;gap:8px"><div style="font-size:1.1rem">{{p.icon}}</div><div><div style="font-weight:700;font-size:.82rem">{{p.name}}</div><div style="font-size:.58rem;color:var(--text3)">SKU: {{p.sku}}</div></div></div></td>
+            <td><span class="badge" :class="catBadge(p.category)">{{p.category}}</span></td>
+            <td style="font-weight:700;color:var(--accent);font-family:var(--font-mono);font-size:.78rem">{{formatPrice(p.price)}}/{{p.priceUnit}}</td>
+            <td><span :style="{color:p.stock===0?'var(--red)':p.stock<10?'var(--amber)':'var(--text)',fontWeight:700}">{{p.stock}} {{p.unit}}</span></td>
+            <td style="font-weight:600">{{p.soldMonth}}</td>
+            <td style="font-size:.76rem">{{p.manufacturer}}</td>
+            <td><span class="badge" :class="p.stock===0?'badge-red':p.stock<10?'badge-amber':'badge-green'">{{p.stock===0?'Hết hàng':p.stock<10?'Sắp hết':'Còn hàng'}}</span></td>
+            <td><button class="btn btn-xs btn-outline" @click="openProductDetail(p)">Chi tiết</button></td>
+          </tr>
+        </tbody>
+        </table>
+      </div>
+    </div>
+  </template>
+</template>
+
+<!-- ========== ĐƠN HÀNG ========== -->
+<template v-if="page==='orders'">
+  <div class="ph"><div><h1>🧾 Đơn hàng</h1><p>{{orders.length}} đơn · Tháng này: {{dash.monthlyOrders}} đơn / {{formatPrice(dash.monthlyRevenue)}} doanh thu</p></div>
+    <button class="btn btn-primary" @click="showNewOrder=true">+ Tạo đơn hàng</button>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <input class="search-box" placeholder="🔍 Mã đơn, tên khách, SĐT..." v-model="orderSearch" style="max-width:300px">
+    <select class="sel" v-model="orderStatusF"><option value="">Tất cả</option><option value="pending">Chờ xử lý</option><option value="confirmed">Đã xác nhận</option><option value="packing">Đang đóng gói</option><option value="delivering">Đang giao</option><option value="completed">Hoàn thành</option><option value="cancelled">Đã hủy</option></select>
+    <select class="sel" v-model="orderPayF"><option value="">Thanh toán</option><option value="cash">Tiền mặt</option><option value="transfer">Chuyển khoản</option><option value="credit">Ghi nợ</option></select>
+  </div>
+
+  <div class="tabs">
+    <button class="tab" :class="{active:orderTab==='all'}" @click="orderTab='all'">Tất cả <span class="n">{{filteredOrders.length}}</span></button>
+    <button class="tab" :class="{active:orderTab==='pending'}" @click="orderTab='pending'">Chờ xử lý <span class="n">{{orders.filter(o=>o.status==='pending').length}}</span></button>
+    <button class="tab" :class="{active:orderTab==='credit'}" @click="orderTab='credit'">Ghi nợ <span class="n">{{orders.filter(o=>o.payment==='credit').length}}</span></button>
+    <button class="tab" :class="{active:orderTab==='today'}" @click="orderTab='today'">Hôm nay</button>
+  </div>
+
+  <div class="card au d1">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Sản phẩm</th><th>Tổng tiền</th><th>Thanh toán</th><th>Trạng thái</th><th>Thời gian</th><th></th></tr></thead>
+        <tbody>
+          <tr v-for="o in displayOrders" :key="o.id">
+            <td style="font-weight:700;font-family:var(--font-mono);font-size:.72rem;color:var(--accent)">{{o.id}}</td>
+            <td><div style="display:flex;align-items:center;gap:7px"><div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;background:var(--accent-soft);color:var(--accent);font-weight:800">{{o.custIcon}}</div><div><div style="font-weight:600;font-size:.8rem">{{o.customer}}</div><div style="font-size:.55rem;color:var(--text3)">{{o.phone||'—'}}</div></div></div></td>
+            <td><div style="font-size:.76rem">{{o.items.map(i=>i.name).join(', ')}}</div><div style="font-size:.55rem;color:var(--text3)">{{o.items.length}} SP</div></td>
+            <td style="font-weight:700;color:var(--accent);font-family:var(--font-mono);font-size:.78rem">{{formatPrice(o.total)}}</td>
+            <td><span class="badge" :class="payBadge(o.payment)">{{o.paymentLabel}}</span></td>
+            <td><span class="badge" :class="orderStatusBadge(o.status)">{{o.statusLabel}}</span></td>
+            <td style="font-size:.68rem;color:var(--text3)">{{o.time}}</td>
+            <td><button class="btn btn-xs btn-outline" @click="openOrderDetail(o)">Chi tiết</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
+
+<!-- ========== KHÁCH HÀNG ========== -->
+<template v-if="page==='customers'">
+  <div class="ph"><div><h1>👥 Khách hàng</h1><p>{{customers.length}} khách hàng · {{customers.filter(c=>c.owed>0).length}} đang nợ</p></div></div>
+
+  <div style="display:flex;gap:10px;margin-bottom:14px">
+    <input class="search-box" placeholder="🔍 Tên, SĐT, khu vực..." v-model="custSearch" style="max-width:300px">
+    <select class="sel" v-model="custType"><option value="">Tất cả</option><option value="farmer">Nông dân</option><option value="coop">HTX</option><option value="shop">Đại lý</option></select>
+  </div>
+
+  <div class="card au d1">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Khách hàng</th><th>Loại</th><th>Khu vực</th><th>Đơn hàng</th><th>Tổng mua</th><th>Nợ hiện tại</th><th>Hạn mức</th><th>Đánh giá</th><th></th></tr></thead>
+        <tbody>
+          <tr v-for="c in filteredCustomers" :key="c.id">
+            <td><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:800;background:var(--accent-soft);color:var(--accent)">{{c.avatar}}</div><div><div style="font-weight:700;font-size:.82rem">{{c.name}}</div><div style="font-size:.55rem;color:var(--text3)">{{c.phone}}</div></div></div></td>
+            <td><span class="badge" :class="c.type==='farmer'?'badge-green':c.type==='coop'?'badge-blue':'badge-brown'">{{c.type==='farmer'?'Nông dân':c.type==='coop'?'HTX':'Đại lý'}}</span></td>
+            <td style="font-size:.78rem">{{c.area}}</td>
+            <td style="font-weight:700">{{c.totalOrders}}</td>
+            <td style="font-weight:700;color:var(--accent)">{{formatPrice(c.totalSpent)}}</td>
+            <td><span :style="{color:c.owed>0?'var(--red)':'var(--text3)',fontWeight:c.owed>0?700:400}">{{c.owed>0?formatPrice(c.owed):'—'}}</span></td>
+            <td><div style="display:flex;align-items:center;gap:5px"><div class="prog" style="width:50px"><div class="prog-f" :style="{width:(c.used/c.limit*100)+'%',background:c.used/c.limit>.8?'var(--red)':'var(--accent)'}"></div></div><span style="font-size:.58rem;color:var(--text3)">{{c.used}}/{{c.limit}}tr</span></div></td>
+            <td><span style="color:var(--amber)">★</span> {{c.rating}}</td>
+            <td><button class="btn btn-xs btn-outline">Xem</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
+
+<!-- ========== TƯ VẤN KỸ THUẬT ========== -->
+<template v-if="page==='advisory'">
+  <div class="ph"><div><h1>🧠 Tư vấn kỹ thuật</h1><p>Khuyến nghị sản phẩm theo mùa vụ, cây trồng & tình trạng đất</p></div></div>
+
+  <div class="tabs">
+    <button class="tab" :class="{active:advTab==='combos'}" @click="advTab='combos'">Gói sản phẩm</button>
+    <button class="tab" :class="{active:advTab==='schedule'}" @click="advTab='schedule'">Lịch bón phân</button>
+    <button class="tab" :class="{active:advTab==='calculator'}" @click="advTab='calculator'">Tính liều lượng</button>
+  </div>
+
+  <template v-if="advTab==='combos'">
+    <div class="g3">
+      <div v-for="cb in combos" :key="cb.id" class="card au" style="overflow:visible">
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px">
+          <div style="font-size:1.3rem">{{cb.icon}}</div>
+          <div style="flex:1"><div style="font-weight:700;font-size:.88rem">{{cb.name}}</div><div style="font-size:.62rem;color:var(--text3)">{{cb.season}} · {{cb.area}}</div></div>
+          <span class="badge badge-green">{{cb.discount}}%</span>
+        </div>
+        <div style="padding:12px 16px">
+          <div v-for="item in cb.items" :key="item" style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:.76rem"><span style="color:var(--accent)">✓</span> {{item}}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">
+            <div><span style="font-size:.62rem;color:var(--text3);text-decoration:line-through">{{formatPrice(cb.originalPrice)}}</span><br><span style="font-family:var(--font-head);font-size:1.1rem;color:var(--accent)">{{formatPrice(cb.comboPrice)}}</span></div>
+            <button class="btn btn-xs btn-primary">Bán gói</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template v-if="advTab==='schedule'">
+    <div class="card au d1">
+      <div class="ch"><h4>📅 Lịch bón phân — Lúa Đông Xuân 2026</h4></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Giai đoạn</th><th>Tuần</th><th>Phân bón</th><th>Liều lượng</th><th>Cách bón</th><th>Sản phẩm gợi ý</th></tr></thead>
+        <tbody>
+          <tr v-for="s in fertilizerSchedule" :key="s.id">
+            <td><span class="badge" :class="s.stageBadge">{{s.stage}}</span></td>
+            <td style="font-weight:600;font-size:.78rem">{{s.week}}</td>
+            <td style="font-weight:600">{{s.fertilizer}}</td>
+            <td style="font-family:var(--font-mono);font-size:.76rem">{{s.dose}}</td>
+            <td style="font-size:.76rem">{{s.method}}</td>
+            <td><button class="btn btn-xs btn-outline" @click="suggestionToCart(s)">🛒 Thêm</button></td>
+          </tr>
+        </tbody>
+        </table>
+      </div>
+    </div>
+  </template>
+
+  <template v-if="advTab==='calculator'">
+    <div class="card au d1" style="max-width:500px">
+      <div class="ch"><h4>🧮 Tính liều lượng phân bón</h4></div>
+      <div class="cb">
+        <div class="fg"><label>Loại cây trồng</label><select v-model="calcCrop"><option value="lúa">Lúa</option><option value="cam">Cam/Quýt</option><option value="tiêu">Hồ tiêu</option><option value="đậu">Đậu nành</option></select></div>
+        <div class="frow">
+          <div class="fg"><label>Diện tích (công)</label><input type="number" v-model="calcArea" placeholder="VD: 10"></div>
+          <div class="fg"><label>Loại phân</label><select v-model="calcFert"><option value="NPK">NPK 16-16-8</option><option value="ure">Ure</option><option value="DAP">DAP</option><option value="KCl">KCl</option></select></div>
+        </div>
+        <div v-if="calcArea" style="padding:14px;background:var(--accent-soft);border-radius:var(--rxs);border:1px solid var(--accent-med)">
+          <div style="font-size:.68rem;color:var(--text2);margin-bottom:4px">Khuyến nghị bón</div>
+          <div style="font-family:var(--font-head);font-size:1.4rem;color:var(--accent)">{{calcResult}} kg</div>
+          <div style="font-size:.68rem;color:var(--text3);margin-top:2px">= {{(calcResult/50).toFixed(1)}} bao 50kg</div>
+        </div>
+      </div>
+    </div>
+  </template>
+</template>
+
+<!-- ========== KHUYẾN MÃI ========== -->
+<template v-if="page==='promotions'">
+  <div class="ph"><div><h1>🎉 Khuyến mãi</h1><p>{{promos.filter(p=>p.active).length}} chương trình đang chạy</p></div>
+    <button class="btn btn-primary">+ Tạo khuyến mãi</button>
+  </div>
+
+  <div class="g2">
+    <div v-for="p in promos" :key="p.id" class="card au" :style="{opacity:p.active?1:.55}">
+      <div style="padding:16px;display:flex;gap:14px;align-items:start">
+        <div style="width:52px;height:52px;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0" :style="{background:p.active?'var(--accent-soft)':'var(--bg2)'}">{{p.icon}}</div>
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px"><span style="font-weight:700;font-size:.88rem">{{p.name}}</span><span class="badge" :class="p.active?'badge-green':'badge-gray'">{{p.active?'Đang chạy':'Tạm dừng'}}</span></div>
+          <div style="font-size:.72rem;color:var(--text2);margin-bottom:6px">{{p.desc}}</div>
+          <div style="display:flex;gap:12px;font-size:.65rem;color:var(--text3)"><span>📅 {{p.period}}</span><span>🛒 {{p.used}}/{{p.limit}} đã dùng</span></div>
+          <div class="prog" style="margin-top:6px"><div class="prog-f" :style="{width:(p.used/p.limit*100)+'%',background:'var(--accent)'}"></div></div>
+        </div>
+        <div style="font-family:var(--font-head);font-size:1.4rem;color:var(--accent);white-space:nowrap">-{{p.discount}}%</div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- ========== TÀI CHÍNH ========== -->
+<template v-if="page==='finance'">
+  <div class="ph"><div><h1>💰 Tài chính</h1><p>Doanh thu, chi phí, công nợ</p></div></div>
+
+  <div class="stat-row">
+    <div class="st st-green au d1"><div class="st-ic" style="background:var(--green-soft)">💰</div><div class="st-val">{{dash.monthlyRevenue}} tr</div><div class="st-lbl">Doanh thu tháng</div><div class="st-tag up">↑ 15%</div></div>
+    <div class="st st-amber au d2"><div class="st-ic" style="background:var(--amber-soft)">📊</div><div class="st-val">{{dash.monthlyProfit}} tr</div><div class="st-lbl">Lợi nhuận tháng</div><div class="st-tag up">Biên: {{dash.margin}}%</div></div>
+    <div class="st st-blue au d3"><div class="st-ic" style="background:var(--blue-soft)">📤</div><div class="st-val">{{dash.totalOwed}} tr</div><div class="st-lbl">Tổng công nợ</div><div class="st-tag dn">{{dash.owedCount}} KH nợ</div></div>
+    <div class="st st-teal au d4"><div class="st-ic" style="background:var(--teal-soft)">📦</div><div class="st-val">{{dash.invValue}} tr</div><div class="st-lbl">Giá trị tồn kho</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="card au d4">
+      <div class="ch"><h4>📈 Doanh thu 6 tháng</h4></div>
+      <div class="cb"><div class="chart-box"><canvas id="finChart"></canvas></div></div>
+    </div>
+    <div class="card au d5">
+      <div class="ch"><h4>📋 Công nợ phải thu</h4></div>
+      <div class="cb" style="max-height:240px;overflow-y:auto">
+        <div v-for="d in debtList" :key="d.id" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;background:var(--red-soft);color:var(--red)">{{d.avatar}}</div>
+          <div style="flex:1"><div style="font-size:.8rem;font-weight:600">{{d.name}}</div><div style="font-size:.58rem;color:var(--text3)">{{d.since}}</div></div>
+          <div style="text-align:right"><div style="font-weight:700;color:var(--red);font-size:.82rem">{{formatPrice(d.amount)}}</div><div style="font-size:.55rem;color:var(--text3)">Hạn: {{d.due}}</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- ========== BÁO CÁO ========== -->
+<template v-if="page==='reports'">
+  <div class="ph"><div><h1>📊 Báo cáo</h1><p>Phân tích kinh doanh theo nhiều维度</p></div></div>
+  <div class="g3">
+    <div v-for="r in reportCards" :key="r.id" class="card au" style="cursor:pointer">
+      <div class="cb" style="text-align:center;padding:22px">
+        <div style="font-size:1.7rem;margin-bottom:8px">{{r.icon}}</div>
+        <div style="font-weight:700;font-size:.88rem;margin-bottom:4px">{{r.name}}</div>
+        <div style="font-size:.7rem;color:var(--text3);margin-bottom:10px">{{r.desc}}</div>
+        <button class="btn btn-xs btn-outline">Tạo báo cáo</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- ========== THÔNG BÁO ========== -->
+<template v-if="page==='notifications'">
+  <div class="ph"><div><h1>🔔 Thông báo</h1><p>{{unreadNotifs}} chưa đọc</p></div><button class="btn btn-xs btn-outline" @click="allNotifs.forEach(n=>n.read=true)">Đọc tất cả</button></div>
+  <div class="card au d1">
+    <div v-for="n in allNotifs" :key="n.id" class="cb" style="display:flex;gap:10px;align-items:start;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:all .15s" :style="{background:n.read?'transparent':'var(--accent-soft)'}" @click="n.read=true">
+      <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0" :style="{background:n.bg}">{{n.icon}}</div>
+      <div style="flex:1"><div style="font-size:.8rem" v-html="n.text"></div><div style="font-size:.6rem;color:var(--text3);margin-top:2px">{{n.time}}</div></div>
+      <div v-if="!n.read" style="width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:8px"></div>
+    </div>
+  </div>
+</template>
+
+</div></div></div>
+
+<!-- ===== NEW ORDER MODAL ===== -->
+<div v-if="showNewOrder" class="modal-ov" @click.self="showNewOrder=false">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-h"><h3>🧾 Tạo đơn hàng mới</h3><button class="modal-x" @click="showNewOrder=false">✕</button></div>
+    <div class="modal-b">
+      <div class="fg"><label>Khách hàng</label><select v-model="newOrd.customer"><option value="">Chọn khách hàng...</option><option v-for="c in customers" :key="c.id" :value="c.name">{{c.name}} — {{c.area}}</option></select></div>
+      <div style="font-size:.68rem;font-weight:700;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Sản phẩm</div>
+      <div v-for="(item,i) in newOrd.items" :key="i" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <select v-model="item.product" style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--rxs);font-size:.78rem;background:var(--surface);color:var(--text)">
+          <option value="">Chọn sản phẩm...</option>
+          <option v-for="p in products.filter(p=>p.stock>0)" :key="p.id" :value="p.name">{{p.icon}} {{p.name}} — {{formatPrice(p.price)}}/{{p.priceUnit}} (Còn: {{p.stock}})</option>
+        </select>
+        <input type="number" v-model="item.qty" placeholder="SL" style="width:70px;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--rxs);font-size:.78rem;background:var(--surface);color:var(--text);text-align:center">
+        <button class="btn btn-xs btn-outline" style="color:var(--red);border-color:var(--red)" @click="newOrd.items.splice(i,1)" v-if="newOrd.items.length>1">✕</button>
+      </div>
+      <button class="btn btn-xs btn-outline" @click="newOrd.items.push({product:'',qty:1})" style="margin-bottom:14px">+ Thêm sản phẩm</button>
+      <div class="frow">
+        <div class="fg"><label>Hình thức TT</label><select v-model="newOrd.payment"><option value="cash">💵 Tiền mặt</option><option value="transfer">🏦 Chuyển khoản</option><option value="credit">📝 Ghi nợ</option></select></div>
+        <div class="fg"><label>Giao hàng</label><select v-model="newOrd.delivery"><option value="pickup">Khách tự lấy</option><option value="deliver">Giao hàng tận nơi</option></select></div>
+      </div>
+      <div class="fg"><label>Ghi chú</label><textarea placeholder="Ghi chú đơn hàng..." v-model="newOrd.note"></textarea></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-outline" @click="showNewOrder=false">Hủy</button>
+      <button class="btn btn-primary" @click="createOrder()">📦 Tạo đơn</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER DETAIL MODAL -->
+<div v-if="showOrderDetail" class="modal-ov" @click.self="showOrderDetail=false">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-h"><h3>📋 Chi tiết đơn hàng</h3><button class="modal-x" @click="showOrderDetail=false">✕</button></div>
+    <div class="modal-b" v-if="detailOrder">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div><div style="font-family:var(--font-mono);font-size:.82rem;color:var(--accent)">{{detailOrder.id}}</div><div style="font-size:.68rem;color:var(--text3)">{{detailOrder.time}}</div></div>
+        <span class="badge" :class="orderStatusBadge(detailOrder.status)" style="font-size:.68rem;padding:4px 14px">{{detailOrder.statusLabel}}</span>
+      </div>
+      <div style="padding:12px;background:var(--bg2);border-radius:var(--rxs);margin-bottom:14px">
+        <div style="font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:4px">Khách hàng</div>
+        <div style="font-weight:700">{{detailOrder.customer}}</div>
+        <div style="font-size:.72rem;color:var(--text3)">📞 {{detailOrder.phone||'—'}}</div>
+      </div>
+      <div style="font-size:.65rem;font-weight:700;color:var(--text3);margin-bottom:6px">SẢN PHẨM</div>
+      <div v-for="item in detailOrder.items" :key="item.name" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:.78rem">
+        <span>{{item.name}}</span>
+        <span style="font-weight:600">{{item.qty}} × {{formatPrice(item.price)}} = <span style="color:var(--accent)">{{formatPrice(item.qty*item.price)}}</span></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:10px;margin-top:10px;background:var(--accent-soft);border-radius:var(--rxs)">
+        <span style="font-weight:600">Tổng cộng</span>
+        <span style="font-family:var(--font-head);font-size:1.2rem;color:var(--accent)">{{formatPrice(detailOrder.total)}}</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <span class="badge" :class="payBadge(detailOrder.payment)">{{detailOrder.paymentLabel}}</span>
+        <span class="badge badge-gray">{{detailOrder.delivery==='deliver'?'🚛 Giao hàng':'🚶 Tự lấy'}}</span>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-outline" @click="showOrderDetail=false">Đóng</button>
+      <button v-if="detailOrder&&detailOrder.status!=='completed'" class="btn btn-primary" @click="advanceOrder()">⏩ Chuyển trạng thái</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div v-if="showProdDetail" class="modal-ov" @click.self="showProdDetail=false">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-h"><h3>📦 Chi tiết sản phẩm</h3><button class="modal-x" @click="showProdDetail=false">✕</button></div>
+    <div class="modal-b" v-if="detailProduct">
+      <div style="text-align:center;font-size:3rem;margin-bottom:10px">{{detailProduct.icon}}</div>
+      <div style="text-align:center;font-family:var(--font-head);font-size:1.3rem;margin-bottom:2px">{{detailProduct.name}}</div>
+      <div style="text-align:center;font-size:.68rem;color:var(--text3);margin-bottom:14px">Mã SKU: {{detailProduct.sku}}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <div style="padding:10px;background:var(--bg2);border-radius:var(--rxs)">
+          <div style="font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Giá bán</div>
+          <div style="font-family:var(--font-head);font-size:1.2rem;color:var(--accent);font-weight:700">{{formatPrice(detailProduct.price)}}/{{detailProduct.priceUnit}}</div>
+        </div>
+        <div style="padding:10px;background:var(--bg2);border-radius:var(--rxs)">
+          <div style="font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Tồn kho hiện tại</div>
+          <div style="font-size:.9rem;font-weight:700" :style="{color:detailProduct.stock===0?'var(--red)':detailProduct.stock<10?'var(--amber)':'var(--accent)'}">{{detailProduct.stock}} {{detailProduct.unit}}</div>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:4px">Mô tả chi tiết</div>
+        <p style="font-size:.76rem;color:var(--text2);line-height:1.5">{{detailProduct.desc}}</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:2px">Nhà sản xuất</div>
+          <div style="font-size:.76rem;font-weight:600">{{detailProduct.manufacturer}}</div>
+        </div>
+        <div>
+          <div style="font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:2px">Đã bán trong tháng</div>
+          <div style="font-size:.76rem;font-weight:600">{{detailProduct.soldMonth}} {{detailProduct.unit}}</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-outline" @click="showProdDetail=false">Đóng</button>
+      <button class="btn btn-primary" @click="showProdDetail=false">Sửa sản phẩm</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW PRODUCT MODAL -->
+<div v-if="showNewProduct" class="modal-ov" @click.self="showNewProduct=false">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-h"><h3>📦 Thêm sản phẩm mới</h3><button class="modal-x" @click="showNewProduct=false">✕</button></div>
+    <div class="modal-b">
+      <div class="frow">
+        <div class="fg"><label>Tên sản phẩm</label><input type="text" v-model="newProd.name" placeholder="Ví dụ: Phân NPK 16-16-8"></div>
+        <div class="fg"><label>Biểu tượng (Icon)</label><input type="text" v-model="newProd.icon" placeholder="Ví dụ: 🌾, 🧪"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Mã SKU</label><input type="text" v-model="newProd.sku" placeholder="Ví dụ: NPK16168"></div>
+        <div class="fg"><label>Danh mục</label>
+          <select v-model="newProd.category">
+            <option v-for="c in categories" :key="c" :value="c">{{c}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Giá bán (VNĐ)</label><input type="number" v-model.number="newProd.price" placeholder="Ví dụ: 580000"></div>
+        <div class="fg"><label>Đơn vị tính giá</label><input type="text" v-model="newProd.priceUnit" placeholder="Ví dụ: bao, chai"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Số lượng tồn ban đầu</label><input type="number" v-model.number="newProd.stock" placeholder="Ví dụ: 100"></div>
+        <div class="fg"><label>Đơn vị tồn kho</label><input type="text" v-model="newProd.unit" placeholder="Ví dụ: bao, chai"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Nhà sản xuất</label><input type="text" v-model="newProd.manufacturer" placeholder="Ví dụ: Bình Điền"></div>
+        <div class="fg"><label>Số lượng tồn tối đa</label><input type="number" v-model.number="newProd.maxStock" placeholder="Ví dụ: 200"></div>
+      </div>
+      <div class="fg"><label>Mô tả chi tiết</label><textarea placeholder="Nhập mô tả sản phẩm..." v-model="newProd.desc"></textarea></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-outline" @click="showNewProduct=false">Hủy</button>
+      <button class="btn btn-primary" @click="createProduct()">📦 Lưu sản phẩm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-box">
+  <div v-for="t in toasts" :key="t.id" class="toast" :class="t.type||''">{{t.m}}</div>
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+const { createApp, ref, reactive, computed, onMounted, nextTick, watch } = Vue;
+
+createApp({
+  setup() {
+    // ===== DATA / MOCK STATE =====
+    const page = ref('home');
+    const showNewOrder = ref(false);
+    const showOrderDetail = ref(false);
+    const showProdDetail = ref(false);
+    const showNewProduct = ref(false);
+    
+    const detailOrder = ref(null);
+    const detailProduct = ref(null);
+    
+    const chartView = ref('revenue');
+    
+    const prodSearch = ref('');
+    const prodCat = ref('');
+    const prodStock = ref('');
+    const prodTab = ref('grid');
+    
+    const orderSearch = ref('');
+    const orderStatusF = ref('');
+    const orderPayF = ref('');
+    const orderTab = ref('all');
+    
+    const custSearch = ref('');
+    const custType = ref('');
+    
+    const advTab = ref('combos');
+    const calcCrop = ref('lúa');
+    const calcArea = ref('');
+    const calcFert = ref('NPK');
+    
+    const toasts = ref([]);
+    
+    const newOrd = reactive({
+      customer: '',
+      items: [{ product: '', qty: 1 }],
+      payment: 'cash',
+      delivery: 'pickup',
+      note: ''
+    });
+
+    const newProd = reactive({
+      name: '',
+      icon: '🌾',
+      sku: '',
+      category: 'Phân bón',
+      price: 0,
+      priceUnit: 'bao',
+      stock: 10,
+      maxStock: 100,
+      unit: 'bao',
+      manufacturer: '',
+      desc: '',
+      isNew: true,
+      hot: false,
+      bg: 'var(--accent-soft)',
+      soldMonth: 0
+    });
+
+    const mainNav = [
+      { id: 'home', label: 'Tổng quan', icon: '📊' },
+      { id: 'products', label: 'Sản phẩm', icon: '📦' },
+      { id: 'orders', label: 'Đơn hàng', icon: '🧾' },
+      { id: 'customers', label: 'Khách hàng', icon: '👥' }
+    ];
+
+    const bizNav = [
+      { id: 'advisory', label: 'Tư vấn kỹ thuật', icon: '🧠' },
+      { id: 'promotions', label: 'Khuyến mãi', icon: '🎉' },
+      { id: 'finance', label: 'Tài chính', icon: '💰' },
+      { id: 'reports', label: 'Báo cáo', icon: '📊' }
+    ];
+
+    const sysNav = [
+      { id: 'notifications', label: 'Thông báo', icon: '🔔', badge: () => unreadNotifs.value }
+    ];
+
+    const categories = ['Phân bón', 'Thuốc BVTV', 'Hạt giống', 'Nông cụ'];
+
+    const todayStr = computed(() => {
+      const now = new Date();
+      return `Hôm nay, ngày ${now.getDate()} tháng ${now.getMonth() + 1} năm ${now.getFullYear()}`;
+    });
+
+    const formatPrice = (val) => {
+      if (val === undefined || val === null) return '—';
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(val);
+    };
+
+    const dash = reactive({
+      todaySales: 18,
+      todaySalesGrowth: 12.5,
+      todayRevenue: '24.5',
+      revenueGrowth: 8.2,
+      totalProducts: 45,
+      lowStock: 4,
+      customers: 156,
+      newCustomers: 12,
+      monthlyOrders: 284,
+      monthlyRevenue: 320000000,
+      monthlyProfit: 85,
+      margin: 26.5,
+      totalOwed: 42500000,
+      owedCount: 3,
+      invValue: 750000000
+    });
+
+    const seasonalDemands = ref([
+      { name: 'Phân bón NPK bón thúc', icon: '🌾', demand: 85 },
+      { name: 'Thuốc trừ sâu cuốn lá', icon: '🐛', demand: 62 },
+      { name: 'Thuốc diệt nấm đạo ôn', icon: '🍂', demand: 45 },
+      { name: 'Hạt giống lúa OM18', icon: '🌱', demand: 90 }
+    ]);
+
+    const combos = ref([
+      { id: 1, name: 'Gói Dinh Dưỡng Đầu Vụ', icon: '🌱', season: 'Vụ Đông Xuân', area: 'ĐBSCL', discount: 10, items: ['Phân Ure Ninh Bình (2 bao)', 'Phân DAP Hồng Hà (1 bao)', 'Hữu cơ vi sinh Sông Hương (1 bao)'], originalPrice: 1850000, comboPrice: 1665000 },
+      { id: 2, name: 'Gói Bảo Vệ Toàn Diện Lúa', icon: '🌾', season: 'Giai đoạn đẻ nhánh', area: 'Long An', discount: 15, items: ['Thuốc trừ sâu Abamectin (5 chai)', 'Thuốc diệt nấm Hexaconazole (3 chai)', 'Chất bám dính siêu hấp thụ (1 chai)'], originalPrice: 1320000, comboPrice: 1122000 }
+    ]);
+
+    const fertilizerSchedule = ref([
+      { id: 1, stage: 'Bón lót (Trước sạ)', week: 'Tuần 0', fertilizer: 'Phân lân Lâm Thao', dose: '15-20 kg/công', method: 'Rải đều mặt ruộng trước khi trục bùn', stageBadge: 'badge-gray' },
+      { id: 2, stage: 'Bón thúc lần 1 (7-10 NSS)', week: 'Tuần 1-2', fertilizer: 'Phân NPK 16-16-8 + Ure', dose: '8kg NPK + 2kg Ure/công', method: 'Rải khi ruộng có nước xâm xấp', stageBadge: 'badge-blue' },
+      { id: 3, stage: 'Bón thúc lần 2 (18-22 NSS)', week: 'Tuần 3', fertilizer: 'Phân NPK 20-20-15', dose: '10-12 kg/công', method: 'Bón đón đòng, làm sạch cỏ dại trước khi bón', stageBadge: 'badge-amber' },
+      { id: 4, stage: 'Bón thúc lần 3 (40-45 NSS)', week: 'Tuần 6', fertilizer: 'Phân Kali KCl', dose: '5-6 kg/công', method: 'Bón nuôi hạt, bón khi chiều mát', stageBadge: 'badge-green' }
+    ]);
+
+    const promos = ref([
+      { id: 1, icon: '🏷️', name: 'Tri ân nông dân Long An', active: true, desc: 'Giảm giá 10% cho tất cả đơn hàng phân bón đạt trị giá từ 5 triệu trở lên.', period: '2026-06-01 đến 2026-07-01', used: 45, limit: 100, discount: 10 },
+      { id: 2, icon: '🚚', name: 'Miễn phí vận chuyển nội vùng', active: true, desc: 'Miễn phí giao hàng tận nơi trong bán kính 15km cho đại lý và HTX.', period: 'Áp dụng cả năm 2026', used: 120, limit: 200, discount: 5 }
+    ]);
+
+    const debtList = ref([
+      { id: 1, avatar: 'H', name: 'HTX Chanh Không Hạt Bến Lức', since: 'Ghi nợ từ 10/05/2026', amount: 15400000, due: 'Chậm 15 ngày' },
+      { id: 2, avatar: 'A', name: 'Nguyễn Văn An', since: 'Ghi nợ từ 01/06/2026', amount: 6200000, due: 'Hạn: 01/07/2026' },
+      { id: 3, avatar: 'B', name: 'Trần Thị Bích', since: 'Ghi nợ từ 15/06/2026', amount: 2800000, due: 'Hạn: 15/07/2026' }
+    ]);
+
+    const reportCards = [
+      { id: 1, icon: '📊', name: 'Báo cáo doanh số bán lẻ', desc: 'Thống kê tổng chi tiết doanh số bán hàng, mặt hàng chạy nhất tuần.' },
+      { id: 2, icon: '🧾', name: 'Báo cáo công nợ tồn đọng', desc: 'Danh sách các HTX, đại lý nợ chậm hạn và phân nhóm rủi ro.' },
+      { id: 3, icon: '📦', name: 'Báo cáo tồn kho cảnh báo', desc: 'Dự báo mua hàng nông cụ, phân bón cần nhập kho cho mùa vụ mới.' }
+    ];
+
+    const allNotifs = ref([
+      { id: 1, icon: '🚨', bg: 'var(--red-soft)', text: 'Cảnh báo: <b>HTX Chanh Bến Lức</b> đã vượt quá hạn mức nợ ghi có cho phép (15.4tr / 15tr).', time: '10 phút trước', read: false },
+      { id: 2, icon: '📦', bg: 'var(--amber-soft)', text: 'Sản phẩm <b>Phân Kali KCl 60%</b> chỉ còn 5 bao trong kho. Hãy nhập thêm hàng.', time: '2 giờ trước', read: false },
+      { id: 3, icon: '💰', bg: 'var(--green-soft)', text: 'Nhận thành công thanh toán chuyển khoản đơn hàng <b>#ORD-1002</b> (7.800.000 ₫).', time: '5 giờ trước', read: true }
+    ]);
+
+    const unreadNotifs = computed(() => allNotifs.value.filter(n => !n.read).length);
+
+    // ===== PRODUCTS STATE =====
+    const products = ref([
+      { id: 1, name: 'Phân NPK 16-16-8 Ba Con Cò', icon: '🌾', sku: 'NPK16168', category: 'Phân bón', price: 680000, priceUnit: 'bao', stock: 120, maxStock: 200, unit: 'bao', soldMonth: 450, manufacturer: 'Bình Điền', bg: 'var(--accent-soft)', isNew: false, hot: true, desc: 'Phân bón NPK cao cấp giúp cây lúa ra rễ mạnh, đẻ nhánh khỏe, tăng khả năng chống chịu phèn mặn hiệu quả.' },
+      { id: 2, name: 'Thuốc trừ sâu cuốn lá Abamectin 3.6EC', icon: '🧪', sku: 'ABA36EC', category: 'Thuốc BVTV', price: 145000, priceUnit: 'chai', stock: 8, maxStock: 100, unit: 'chai', soldMonth: 230, manufacturer: 'Nông Dược Xanh', bg: 'var(--red-soft)', isNew: false, hot: false, desc: 'Thuốc trừ sâu thế hệ mới nguồn gốc sinh học đặc trị sâu cuốn lá, sâu đục thân hại lúa. An toàn cho môi trường ruộng đồng.' },
+      { id: 3, name: 'Hạt giống lúa thơm OM18 siêu cấp', icon: '🌱', sku: 'G-OM18', category: 'Hạt giống', price: 18000, priceUnit: 'kg', stock: 1500, maxStock: 2000, unit: 'kg', soldMonth: 3200, manufacturer: 'Lộc Trời Group', bg: 'var(--blue-soft)', isNew: true, hot: true, desc: 'Giống lúa thơm OM18 chuẩn xác nhận, kháng bệnh đạo ôn tốt, hạt gạo thon dài, dẻo thơm nhẹ, đạt tiêu chuẩn xuất khẩu.' },
+      { id: 4, name: 'Bình phun thuốc sâu điện AgroJet 20L', icon: '🎒', sku: 'BP-AJ20L', category: 'Nông cụ', price: 850000, priceUnit: 'cái', stock: 0, maxStock: 15, unit: 'cái', soldMonth: 25, manufacturer: 'AgroTool', bg: 'var(--brown-soft)', isNew: true, hot: false, desc: 'Bình phun thuốc bằng điện ắc quy sạc nhanh, áp lực phun mạnh mẽ ổn định, dây đeo vai êm ái chống mỏi.' },
+      { id: 5, name: 'Phân Kali KCl 60% nhập khẩu', icon: '🌾', sku: 'KALI60', category: 'Phân bón', price: 490000, priceUnit: 'bao', stock: 5, maxStock: 150, unit: 'bao', soldMonth: 180, manufacturer: 'Belarus Kali', bg: 'var(--accent-soft)', isNew: false, hot: false, desc: 'Phân bón Kali Clorua hàm lượng dinh dưỡng 60% giúp hạt lúa chắc mẩy, sáng vỏ, cứng cây chống đổ ngã.' }
+    ]);
+
+    const lowStockProducts = computed(() => products.value.filter(p => p.stock <= 10));
+
+    const filteredProducts = computed(() => {
+      return products.value.filter(p => {
+        const matchesSearch = !prodSearch.value || p.name.toLowerCase().includes(prodSearch.value.toLowerCase()) || p.sku.toLowerCase().includes(prodSearch.value.toLowerCase());
+        const matchesCat = !prodCat.value || p.category === prodCat.value;
+        let matchesStock = true;
+        if (prodStock.value === 'low') matchesStock = p.stock > 0 && p.stock <= 10;
+        else if (prodStock.value === 'out') matchesStock = p.stock === 0;
+        return matchesSearch && matchesCat && matchesStock;
+      });
+    });
+
+    const catBadge = (cat) => {
+      const map = {
+        'Phân bón': 'badge-green',
+        'Thuốc BVTV': 'badge-red',
+        'Hạt giống': 'badge-blue',
+        'Nông cụ': 'badge-brown'
+      };
+      return map[cat] || 'badge-gray';
+    };
+
+    const openProductDetail = (p) => {
+      detailProduct.value = p;
+      showProdDetail.value = true;
+    };
+
+    const createProduct = () => {
+      if (!newProd.name || newProd.price <= 0) {
+        showToast('Vui lòng điền đầy đủ tên sản phẩm và giá bán hợp lệ.', 'red');
+        return;
+      }
+      
+      const id = products.value.length + 1;
+      products.value.unshift({
+        id,
+        name: newProd.name,
+        icon: newProd.icon || '📦',
+        sku: newProd.sku || 'SKU' + Date.now().toString().slice(-6),
+        category: newProd.category,
+        price: newProd.price,
+        priceUnit: newProd.priceUnit || 'bao',
+        stock: newProd.stock || 0,
+        maxStock: newProd.maxStock || 100,
+        unit: newProd.unit || 'bao',
+        manufacturer: newProd.manufacturer || 'Khác',
+        desc: newProd.desc || 'Chưa có mô tả chi tiết.',
+        isNew: true,
+        hot: false,
+        bg: 'var(--accent-soft)',
+        soldMonth: 0
+      });
+
+      showToast('Đã thêm sản phẩm thành công!');
+      showNewProduct.value = false;
+
+      // Reset newProd state
+      newProd.name = '';
+      newProd.icon = '🌾';
+      newProd.sku = '';
+      newProd.category = 'Phân bón';
+      newProd.price = 0;
+      newProd.priceUnit = 'bao';
+      newProd.stock = 10;
+      newProd.maxStock = 100;
+      newProd.unit = 'bao';
+      newProd.manufacturer = '';
+      newProd.desc = '';
+    };
+
+    // ===== ORDERS STATE =====
+    const orders = ref([
+      { id: '#ORD-1001', customer: 'Nguyễn Văn An', phone: '0901234567', custIcon: 'A', custBg: 'var(--green-soft)', items: [{ name: 'Phân NPK 16-16-8 Ba Con Cò', qty: 10, price: 680000 }], total: 6800000, payment: 'cash', paymentLabel: 'Tiền mặt', status: 'completed', statusLabel: 'Hoàn thành', delivery: 'pickup', time: '10 phút trước', note: 'Khách tự chở bằng xe ba gác.' },
+      { id: '#ORD-1002', customer: 'HTX Chanh Không Hạt Bến Lức', phone: '0912345678', custIcon: 'H', custBg: 'var(--blue-soft)', items: [{ name: 'Thuốc trừ sâu cuốn lá Abamectin', qty: 20, price: 145000 }, { name: 'Phân Kali KCl 60% nhập khẩu', qty: 10, price: 490000 }], total: 7800000, payment: 'credit', paymentLabel: 'Ghi nợ', status: 'confirmed', statusLabel: 'Đã xác nhận', delivery: 'deliver', time: '1 giờ trước', note: 'Giao đến ngã tư xã Thạnh Hòa.' },
+      { id: '#ORD-1003', customer: 'Trần Thị Bích', phone: '0923456789', custIcon: 'B', custBg: 'var(--green-soft)', items: [{ name: 'Hạt giống lúa thơm OM18 siêu cấp', qty: 100, price: 18000 }], total: 1800000, payment: 'transfer', paymentLabel: 'Chuyển khoản', status: 'pending', statusLabel: 'Chờ xử lý', delivery: 'pickup', time: '3 giờ trước', note: 'Gửi biên lai qua Zalo.' }
+    ]);
+
+    const filteredOrders = computed(() => {
+      return orders.value.filter(o => {
+        const matchesSearch = !orderSearch.value || 
+          o.id.toLowerCase().includes(orderSearch.value.toLowerCase()) || 
+          o.customer.toLowerCase().includes(orderSearch.value.toLowerCase()) ||
+          o.phone.includes(orderSearch);
+        const matchesStatus = !orderStatusF.value || o.status === orderStatusF.value;
+        const matchesPay = !orderPayF.value || o.payment === orderPayF.value;
+        return matchesSearch && matchesStatus && matchesPay;
+      });
+    });
+
+    const displayOrders = computed(() => {
+      return filteredOrders.value.filter(o => {
+        if (orderTab.value === 'all') return true;
+        if (orderTab.value === 'pending') return o.status === 'pending';
+        if (orderTab.value === 'credit') return o.payment === 'credit';
+        if (orderTab.value === 'today') {
+          return o.time.includes('phút') || o.time.includes('giờ') || o.time.includes('Hôm nay');
+        }
+        return true;
+      });
+    });
+
+    const orderStatusBadge = (status) => {
+      const map = {
+        pending: 'badge-amber',
+        confirmed: 'badge-blue',
+        packing: 'badge-brown',
+        delivering: 'badge-teal',
+        completed: 'badge-green',
+        cancelled: 'badge-red'
+      };
+      return map[status] || 'badge-gray';
+    };
+
+    const payBadge = (pay) => {
+      const map = {
+        cash: 'badge-green',
+        transfer: 'badge-blue',
+        credit: 'badge-red'
+      };
+      return map[pay] || 'badge-gray';
+    };
+
+    const openOrderDetail = (o) => {
+      detailOrder.value = o;
+      showOrderDetail.value = true;
+    };
+
+    const advanceOrder = () => {
+      if (!detailOrder.value) return;
+      const statuses = ['pending', 'confirmed', 'packing', 'delivering', 'completed'];
+      const labels = ['Chờ xử lý', 'Đã xác nhận', 'Đang đóng gói', 'Đang giao hàng', 'Hoàn thành'];
+      
+      const currentIdx = statuses.indexOf(detailOrder.value.status);
+      if (currentIdx > -1 && currentIdx < statuses.length - 1) {
+        detailOrder.value.status = statuses[currentIdx + 1];
+        detailOrder.value.statusLabel = labels[currentIdx + 1];
+        showToast(`Đã cập nhật trạng thái đơn hàng lên: ${labels[currentIdx + 1]}`);
+      }
+    };
+
+    const createOrder = () => {
+      if (!newOrd.customer) {
+        showToast('Vui lòng chọn khách hàng.', 'red');
+        return;
+      }
+      const selectedItems = newOrd.items.filter(i => i.product && i.qty > 0);
+      if (selectedItems.length === 0) {
+        showToast('Vui lòng chọn ít nhất một sản phẩm hợp lệ.', 'red');
+        return;
+      }
+
+      let orderTotal = 0;
+      const orderItems = selectedItems.map(item => {
+        const prod = products.value.find(p => p.name === item.product);
+        const price = prod ? prod.price : 0;
+        const total = price * item.qty;
+        orderTotal += total;
+
+        // Trừ tồn kho nếu sản phẩm có thật
+        if (prod) {
+          prod.stock = Math.max(0, prod.stock - item.qty);
+          prod.soldMonth += item.qty;
+        }
+
+        return {
+          name: item.product,
+          qty: item.qty,
+          price: price
+        };
+      });
+
+      const customerObj = customers.value.find(c => c.name === newOrd.customer);
+      if (customerObj) {
+        customerObj.totalOrders += 1;
+        customerObj.totalSpent += orderTotal;
+        if (newOrd.payment === 'credit') {
+          customerObj.owed += orderTotal;
+          customerObj.used = Math.min(customerObj.limit, customerObj.used + (orderTotal / 1000000));
+        }
+      }
+
+      const id = '#ORD-' + (1000 + orders.value.length + 1);
+      const custIcon = newOrd.customer.slice(0, 1);
+      
+      const paymentLabels = { cash: 'Tiền mặt', transfer: 'Chuyển khoản', credit: 'Ghi nợ' };
+
+      orders.value.unshift({
+        id,
+        customer: newOrd.customer,
+        phone: customerObj ? customerObj.phone : '',
+        custIcon,
+        custBg: 'var(--green-soft)',
+        items: orderItems,
+        total: orderTotal,
+        payment: newOrd.payment,
+        paymentLabel: paymentLabels[newOrd.payment] || 'Tiền mặt',
+        status: 'pending',
+        statusLabel: 'Chờ xử lý',
+        delivery: newOrd.delivery,
+        time: 'Vừa xong',
+        note: newOrd.note
+      });
+
+      showToast('Đã tạo đơn hàng thành công!');
+      showNewOrder.value = false;
+
+      // Reset form
+      newOrd.customer = '';
+      newOrd.items = [{ product: '', qty: 1 }];
+      newOrd.payment = 'cash';
+      newOrd.delivery = 'pickup';
+      newOrd.note = '';
+    };
+
+    // ===== CUSTOMERS STATE =====
+    const customers = ref([
+      { id: 1, name: 'HTX Chanh Không Hạt Bến Lức', phone: '0912345678', avatar: 'H', type: 'coop', area: 'Bến Lức, Long An', totalOrders: 32, totalSpent: 125000000, owed: 15400000, used: 15.4, limit: 30, rating: 4.9 },
+      { id: 2, name: 'Nguyễn Văn An', phone: '0901234567', avatar: 'A', type: 'farmer', area: 'Cần Giuộc, Long An', totalOrders: 15, totalSpent: 42000000, owed: 6200000, used: 6.2, limit: 15, rating: 4.7 },
+      { id: 3, name: 'Trần Thị Bích', phone: '0923456789', avatar: 'B', type: 'farmer', area: 'Thạnh Hóa, Long An', totalOrders: 8, totalSpent: 22000000, owed: 2800000, used: 2.8, limit: 10, rating: 4.8 },
+      { id: 4, name: 'Đại lý vật tư Út Chanh', phone: '0812345679', avatar: 'U', type: 'shop', area: 'Bến Lức, Long An', totalOrders: 54, totalSpent: 450000000, owed: 0, used: 0, limit: 100, rating: 5.0 }
+    ]);
+
+    const filteredCustomers = computed(() => {
+      return customers.value.filter(c => {
+        const matchesSearch = !custSearch.value || c.name.toLowerCase().includes(custSearch.value.toLowerCase()) || c.phone.includes(custSearch.value) || c.area.toLowerCase().includes(custSearch.value.toLowerCase());
+        const matchesType = !custType.value || c.type === custType.value;
+        return matchesSearch && matchesType;
+      });
+    });
+
+    // ===== ADVISORY HELPERS =====
+    const calcResult = computed(() => {
+      if (!calcArea.value || calcArea.value <= 0) return 0;
+      let multiplier = 10;
+      if (calcCrop.value === 'lúa') {
+        if (calcFert.value === 'NPK') multiplier = 12;
+        else if (calcFert.value === 'ure') multiplier = 8;
+        else multiplier = 5;
+      } else {
+        if (calcFert.value === 'NPK') multiplier = 18;
+        else if (calcFert.value === 'ure') multiplier = 12;
+        else multiplier = 10;
+      }
+      return calcArea.value * multiplier;
+    });
+
+    const suggestionToCart = (s) => {
+      showToast(`Đã thêm gợi ý bón phân: ${s.fertilizer} (${s.dose}) vào bảng kê đơn.`);
+      showNewOrder.value = true;
+      newOrd.items = [{
+        product: s.fertilizer.includes('NPK') ? 'Phân NPK 16-16-8 Ba Con Cò' : s.fertilizer.includes('Kali') ? 'Phân Kali KCl 60% nhập khẩu' : 'Phân NPK 16-16-8 Ba Con Cò',
+        qty: 10
+      }];
+    };
+
+    // ===== TOASTS HELPER =====
+    const showToast = (msg, type = 'green') => {
+      const id = Date.now();
+      toasts.value.push({ id, m: msg, type });
+      setTimeout(() => {
+        toasts.value = toasts.value.filter(t => t.id !== id);
+      }, 3000);
+    };
+
+    // ===== CHARTS & INITIALIZATIONS =====
+    let homeChartInstance = null;
+    let finChartInstance = null;
+
+    const initHomeChart = () => {
+      nextTick(() => {
+        const ctx = document.getElementById('homeChart');
+        if (!ctx) return;
+        if (homeChartInstance) {
+          homeChartInstance.destroy();
+        }
+
+        const isRevenue = chartView.value === 'revenue';
+        const labels = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+        const data = isRevenue ? [15.4, 18.2, 16.5, 21.3, 24.5, 28.0, 24.5] : [10, 14, 12, 16, 18, 22, 18];
+        const datasetLabel = isRevenue ? 'Doanh thu (triệu đồng)' : 'Số đơn hàng';
+        const borderColor = isRevenue ? '#2d6a4f' : '#e76f51';
+        const backgroundColor = isRevenue ? 'rgba(45, 106, 79, 0.08)' : 'rgba(231, 111, 81, 0.08)';
+
+        homeChartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [{
+              label: datasetLabel,
+              data,
+              borderColor,
+              backgroundColor,
+              fill: true,
+              tension: 0.3
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                labels: { font: { family: 'DM Sans', weight: 'bold' } }
+              }
+            },
+            scales: {
+              y: { grid: { color: 'rgba(201, 191, 178, 0.3)' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      });
+    };
+
+    const initFinChart = () => {
+      nextTick(() => {
+        const ctx = document.getElementById('finChart');
+        if (!ctx) return;
+        if (finChartInstance) {
+          finChartInstance.destroy();
+        }
+
+        finChartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'],
+            datasets: [
+              {
+                label: 'Doanh thu',
+                data: [180, 210, 250, 230, 290, 320],
+                backgroundColor: '#2d6a4f',
+                borderRadius: 4
+              },
+              {
+                label: 'Chi phí',
+                data: [130, 150, 180, 165, 210, 235],
+                backgroundColor: '#e76f51',
+                borderRadius: 4
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { font: { family: 'DM Sans', weight: 'bold' } } }
+            },
+            scales: {
+              y: { grid: { color: 'rgba(201, 191, 178, 0.3)' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      });
+    };
+
+    // Watchers for page switches to redraw charts
+    watch(page, (newPage) => {
+      setTimeout(() => {
+        if (newPage === 'home') {
+          initHomeChart();
+        } else if (newPage === 'finance') {
+          initFinChart();
+        }
+      }, 50);
+    });
+
+    onMounted(() => {
+      setTimeout(() => {
+        initHomeChart();
+      }, 100);
+    });
+
+    // ===== PAGE TITLE COMPUTATION =====
+    const pageTitle = computed(() => {
+      const titles = {
+        home: 'Tổng quan hệ thống',
+        products: 'Quản lý sản phẩm',
+        orders: 'Quản lý đơn hàng',
+        customers: 'Quản lý khách hàng',
+        advisory: 'Tư vấn kỹ thuật',
+        promotions: 'Chương trình khuyến mãi',
+        finance: 'Báo cáo tài chính',
+        reports: 'Hệ thống báo cáo',
+        notifications: 'Thông báo hệ thống'
+      };
+      return titles[page.value] || 'AgriSup';
+    });
+
+    const logout = () => {
+      if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?')) {
+        showToast('Đăng xuất thành công.', 'amber');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
+      }
+    };
+
+    return {
+      page,
+      showNewOrder,
+      showOrderDetail,
+      showProdDetail,
+      showNewProduct,
+      
+      detailOrder,
+      detailProduct,
+      
+      chartView,
+      
+      prodSearch,
+      prodCat,
+      prodStock,
+      prodTab,
+      
+      orderSearch,
+      orderStatusF,
+      orderPayF,
+      orderTab,
+      
+      custSearch,
+      custType,
+      
+      advTab,
+      calcCrop,
+      calcArea,
+      calcFert,
+      
+      toasts,
+      newOrd,
+      newProd,
+      
+      mainNav,
+      bizNav,
+      sysNav,
+      categories,
+      todayStr,
+      dash,
+      seasonalDemands,
+      combos,
+      fertilizerSchedule,
+      promos,
+      debtList,
+      reportCards,
+      allNotifs,
+      unreadNotifs,
+      
+      products,
+      lowStockProducts,
+      filteredProducts,
+      catBadge,
+      openProductDetail,
+      createProduct,
+      
+      orders,
+      filteredOrders,
+      displayOrders,
+      orderStatusBadge,
+      payBadge,
+      openOrderDetail,
+      advanceOrder,
+      createOrder,
+      
+      customers,
+      filteredCustomers,
+      
+      calcResult,
+      suggestionToCart,
+      showToast,
+      initHomeChart,
+      initFinChart,
+      pageTitle,
+      formatPrice,
+      logout
+    };
+  }
+}).mount('#app');
+</script>
+</body>
+</html>
