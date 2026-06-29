@@ -35,12 +35,8 @@ export function LandingPage({ onLogin }) {
     <main className={`landing-page landing-view-${landingPage}`}>
       <FloatingParticles />
       <header className="landing-header">
-        <button className="landing-brand" onClick={() => navigate('/')}>
-          <div className="brand-mark small"><Leaf size={22} /></div>
-          <div>
-            <strong>GREENOVA</strong>
-            <span>Nông nghiệp số Long An</span>
-          </div>
+        <button className="landing-brand" onClick={() => navigate('/')} style={{ padding: 0, border: 'none', background: 'transparent' }}>
+          <img src="/color-wordmark.svg" alt="Greenova" style={{ height: 56, filter: 'brightness(0) invert(1)' }} />
         </button>
         <nav className="landing-nav">
           {landingTabs.map((tab) => (

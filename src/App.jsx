@@ -110,7 +110,9 @@ function Shell({ role, activePage, setActivePage, navItems = [], onLogout, onRes
   const navContent = (isDrawer = false) => (
     <>
       <div className="sidebar-brand">
-        <div className="brand-mark small"><Leaf size={22} /></div>
+        <div className="brand-mark small" style={{ background: 'transparent', padding: 0 }}>
+          <img src="/fav-white.ico" alt="Logo" style={{ width: 34, height: 34 }} />
+        </div>
         <div className="sidebar-brand-text">
           <strong>GREENOVA</strong>
           <span>Agricultural Digital Ecosystem</span>
