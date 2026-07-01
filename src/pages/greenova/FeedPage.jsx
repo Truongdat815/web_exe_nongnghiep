@@ -84,6 +84,12 @@ const farmerSeedPosts = [
   },
 ];
 
+const expertTreatmentSuggestions = [
+  'Khuyến nghị tỉa lá bệnh, ngưng tưới chiều tối 2 ngày và theo dõi mặt dưới lá.',
+  'Có thể dùng Nano đồng bạc liều nhẹ theo nhãn, phun lúc sáng sớm và tránh trước mưa.',
+  'Bổ sung Trichoderma khi đất ráo để phục hồi hệ rễ, chưa nên bón thêm đạm.',
+];
+
 export function FeedPage({ role, notify }) {
   const account = roles.find((item) => item.id === role);
   const [stream, setStream] = useState(defaultIntelStream);
@@ -150,14 +156,15 @@ export function FeedPage({ role, notify }) {
       notify('Bạn nhập nội dung hoặc chọn ảnh/video trước nha.');
       return;
     }
+    const isExpert = role === 'expert';
     setFarmerPosts([
       {
         id: `FARM-FEED-${Date.now()}`,
-        author: account?.accountName || 'Nông dân GREENOVA',
-        role: 'Nông dân · Bến Lức',
+        author: account?.accountName || (isExpert ? 'Kỹ sư GREENOVA' : 'Nông dân GREENOVA'),
+        role: isExpert ? 'Kỹ sư nông nghiệp · Bến Lức' : 'Nông dân · Bến Lức',
         time: 'Vừa xong',
-        content: content || 'Đã thêm ảnh/video từ vườn.',
-        tags: ['Hỏi đáp', 'Vườn nhà'],
+        content: content || (isExpert ? 'Đã thêm hình ảnh cảnh báo kỹ thuật cho bà con.' : 'Đã thêm ảnh/video từ vườn.'),
+        tags: isExpert ? ['Khuyến cáo kỹ thuật', 'BVTV', 'Bến Lức'] : ['Hỏi đáp', 'Vườn nhà'],
         likes: 0,
         liked: false,
         comments: 0,
@@ -169,7 +176,7 @@ export function FeedPage({ role, notify }) {
     ]);
     setDraft('');
     setDraftMedia(null);
-    notify('Đã đăng bài lên bảng tin.');
+    notify(isExpert ? 'Đã đăng hướng dẫn kỹ thuật lên bảng tin.' : 'Đã đăng bài lên bảng tin.');
   };
 
   const toggleLike = (postId) => {
@@ -198,25 +205,35 @@ export function FeedPage({ role, notify }) {
     setCommentDrafts((drafts) => ({ ...drafts, [postId]: '' }));
   };
 
-  if (role === 'farmer') {
+  const applyExpertSuggestion = (postId, text) => {
+    setCommentDrafts((drafts) => ({ ...drafts, [postId]: text }));
+    window.setTimeout(() => document.getElementById(`farmer-comment-${postId}`)?.focus(), 0);
+  };
+
+  if (role === 'farmer' || role === 'expert') {
+    const isExpertFeed = role === 'expert';
     return (
       <section className="farmer-feed page-grid">
         <header className="farmer-feed-head">
           <div>
-            <p className="eyebrow">Cộng đồng</p>
-            <h1>Bảng tin nhà nông</h1>
-            <p>Đăng câu hỏi, xem cảnh báo của kỹ sư và trao đổi kinh nghiệm canh tác.</p>
+            <p className="eyebrow">{isExpertFeed ? 'Kỹ sư nông nghiệp' : 'Cộng đồng'}</p>
+            <h1>{isExpertFeed ? 'Bảng tin tư vấn cây trồng' : 'Bảng tin nhà nông'}</h1>
+            <p>
+              {isExpertFeed
+                ? 'Theo dõi câu hỏi của nông dân, bình luận biện pháp xử lý bệnh và gợi ý vật tư phù hợp.'
+                : 'Đăng câu hỏi, xem cảnh báo của kỹ sư và trao đổi kinh nghiệm canh tác.'}
+            </p>
           </div>
         </header>
 
         <article className="farmer-composer">
           <div className="farmer-composer-top">
-            <div className="farmer-avatar">N</div>
+            <div className={isExpertFeed ? 'farmer-avatar expert' : 'farmer-avatar'}>{isExpertFeed ? 'K' : 'N'}</div>
             <textarea
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               rows={3}
-              placeholder="Bạn đang nghĩ gì về vườn hôm nay?"
+              placeholder={isExpertFeed ? 'Đăng cảnh báo vùng, hướng dẫn xử lý bệnh hoặc khuyến cáo dùng thuốc...' : 'Bạn đang nghĩ gì về vườn hôm nay?'}
             />
           </div>
           {draftMedia && (
@@ -238,7 +255,9 @@ export function FeedPage({ role, notify }) {
               <Video size={16} /> Video
               <input type="file" accept="video/*" onChange={chooseDraftMedia} />
             </label>
-            <button type="button" className="primary" onClick={submitFarmerPost}><Send size={16} /> Đăng</button>
+            <button type="button" className="primary" onClick={submitFarmerPost}>
+              <Send size={16} /> {isExpertFeed ? 'Đăng hướng dẫn' : 'Đăng'}
+            </button>
           </div>
         </article>
 
@@ -293,7 +312,7 @@ export function FeedPage({ role, notify }) {
                     </div>
                   ))}
                   <div className="farmer-comment-input">
-                    <div className="farmer-comment-avatar">B</div>
+                    <div className="farmer-comment-avatar">{isExpertFeed ? 'K' : 'B'}</div>
                     <input
                       id={`farmer-comment-${post.id}`}
                       value={commentDrafts[post.id] || ''}
@@ -301,10 +320,19 @@ export function FeedPage({ role, notify }) {
                       onKeyDown={(event) => {
                         if (event.key === 'Enter') submitComment(post.id);
                       }}
-                      placeholder="Viết bình luận..."
+                      placeholder={isExpertFeed ? 'Viết biện pháp xử lý hoặc gợi ý thuốc...' : 'Viết bình luận...'}
                     />
                     <button onClick={() => submitComment(post.id)}><Send size={15} /></button>
                   </div>
+                  {isExpertFeed && (
+                    <div className="expert-comment-suggestions">
+                      {expertTreatmentSuggestions.map((suggestion) => (
+                        <button key={suggestion} onClick={() => applyExpertSuggestion(post.id, suggestion)}>
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </article>
             ))}
@@ -312,16 +340,18 @@ export function FeedPage({ role, notify }) {
 
           <aside className="farmer-feed-side">
             <div>
-              <strong>Chủ đề nhanh</strong>
-              <span>#Chanh không hạt</span>
-              <span>#Nấm lá</span>
-              <span>#IoT tưới</span>
-              <span>#Bán nông sản</span>
+              <strong>{isExpertFeed ? 'Ca cần ưu tiên' : 'Chủ đề nhanh'}</strong>
+              {(isExpertFeed
+                ? ['#Đốm lá sau mưa', '#Úng rễ khóm', '#Bọ trĩ đọt non', '#Gợi ý thuốc']
+                : ['#Chanh không hạt', '#Nấm lá', '#IoT tưới', '#Bán nông sản']
+              ).map((topic) => <span key={topic}>{topic}</span>)}
             </div>
             <div>
-              <strong>Kỹ sư online</strong>
-              <span>KS. Nguyễn Minh Khoa</span>
-              <span>ThS. Lê Thu Hà</span>
+              <strong>{isExpertFeed ? 'Vật tư hay kê đơn' : 'Kỹ sư online'}</strong>
+              {(isExpertFeed
+                ? ['Nano đồng bạc', 'Trichoderma', 'Bẫy dính vàng']
+                : ['KS. Nguyễn Minh Khoa', 'ThS. Lê Thu Hà']
+              ).map((item) => <span key={item}>{item}</span>)}
             </div>
           </aside>
         </div>
