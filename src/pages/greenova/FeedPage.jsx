@@ -226,13 +226,13 @@ export function FeedPage({ role, notify }) {
           </div>
         </header>
 
-        <article className="farmer-composer">
+        <article className="farmer-composer farmer-facebook-composer">
           <div className="farmer-composer-top">
             <div className={isExpertFeed ? 'farmer-avatar expert' : 'farmer-avatar'}>{isExpertFeed ? 'K' : 'N'}</div>
             <textarea
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
-              rows={3}
+              rows={2}
               placeholder={isExpertFeed ? 'Đăng cảnh báo vùng, hướng dẫn xử lý bệnh hoặc khuyến cáo dùng thuốc...' : 'Bạn đang nghĩ gì về vườn hôm nay?'}
             />
           </div>
@@ -246,12 +246,13 @@ export function FeedPage({ role, notify }) {
               )}
             </div>
           )}
+          <div className="farmer-composer-divider" />
           <div className="farmer-composer-actions">
-            <label>
+            <label className="media-action image-action">
               <ImageIcon size={16} /> Ảnh
               <input type="file" accept="image/*" onChange={chooseDraftMedia} />
             </label>
-            <label>
+            <label className="media-action video-action">
               <Video size={16} /> Video
               <input type="file" accept="video/*" onChange={chooseDraftMedia} />
             </label>

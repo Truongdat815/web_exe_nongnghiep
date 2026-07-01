@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Bell,
   CheckCircle2,
@@ -181,13 +181,39 @@ function Shell({ role, activePage, setActivePage, navItems = [], onLogout, onRes
 
       <main className="workspace">
         <header className="topbar">
-          <button className="icon-button mobile-only" onClick={() => setMobileOpen(true)}>
-            <Menu size={20} />
-          </button>
-          <div>
+          <div className="topbar-brand">
+            <img src="/fav-white.ico" alt="GREENOVA" />
+            <div>
+              <strong>GREENOVA</strong>
+              <span>{roleTheme[role].label}</span>
+            </div>
+          </div>
+
+          <div className="topbar-title">
             <p className="eyebrow">{roleTheme[role].label}</p>
             <h2>{nav.find((item) => item.id === activePage)?.label || 'Dashboard'}</h2>
           </div>
+
+          <nav className="top-nav-tabs" aria-label="Menu chính">
+            {nav.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.id}
+                  to={`/${role}/${item.id}`}
+                  className={activePage === item.id ? 'active' : ''}
+                  title={item.label}
+                  onClick={() => {
+                    setActivePage(item.id);
+                    setMobileOpen(false);
+                  }}
+                >
+                  <Icon size={20} />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
           <div className="topbar-actions">
             <div className="search-pill">
               <Search size={16} />
@@ -198,6 +224,9 @@ function Shell({ role, activePage, setActivePage, navItems = [], onLogout, onRes
             <button className="icon-button" onClick={() => setNotifOpen((value) => !value)}>
               <Bell size={18} />
               {unread > 0 && <i>{unread}</i>}
+            </button>
+            <button className="icon-button topbar-menu-button" onClick={() => setMobileOpen(true)} title="Tài khoản">
+              <Menu size={18} />
             </button>
           </div>
           {notifOpen && (
@@ -220,6 +249,8 @@ function Shell({ role, activePage, setActivePage, navItems = [], onLogout, onRes
 }
 
 export default function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [state, setState] = useState(loadState);
   const [role, setRole] = useState(null);
   const [activePage, setActivePage] = useState('overview');
@@ -236,9 +267,22 @@ export default function App() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
 
+  useEffect(() => {
+    if (!role) return;
+    const [, pathRole, pathPage] = location.pathname.split('/');
+    const firstPage = getFirstPageForRole(role);
+    const rolePages = roleApps[role]?.pages || [];
+    const validPage = rolePages.some((item) => item.id === pathPage) ? pathPage : firstPage;
+    if (pathRole !== role || pathPage !== validPage) {
+      navigate(`/${role}/${validPage}`, { replace: true });
+    }
+  }, [location.pathname, navigate, role]);
+
   const handleRoleLogin = (roleId) => {
+    const firstPage = getFirstPageForRole(roleId);
     setRole(roleId);
-    setActivePage(getFirstPageForRole(roleId));
+    setActivePage(firstPage);
+    navigate(`/${roleId}/${firstPage}`, { replace: true });
   };
 
   if (!role) return <LandingPage onLogin={handleRoleLogin} />;
@@ -251,7 +295,10 @@ export default function App() {
     state,
     setState,
     notify,
-    onLogout: () => setRole(null),
+    onLogout: () => {
+      setRole(null);
+      navigate('/', { replace: true });
+    },
     onReset: () => {
       setState(initialGreenovaState);
       notify('Đã reset toàn bộ dữ liệu demo.');

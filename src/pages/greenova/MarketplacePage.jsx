@@ -15,6 +15,7 @@ import {
   Star,
   Store,
   Tractor,
+  X,
 } from 'lucide-react';
 import { currency, addLedgerEntry, Badge } from './pageUtils';
 
@@ -192,6 +193,7 @@ export function MarketplacePage({ state, setState, notify }) {
   const [activeCategory, setActiveCategory] = useState('all');
   const [query, setQuery] = useState('');
   const [cart, setCart] = useState([]);
+  const [cartOpen, setCartOpen] = useState(false);
 
   const filteredCatalog = useMemo(() => {
     const text = query.trim().toLowerCase();
@@ -232,6 +234,7 @@ export function MarketplacePage({ state, setState, notify }) {
       return [...prev, { productId: product.id, quantity: 1 }];
     });
     notify(`Đã thêm ${product.name} vào giỏ vật tư.`);
+    setCartOpen(true);
   };
 
   const changeQuantity = (productId, delta) => {
@@ -296,6 +299,7 @@ export function MarketplacePage({ state, setState, notify }) {
     });
 
     setCart([]);
+    setCartOpen(false);
     notify(`Đã tạo đơn escrow ${currency(cartTotal)} cho giỏ vật tư.`);
   };
 
@@ -391,12 +395,17 @@ export function MarketplacePage({ state, setState, notify }) {
           </div>
         </main>
 
-        <aside className="supply-cart">
+        {cartOpen && <button className="supply-cart-backdrop" aria-label="Đóng giỏ hàng" onClick={() => setCartOpen(false)} />}
+
+        <aside className={`supply-cart ${cartOpen ? 'open' : ''}`}>
           <div className="supply-cart-head">
             <div>
               <p className="eyebrow">Giỏ vật tư</p>
               <h2>Thanh toán escrow</h2>
             </div>
+            <button className="supply-cart-close" onClick={() => setCartOpen(false)} aria-label="Đóng giỏ hàng">
+              <X size={17} />
+            </button>
             <ShoppingCart size={22} />
           </div>
 
@@ -435,6 +444,16 @@ export function MarketplacePage({ state, setState, notify }) {
           </button>
           <p className="supply-note">Tiền được khóa 48h, chỉ giải ngân cho đại lý sau khi nông dân xác nhận nhận hàng.</p>
         </aside>
+      </div>
+
+      <div className="supply-mobile-checkout" aria-label="Giỏ vật tư mobile">
+        <div>
+          <span>{cartLines.length} mặt hàng</span>
+          <strong>{currency(cartTotal)}</strong>
+        </div>
+        <button onClick={() => setCartOpen(true)}>
+          <ShoppingCart size={16} /> Giỏ hàng
+        </button>
       </div>
     </section>
   );
