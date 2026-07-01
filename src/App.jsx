@@ -1,20 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Bell,
-  Bot,
-  Building2,
-  ChevronRight,
   CheckCircle2,
-  Leaf,
-  LockKeyhole,
   LogOut,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
   RefreshCcw,
   Search,
-  Sprout,
-  Store,
   X,
 } from 'lucide-react';
 import { defaultFeedPosts, initialGreenovaState, roles } from './data/greenovaData';
@@ -119,6 +113,17 @@ function Shell({ role, activePage, setActivePage, navItems = [], onLogout, onRes
         </div>
       </div>
 
+      {!isDrawer && (
+        <button
+          className="sidebar-collapse-toggle"
+          onClick={() => setSidebarCollapsed((value) => !value)}
+          aria-label={sidebarCollapsed ? 'Mở rộng menu' : 'Thu gọn menu'}
+          title={sidebarCollapsed ? 'Mở rộng menu' : 'Thu gọn menu'}
+        >
+          {sidebarCollapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
+        </button>
+      )}
+
       <div className="account-card">
         <RoleIcon size={18} style={{ color: roleTheme[role].color }} />
         <div className="account-copy">
@@ -131,8 +136,9 @@ function Shell({ role, activePage, setActivePage, navItems = [], onLogout, onRes
         {nav.map((item) => {
           const Icon = item.icon;
           return (
-            <button
+            <Link
               key={item.id}
+              to={`/${role}/${item.id}`}
               className={activePage === item.id ? 'active' : ''}
               title={item.label}
               onClick={() => {
@@ -142,7 +148,7 @@ function Shell({ role, activePage, setActivePage, navItems = [], onLogout, onRes
             >
               <Icon size={18} />
               <span>{item.label}</span>
-            </button>
+            </Link>
           );
         })}
       </nav>

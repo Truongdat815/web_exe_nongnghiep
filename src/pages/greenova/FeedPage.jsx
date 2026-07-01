@@ -1,355 +1,504 @@
 import { useState } from 'react';
 import {
-  AlertTriangle,
+  Activity,
+  AlertOctagon,
   Bot,
-  Camera,
-  ClipboardList,
-  FileCheck2,
+  CloudLightning,
+  Filter,
   Heart,
   Image as ImageIcon,
-  MoreHorizontal,
-  QrCode,
+  LineChart,
+  MapPin,
   MessageCircle,
+  Radio,
+  RefreshCcw,
   Send,
-  Share2,
-  Smile,
-  Sprout,
+  ShieldAlert,
+  ThermometerSun,
+  Video,
+  Wifi,
+  X,
 } from 'lucide-react';
-import { roles } from '../../data/greenovaData';
+import { defaultIntelStream, roles } from '../../data/greenovaData';
 
-export function FeedPage({ state, setState, role, notify }) {
+const farmerSeedPosts = [
+  {
+    id: 'FARM-FEED-01',
+    author: 'Ngô Hoàng Trường Đạt',
+    role: 'Nông dân · Thạnh Phú',
+    time: '15 phút trước',
+    content: 'Vườn chanh sau mưa có vài lá đốm vàng nhẹ. Mình đã giảm tưới chiều nay, bà con có gặp tình trạng này chưa?',
+    tags: ['Chanh không hạt', 'Đốm lá', 'Bến Lức'],
+    likes: 18,
+    liked: false,
+    comments: 4,
+    commentList: [
+      { id: 'CMT-F-01', author: 'KS. Nguyễn Minh Khoa', text: 'Anh kiểm tra mặt dưới lá thêm giúp em, nếu lan nhanh thì tạo SOS để kỹ sư xem kỹ hơn.' },
+    ],
+    tone: 'lime',
+    media: {
+      type: 'image',
+      url: '/lime_orchard.png',
+      alt: 'Vườn chanh của nông dân',
+    },
+  },
+  {
+    id: 'FARM-FEED-02',
+    author: 'KS. Nguyễn Minh Khoa',
+    role: 'Kỹ sư nông nghiệp',
+    time: '1 giờ trước',
+    content: 'Độ ẩm không khí cao liên tục, bà con nên thăm vườn buổi sáng và tránh làm ướt tán lá khi tưới.',
+    tags: ['Cảnh báo vùng', 'Nấm lá'],
+    likes: 42,
+    liked: false,
+    comments: 9,
+    commentList: [
+      { id: 'CMT-F-02', author: 'Mai Thị Lan', text: 'Cảm ơn kỹ sư, sáng nay em đã mở rãnh thoát nước trước.' },
+    ],
+    tone: 'alert',
+    media: {
+      type: 'image',
+      url: '/botanical_bg.png',
+      alt: 'Kiểm tra lá cây ngoài vườn',
+    },
+  },
+  {
+    id: 'FARM-FEED-03',
+    author: 'Mai Thị Lan',
+    role: 'Nông dân trồng khóm',
+    time: '3 giờ trước',
+    content: 'Lô khóm gần mương đã thoát nước tốt hơn sau khi vét rãnh. Cảm biến báo độ ẩm còn 68%, cây đứng lại rồi.',
+    tags: ['Khóm', 'IoT', 'Thoát nước'],
+    likes: 27,
+    liked: false,
+    comments: 6,
+    commentList: [
+      { id: 'CMT-F-03', author: 'Ngô Hoàng Trường Đạt', text: 'Nhìn ổn hơn nhiều đó chị, khóm sau mưa cần thoát nước nhanh.' },
+    ],
+    tone: 'pineapple',
+    media: {
+      type: 'image',
+      url: '/pineapple_field.png',
+      alt: 'Ruộng khóm sau mưa',
+    },
+  },
+];
+
+const expertTreatmentSuggestions = [
+  'Khuyến nghị tỉa lá bệnh, ngưng tưới chiều tối 2 ngày và theo dõi mặt dưới lá.',
+  'Có thể dùng Nano đồng bạc liều nhẹ theo nhãn, phun lúc sáng sớm và tránh trước mưa.',
+  'Bổ sung Trichoderma khi đất ráo để phục hồi hệ rễ, chưa nên bón thêm đạm.',
+];
+
+export function FeedPage({ role, notify }) {
   const account = roles.find((item) => item.id === role);
-  const [content, setContent] = useState('');
-  const [tagText, setTagText] = useState(role === 'expert' ? 'Cảnh báo dịch, Bến Lức' : 'Chanh không hạt, Hỏi đáp');
+  const [stream, setStream] = useState(defaultIntelStream);
+  const [filter, setFilter] = useState('ALL');
+  const [farmerPosts, setFarmerPosts] = useState(farmerSeedPosts);
+  const [draft, setDraft] = useState('');
+  const [draftMedia, setDraftMedia] = useState(null);
   const [commentDrafts, setCommentDrafts] = useState({});
-  const [feedFilter, setFeedFilter] = useState('all');
 
-  const visiblePosts = (state.feedPosts || []).filter((post) => {
-    if (feedFilter === 'all') return true;
-    if (feedFilter === 'question') return post.type === 'question';
-    if (feedFilter === 'alert') return post.type === 'alert' || post.type === 'guide';
-    return post.tags.some((tag) => tag.toLowerCase().includes(feedFilter.toLowerCase()));
+  const visibleStream = stream.filter(evt => {
+    if (filter === 'ALL') return true;
+    if (filter === 'CRITICAL') return evt.severity === 'high';
+    if (filter === 'IOT') return evt.type === 'IOT_TELEMETRY';
+    if (filter === 'AI') return evt.source.includes('AI');
+    return true;
   });
 
-  const createPost = () => {
-    const cleanContent = content.trim();
-    if (!cleanContent) {
-      notify('Bạn nhập nội dung bài viết trước đã nha.');
-      return;
-    }
-    const tags = tagText
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean)
-      .slice(0, 4);
-
-    setState((prev) => ({
-      ...prev,
-      feedPosts: [
-        {
-          id: `POST-${Date.now()}`,
-          authorRole: role,
-          authorName: account.accountName,
-          authorTitle: role === 'expert' ? 'Kỹ sư nông nghiệp' : 'Nông dân',
-          location: account.location,
-          content: cleanContent,
-          tags,
-          type: role === 'expert' ? 'alert' : 'question',
-          mediaTitle: tags[0] || 'Bài đăng GREENOVA',
-          mediaTone: role === 'expert' ? 'guide' : 'field',
-          likes: 0,
-          comments: [],
-          createdAt: new Date().toISOString(),
-        },
-        ...(prev.feedPosts || []),
-      ],
-    }));
-    setContent('');
-    notify('Đã đăng bài lên Bảng tin.');
-  };
-
-  const likePost = (postId) => {
-    setState((prev) => ({
-      ...prev,
-      feedPosts: prev.feedPosts.map((post) =>
-        post.id === postId ? { ...post, likes: post.likes + 1 } : post,
-      ),
-    }));
-    notify('Đã đánh dấu bài viết là hữu ích.');
-  };
-
-  const addComment = (postId) => {
-    const cleanContent = (commentDrafts[postId] || '').trim();
-    if (!cleanContent) {
-      notify('Bạn nhập bình luận trước đã nha.');
-      return;
-    }
-    setState((prev) => ({
-      ...prev,
-      feedPosts: prev.feedPosts.map((post) =>
-        post.id === postId
-          ? {
-              ...post,
-              comments: [
-                ...post.comments,
-                {
-                  id: `CMT-${Date.now()}`,
-                  authorName: account.accountName,
-                  authorRole: role,
-                  content: cleanContent,
-                },
-              ],
-            }
-          : post,
-      ),
-    }));
-    setCommentDrafts((prev) => ({ ...prev, [postId]: '' }));
-    notify('Đã thêm bình luận.');
-  };
-
-  const seedComposer = (kind) => {
-    const presets = {
-      photo: {
-        content: 'Mình vừa chụp ảnh vườn sáng nay. Lá ở hàng gần mương có vài đốm lạ, nhờ mọi người xem giúp.',
-        tags: 'Ảnh vườn, Chanh không hạt, Bến Lức',
-      },
-      symptom: {
-        content: 'Triệu chứng: lá vàng nhẹ từ mép vào, xuất hiện sau mưa lớn 2 ngày. Độ ẩm không khí đang trên 85%.',
-        tags: 'Triệu chứng, Nấm lá, IoT',
-      },
-      mood: {
-        content: 'Hôm nay hệ thống IoT báo van tưới tự bật đúng lúc đất xuống 38%. Demo này thấy khá sát nhu cầu thực tế.',
-        tags: 'Cảm nhận, IoT tưới tự động',
-      },
+  const triggerManualAlert = () => {
+    const newAlert = {
+      id: `EVT-${Date.now()}`,
+      type: "CRITICAL_ALERT",
+      source: `Chuyên gia ${account.accountName}`,
+      location: "Khu vực giám sát",
+      title: "Cảnh báo khẩn cấp (Thủ công)",
+      description: "Chuyên gia vừa kích hoạt cảnh báo khẩn. Yêu cầu toàn bộ nông trại kiểm tra hệ thống tiêu thoát nước ngay lập tức.",
+      severity: "high",
+      timestamp: new Date().toISOString(),
+      metrics: { status: "URGENT", level: 5 }
     };
-    setContent(presets[kind].content);
-    setTagText(presets[kind].tags);
-    notify('Đã điền nội dung mẫu vào ô đăng bài.');
+    setStream([newAlert, ...stream]);
+    notify('Đã phát đi cảnh báo khẩn cấp trên toàn hệ thống!');
   };
 
-  const sharePost = async (post) => {
-    const text = `${post.authorName}: ${post.content}`;
-    try {
-      await navigator.clipboard.writeText(text);
-      notify('Đã copy nội dung bài viết để chia sẻ.');
-    } catch {
-      notify('Đã tạo hành động chia sẻ demo.');
+  const getSeverityColor = (sev) => {
+    if (sev === 'high') return 'red';
+    if (sev === 'warning') return 'orange';
+    if (sev === 'success') return 'green';
+    return 'blue';
+  };
+
+  const getIcon = (type) => {
+    if (type === 'CRITICAL_ALERT') return <ShieldAlert size={18} />;
+    if (type === 'IOT_TELEMETRY') return <Radio size={18} />;
+    if (type === 'MARKET_INSIGHT') return <LineChart size={18} />;
+    if (type === 'WEATHER_WARNING') return <CloudLightning size={18} />;
+    return <Activity size={18} />;
+  };
+
+  const chooseDraftMedia = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const mediaType = file.type.startsWith('video') ? 'video' : 'image';
+    setDraftMedia({
+      type: mediaType,
+      url: URL.createObjectURL(file),
+      alt: file.name,
+    });
+    event.target.value = '';
+  };
+
+  const submitFarmerPost = () => {
+    const content = draft.trim();
+    if (!content && !draftMedia) {
+      notify('Bạn nhập nội dung hoặc chọn ảnh/video trước nha.');
+      return;
     }
+    const isExpert = role === 'expert';
+    setFarmerPosts([
+      {
+        id: `FARM-FEED-${Date.now()}`,
+        author: account?.accountName || (isExpert ? 'Kỹ sư GREENOVA' : 'Nông dân GREENOVA'),
+        role: isExpert ? 'Kỹ sư nông nghiệp · Bến Lức' : 'Nông dân · Bến Lức',
+        time: 'Vừa xong',
+        content: content || (isExpert ? 'Đã thêm hình ảnh cảnh báo kỹ thuật cho bà con.' : 'Đã thêm ảnh/video từ vườn.'),
+        tags: isExpert ? ['Khuyến cáo kỹ thuật', 'BVTV', 'Bến Lức'] : ['Hỏi đáp', 'Vườn nhà'],
+        likes: 0,
+        liked: false,
+        comments: 0,
+        commentList: [],
+        tone: 'lime',
+        media: draftMedia,
+      },
+      ...farmerPosts,
+    ]);
+    setDraft('');
+    setDraftMedia(null);
+    notify(isExpert ? 'Đã đăng hướng dẫn kỹ thuật lên bảng tin.' : 'Đã đăng bài lên bảng tin.');
   };
 
-  const openPostMenu = (post) => {
-    notify(`Menu bài viết: đã lưu "${post.mediaTitle || post.tags[0]}" vào danh sách theo dõi demo.`);
+  const toggleLike = (postId) => {
+    setFarmerPosts((posts) => posts.map((post) => {
+      if (post.id !== postId) return post;
+      const liked = !post.liked;
+      return { ...post, liked, likes: Math.max(0, post.likes + (liked ? 1 : -1)) };
+    }));
   };
 
-  return (
-    <section className="facebook-feed">
-      <aside className="fb-left-rail">
-        <div className="fb-profile-mini">
-          <div className="fb-avatar big">{account.accountName.charAt(0)}</div>
+  const submitComment = (postId) => {
+    const text = (commentDrafts[postId] || '').trim();
+    if (!text) return;
+    setFarmerPosts((posts) => posts.map((post) => (
+      post.id === postId
+        ? {
+            ...post,
+            comments: post.comments + 1,
+            commentList: [
+              ...(post.commentList || []),
+              { id: `CMT-${Date.now()}`, author: account?.accountName || 'Bạn', text },
+            ],
+          }
+        : post
+    )));
+    setCommentDrafts((drafts) => ({ ...drafts, [postId]: '' }));
+  };
+
+  const applyExpertSuggestion = (postId, text) => {
+    setCommentDrafts((drafts) => ({ ...drafts, [postId]: text }));
+    window.setTimeout(() => document.getElementById(`farmer-comment-${postId}`)?.focus(), 0);
+  };
+
+  if (role === 'farmer' || role === 'expert') {
+    const isExpertFeed = role === 'expert';
+    return (
+      <section className="farmer-feed page-grid">
+        <header className="farmer-feed-head">
           <div>
-            <strong>{account.accountName}</strong>
-            <span>{role === 'expert' ? 'Kỹ sư nông nghiệp' : 'Nông dân'} tại {account.location}</span>
+            <p className="eyebrow">{isExpertFeed ? 'Kỹ sư nông nghiệp' : 'Cộng đồng'}</p>
+            <h1>{isExpertFeed ? 'Bảng tin tư vấn cây trồng' : 'Bảng tin nhà nông'}</h1>
+            <p>
+              {isExpertFeed
+                ? 'Theo dõi câu hỏi của nông dân, bình luận biện pháp xử lý bệnh và gợi ý vật tư phù hợp.'
+                : 'Đăng câu hỏi, xem cảnh báo của kỹ sư và trao đổi kinh nghiệm canh tác.'}
+            </p>
           </div>
-        </div>
-        {[
-          ['Cộng đồng Bến Lức', Sprout],
-          ['Ca bệnh đang theo dõi', ClipboardList],
-          ['Cảnh báo dịch tễ', AlertTriangle],
-          ['Kho bài viết kỹ thuật', FileCheck2],
-          ['Nhật ký đã chia sẻ', QrCode],
-        ].map(([label, Icon]) => (
-          <button
-            key={label}
-            className="fb-left-link"
-            onClick={() => {
-              if (label.includes('Ca bệnh')) setFeedFilter('question');
-              else if (label.includes('Cảnh báo')) setFeedFilter('alert');
-              else if (label.includes('Nhật ký')) setFeedFilter('QR');
-              else setFeedFilter('all');
-              notify(`Đã lọc Bảng tin theo: ${label}.`);
-            }}
-          >
-            <Icon size={20} /> {label}
-          </button>
-        ))}
-      </aside>
+        </header>
 
-      <main className="fb-center-feed">
-        {role !== 'expert' && (
-          <div className="fb-stories">
-            {[
-              ['Vườn chanh', 'Độ ẩm thấp, van đã bật'],
-              ['Khóm ven kênh', 'Cần kiểm tra lá vàng'],
-              ['Kỹ sư Khoa', 'Mẹo phòng nấm lá'],
-            ].map(([title, desc]) => (
-              <article key={title} className="fb-story-card">
-                <div className="fb-story-avatar">{title.charAt(0)}</div>
-                <strong>{title}</strong>
-                <span>{desc}</span>
-              </article>
-            ))}
+        <article className="farmer-composer">
+          <div className="farmer-composer-top">
+            <div className={isExpertFeed ? 'farmer-avatar expert' : 'farmer-avatar'}>{isExpertFeed ? 'K' : 'N'}</div>
+            <textarea
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              rows={3}
+              placeholder={isExpertFeed ? 'Đăng cảnh báo vùng, hướng dẫn xử lý bệnh hoặc khuyến cáo dùng thuốc...' : 'Bạn đang nghĩ gì về vườn hôm nay?'}
+            />
           </div>
-        )}
-
-        <article className="fb-composer">
-          <div className="fb-composer-top">
-            <div className="fb-avatar">{account.accountName.charAt(0)}</div>
-            <button className="fb-input-pill" onClick={() => document.getElementById('feed-post-box')?.focus()}>
-              {role === 'expert' ? 'Chia sẻ cảnh báo hoặc hướng dẫn kỹ thuật...' : 'Bạn đang nghĩ gì về vườn hôm nay?'}
+          {draftMedia && (
+            <div className="farmer-draft-media">
+              <button onClick={() => setDraftMedia(null)} aria-label="Xóa media"><X size={16} /></button>
+              {draftMedia.type === 'video' ? (
+                <video src={draftMedia.url} controls />
+              ) : (
+                <img src={draftMedia.url} alt={draftMedia.alt || 'Ảnh bài viết'} />
+              )}
+            </div>
+          )}
+          <div className="farmer-composer-actions">
+            <label>
+              <ImageIcon size={16} /> Ảnh
+              <input type="file" accept="image/*" onChange={chooseDraftMedia} />
+            </label>
+            <label>
+              <Video size={16} /> Video
+              <input type="file" accept="video/*" onChange={chooseDraftMedia} />
+            </label>
+            <button type="button" className="primary" onClick={submitFarmerPost}>
+              <Send size={16} /> {isExpertFeed ? 'Đăng hướng dẫn' : 'Đăng'}
             </button>
-          </div>
-          <textarea
-            id="feed-post-box"
-            value={content}
-            onChange={(event) => setContent(event.target.value)}
-            placeholder={
-              role === 'expert'
-                ? 'Ví dụ: Bà con trồng chanh ở Bến Lức nên kiểm tra mặt dưới lá sau mưa...'
-                : 'Ví dụ: Lá chanh có đốm vàng sau 3 ngày mưa, mình nên xử lý sao?'
-            }
-            rows={3}
-          />
-          <input
-            className="fb-tag-input"
-            value={tagText}
-            onChange={(event) => setTagText(event.target.value)}
-            placeholder="Tag, cách nhau bằng dấu phẩy"
-          />
-          <div className="fb-composer-actions">
-            {role === 'expert' ? (
-              <>
-                <button onClick={() => seedComposer('photo')}><Camera size={19} /> Báo cáo hình ảnh</button>
-                <button onClick={() => seedComposer('symptom')}><AlertTriangle size={19} /> Cảnh báo diện rộng</button>
-              </>
-            ) : (
-              <>
-                <button onClick={() => seedComposer('photo')}><Camera size={19} /> Ảnh vườn</button>
-                <button onClick={() => seedComposer('symptom')}><ImageIcon size={19} /> Triệu chứng</button>
-                <button onClick={() => seedComposer('mood')}><Smile size={19} /> Cảm nhận</button>
-              </>
-            )}
-            <button className="fb-post-button" onClick={createPost}><Send size={16} /> Đăng</button>
           </div>
         </article>
 
-        <div className="fb-post-list">
-          {visiblePosts.map((post) => {
-            const PostIcon = post.authorRole === 'expert' ? Bot : Sprout;
-            return (
-              <article key={post.id} className="fb-post-card">
-                <header className="fb-post-header">
-                  <div className={`fb-avatar ${post.authorRole}`}>
-                    <PostIcon size={18} />
+        <div className="farmer-feed-layout">
+          <main className="farmer-post-list">
+            {farmerPosts.map((post) => (
+              <article key={post.id} className="farmer-post-card">
+                <div className="farmer-post-header">
+                  <div className={post.role.includes('Kỹ sư') ? 'farmer-avatar expert' : 'farmer-avatar'}>
+                    {post.author.charAt(0)}
                   </div>
                   <div>
-                    <strong>{post.authorName}</strong>
-                    <span>{post.authorTitle} · {post.location}</span>
-                    <small>{new Date(post.createdAt).toLocaleString('vi-VN')} · Công khai</small>
+                    <strong>{post.author}</strong>
+                    <span>{post.role} · {post.time}</span>
                   </div>
-                  <button className="fb-icon-plain" onClick={() => openPostMenu(post)}><MoreHorizontal size={20} /></button>
-                </header>
-
-                <p className="fb-post-content">{post.content}</p>
-                <div className="fb-tags">
+                </div>
+                <p>{post.content}</p>
+                {post.media && (
+                  <div className="farmer-post-media">
+                    {post.media.type === 'video' ? (
+                      <video src={post.media.url} controls />
+                    ) : (
+                      <img src={post.media.url} alt={post.media.alt || post.content} loading="lazy" />
+                    )}
+                  </div>
+                )}
+                <div className="farmer-post-tags">
                   {post.tags.map((tag) => <span key={tag}>#{tag}</span>)}
                 </div>
-
-                <div className={`fb-post-media ${post.authorRole} ${post.mediaTone || ''}`}>
-                  <div>
-                    <span>{post.type === 'alert' ? 'Cảnh báo kỹ thuật' : post.type === 'guide' ? 'Hướng dẫn kỹ thuật' : 'Ảnh vườn mô phỏng'}</span>
-                    <strong>{post.mediaTitle || post.tags[0] || 'GREENOVA Field'}</strong>
-                  </div>
-                </div>
-
-                <div className="fb-social-counts">
-                  <span><Heart size={14} /> {post.likes} người thấy hữu ích</span>
-                  <span>{post.comments.length} bình luận</span>
-                </div>
-
-                <div className="fb-post-actions">
-                  <button onClick={() => likePost(post.id)}><Heart size={18} /> Hữu ích</button>
-                  <button onClick={() => document.getElementById(`comment-${post.id}`)?.focus()}><MessageCircle size={18} /> Bình luận</button>
-                  <button onClick={() => sharePost(post)}><Share2 size={18} /> Chia sẻ</button>
-                </div>
-
-                <div className="fb-comment-list">
-                  {post.comments.map((comment) => (
-                    <div key={comment.id} className="fb-comment-item">
-                      <div className={`fb-comment-avatar ${comment.authorRole}`}>
-                        {comment.authorName.charAt(0)}
-                      </div>
-                      <p>
-                        <strong>{comment.authorName}</strong>
-                        {comment.content}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="fb-comment-box">
-                  <div className="fb-comment-avatar">{account.accountName.charAt(0)}</div>
-                  <input
-                    id={`comment-${post.id}`}
-                    value={commentDrafts[post.id] || ''}
-                    onChange={(event) =>
-                      setCommentDrafts((prev) => ({ ...prev, [post.id]: event.target.value }))
-                    }
-                    placeholder="Viết bình luận..."
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter') addComment(post.id);
-                    }}
-                  />
-                  <button onClick={() => addComment(post.id)}>
-                    <Send size={15} />
+                <div className="farmer-post-actions">
+                  <button
+                    className={post.liked ? 'liked' : ''}
+                    onClick={() => toggleLike(post.id)}
+                    aria-label="Thích bài viết"
+                    title="Thích"
+                  >
+                    <Heart size={20} /> <span>{post.likes}</span>
+                  </button>
+                  <button
+                    onClick={() => document.getElementById(`farmer-comment-${post.id}`)?.focus()}
+                    aria-label="Bình luận bài viết"
+                    title="Bình luận"
+                  >
+                    <MessageCircle size={20} /> <span>{post.comments}</span>
                   </button>
                 </div>
+                <div className="farmer-comments">
+                  {(post.commentList || []).map((comment) => (
+                    <div key={comment.id} className="farmer-comment">
+                      <div className="farmer-comment-avatar">{comment.author.charAt(0)}</div>
+                      <p><strong>{comment.author}</strong>{comment.text}</p>
+                    </div>
+                  ))}
+                  <div className="farmer-comment-input">
+                    <div className="farmer-comment-avatar">{isExpertFeed ? 'K' : 'B'}</div>
+                    <input
+                      id={`farmer-comment-${post.id}`}
+                      value={commentDrafts[post.id] || ''}
+                      onChange={(event) => setCommentDrafts((drafts) => ({ ...drafts, [post.id]: event.target.value }))}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') submitComment(post.id);
+                      }}
+                      placeholder={isExpertFeed ? 'Viết biện pháp xử lý hoặc gợi ý thuốc...' : 'Viết bình luận...'}
+                    />
+                    <button onClick={() => submitComment(post.id)}><Send size={15} /></button>
+                  </div>
+                  {isExpertFeed && (
+                    <div className="expert-comment-suggestions">
+                      {expertTreatmentSuggestions.map((suggestion) => (
+                        <button key={suggestion} onClick={() => applyExpertSuggestion(post.id, suggestion)}>
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </article>
-            );
-          })}
-        </div>
-      </main>
+            ))}
+          </main>
 
-      <aside className="fb-right-rail">
-        <article className="fb-side-card">
-          <div className="fb-side-title">
-            <strong>Chủ đề nổi bật</strong>
-            <MessageCircle size={18} />
+          <aside className="farmer-feed-side">
+            <div>
+              <strong>{isExpertFeed ? 'Ca cần ưu tiên' : 'Chủ đề nhanh'}</strong>
+              {(isExpertFeed
+                ? ['#Đốm lá sau mưa', '#Úng rễ khóm', '#Bọ trĩ đọt non', '#Gợi ý thuốc']
+                : ['#Chanh không hạt', '#Nấm lá', '#IoT tưới', '#Bán nông sản']
+              ).map((topic) => <span key={topic}>{topic}</span>)}
+            </div>
+            <div>
+              <strong>{isExpertFeed ? 'Vật tư hay kê đơn' : 'Kỹ sư online'}</strong>
+              {(isExpertFeed
+                ? ['Nano đồng bạc', 'Trichoderma', 'Bẫy dính vàng']
+                : ['KS. Nguyễn Minh Khoa', 'ThS. Lê Thu Hà']
+              ).map((item) => <span key={item}>{item}</span>)}
+            </div>
+          </aside>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <div className="intel-hub-wrapper">
+      <div className="hub-header">
+        <div className="hub-title">
+          <Activity className="pulse-icon" size={28} />
+          <div>
+            <h1>Trung tâm Trí tuệ Nông nghiệp</h1>
+            <p>Hệ thống giám sát Radar & Luồng dữ liệu thời gian thực</p>
           </div>
-          {['Chanh không hạt', 'Nấm lá', 'IoT tưới tự động', 'Escrow vật tư', 'Khóm Bến Lức'].map((topic) => (
-            <button
-              key={topic}
-              onClick={() => {
-                setFeedFilter(topic);
-                notify(`Đã lọc bài theo chủ đề #${topic}.`);
-              }}
-            >
-              #{topic}
-            </button>
-          ))}
-        </article>
-        <article className="fb-side-card">
-          <div className="fb-side-title">
-            <strong>Kỹ sư đang hoạt động</strong>
-            <span className="online-dot" />
+        </div>
+        <div className="hub-status">
+          <span className="live-badge"><span className="dot"></span> LIVE</span>
+          <span className="sync-time">Last sync: {new Date().toLocaleTimeString()}</span>
+        </div>
+      </div>
+
+      {/* TOP METRICS */}
+      <div className="intel-metrics-grid">
+        <div className="intel-metric-card">
+          <div className="metric-icon blue"><Wifi size={24} /></div>
+          <div className="metric-info">
+            <span className="label">Sensor Trực tuyến</span>
+            <strong className="value">42 / 45</strong>
           </div>
-          {['KS. Nguyễn Minh Khoa', 'ThS. Lê Thu Hà', 'Trạm BVTV Long An'].map((name) => (
-            <button
-              key={name}
-              className="fb-contact"
-              onClick={() => notify(`Đã mở chat demo với ${name}.`)}
-            >
-              <div className="fb-contact-avatar">{name.charAt(0)}</div>
-              <span>{name}</span>
-            </button>
-          ))}
-        </article>
-        <article className="fb-side-card">
-          <div className="fb-side-title"><strong>Gợi ý đăng bài</strong></div>
-          <p className="feed-rule">
-            Ghi rõ cây trồng, vị trí, triệu chứng, thời điểm phát hiện và chỉ số IoT nếu có.
-          </p>
-        </article>
-      </aside>
-    </section>
+        </div>
+        <div className="intel-metric-card">
+          <div className="metric-icon red"><AlertOctagon size={24} /></div>
+          <div className="metric-info">
+            <span className="label">Mức độ Dịch tễ</span>
+            <strong className="value">Cảnh báo Cấp 2</strong>
+          </div>
+        </div>
+        <div className="intel-metric-card">
+          <div className="metric-icon teal"><Bot size={24} /></div>
+          <div className="metric-info">
+            <span className="label">AI Confidence (Avg)</span>
+            <strong className="value">89.4%</strong>
+          </div>
+        </div>
+        <div className="intel-metric-card">
+          <div className="metric-icon orange"><ThermometerSun size={24} /></div>
+          <div className="metric-info">
+            <span className="label">Chỉ số Môi trường</span>
+            <strong className="value">Nguy cơ Cao</strong>
+          </div>
+        </div>
+      </div>
+
+      <div className="intel-hub-layout">
+        
+        {/* LEFT COLUMN: RADAR & CONTROLS */}
+        <aside className="intel-sidebar">
+          
+          <div className="intel-panel">
+            <div className="panel-header">
+              <h3><MapPin size={16} /> Radar Cảnh Báo Vùng</h3>
+              {role === 'expert' && (
+                <button className="danger-btn" onClick={triggerManualAlert}>
+                  Phát lệnh Khẩn
+                </button>
+              )}
+            </div>
+            <div className="radar-map-mock">
+              {/* Vòng Radar CSS */}
+              <div className="radar-circle">
+                <div className="radar-sweep"></div>
+                <div className="radar-blip red" style={{ top: '30%', left: '40%' }}></div>
+                <div className="radar-blip orange" style={{ top: '60%', left: '70%' }}></div>
+                <div className="radar-blip blue" style={{ top: '20%', left: '80%' }}></div>
+              </div>
+              <div className="radar-legend">
+                <span><span className="dot red"></span> Dịch bệnh</span>
+                <span><span className="dot orange"></span> Thời tiết</span>
+                <span><span className="dot blue"></span> Môi trường</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="intel-panel">
+            <div className="panel-header">
+              <h3><Filter size={16} /> Bộ lọc Dữ liệu</h3>
+            </div>
+            <div className="filter-group">
+              <button className={`filter-btn ${filter === 'ALL' ? 'active' : ''}`} onClick={() => setFilter('ALL')}>
+                Toàn cảnh (All)
+              </button>
+              <button className={`filter-btn ${filter === 'CRITICAL' ? 'active' : ''}`} onClick={() => setFilter('CRITICAL')}>
+                Nguy cấp (Critical)
+              </button>
+              <button className={`filter-btn ${filter === 'IOT' ? 'active' : ''}`} onClick={() => setFilter('IOT')}>
+                Dữ liệu IoT (Sensors)
+              </button>
+              <button className={`filter-btn ${filter === 'AI' ? 'active' : ''}`} onClick={() => setFilter('AI')}>
+                Phân tích AI
+              </button>
+            </div>
+          </div>
+
+        </aside>
+
+        {/* RIGHT COLUMN: EVENT STREAM */}
+        <main className="intel-stream">
+          <div className="stream-header">
+            <h3>Luồng sự kiện (Live Stream)</h3>
+            <button className="refresh-btn" onClick={() => notify('Đang đồng bộ dữ liệu mới nhất...')}><RefreshCcw size={14} /> Refresh</button>
+          </div>
+          
+          <div className="stream-list">
+            {visibleStream.map((evt) => (
+              <div key={evt.id} className={`stream-item ${evt.severity}`}>
+                <div className="stream-timeline">
+                  <div className={`timeline-icon ${evt.severity}`}>
+                    {getIcon(evt.type)}
+                  </div>
+                  <div className="timeline-line"></div>
+                </div>
+                
+                <div className="stream-content">
+                  <div className="stream-meta">
+                    <span className="source">{evt.source}</span>
+                    <span className="time">{new Date(evt.timestamp).toLocaleTimeString('vi-VN')}</span>
+                  </div>
+                  <h4 className="stream-title">{evt.title}</h4>
+                  <p className="stream-desc">{evt.description}</p>
+                  
+                  <div className="stream-metrics">
+                    {Object.entries(evt.metrics).map(([key, val]) => (
+                      <div key={key} className="metric-pill">
+                        <span className="m-key">{key}:</span>
+                        <span className="m-val">{val}</span>
+                      </div>
+                    ))}
+                    <span className="location-tag"><MapPin size={12} /> {evt.location}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </main>
+      </div>
+    </div>
   );
 }

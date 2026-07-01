@@ -1,5 +1,6 @@
 import {
   Gavel,
+  Sprout
 } from 'lucide-react';
 import { Badge } from './pageUtils';
 
