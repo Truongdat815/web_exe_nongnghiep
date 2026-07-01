@@ -1,11 +1,11 @@
-﻿import {
+import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts';
 import { revenueData, diseaseHeatmap, users } from '../data/mockData';
 import { ShieldAlert, TrendingUp, Users, DollarSign, Activity, AlertTriangle, ShieldCheck, MapPin, Store, Server, QrCode } from 'lucide-react';
 
-const PIE_COLORS = ['#16a34a', '#3b82f6', '#f59e0b', '#ef4444'];
+const PIE_COLORS = ['#15803d', '#854d0e', '#d97706', '#b91c1c']; // Nông nghiệp: Xanh lá đậm, Nâu đất, Vàng lúa, Đỏ gạch
 
 export default function AdminPage() {
   return (
@@ -18,10 +18,10 @@ export default function AdminPage() {
       {/* KPIs */}
       <div className="grid-4" style={{ marginBottom: 24 }}>
         {[
-          { icon: <Users size={24} />, label: 'Người dùng hoạt động', value: '12.847', change: '+320 tuần này', color: '#3b82f6' },
-          { icon: <DollarSign size={24} />, label: 'Doanh thu tháng 6', value: '135M₫', change: '+20.5%', color: '#16a34a' },
-          { icon: <TrendingUp size={24} />, label: 'Giao dịch thành công', value: '4.290', change: '+15%', color: '#f59e0b' },
-          { icon: <AlertTriangle size={24} />, label: 'Tranh chấp cần xử lý', value: '7', change: '-3 so với tuần trước', color: '#ef4444' },
+          { icon: <Users size={24} />, label: 'Người dùng hoạt động', value: '12.847', change: '+320 tuần này', color: '#854d0e' }, // Nâu đất
+          { icon: <DollarSign size={24} />, label: 'Doanh thu tháng 6', value: '135M₫', change: '+20.5%', color: '#15803d' }, // Xanh lá
+          { icon: <TrendingUp size={24} />, label: 'Giao dịch thành công', value: '4.290', change: '+15%', color: '#d97706' }, // Vàng lúa
+          { icon: <AlertTriangle size={24} />, label: 'Tranh chấp cần xử lý', value: '7', change: '-3 so với tuần trước', color: '#b91c1c' }, // Đỏ gạch
         ].map((s, i) => (
           <div key={i} className="glass-card" style={{ padding: 24, position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: s.color }}></div>
@@ -55,9 +55,9 @@ export default function AdminPage() {
                 <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'var(--slate-500)' }} axisLine={false} tickLine={false} dy={10} />
                 <YAxis tick={{ fontSize: 12, fill: 'var(--slate-500)' }} axisLine={false} tickLine={false} dx={-10} />
                 <Tooltip cursor={{ fill: 'rgba(0,0,0,0.02)' }} contentStyle={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 12, fontSize: 13, boxShadow: '0 10px 25px rgba(0,0,0,0.05)' }} />
-                <Bar dataKey="marketplace" name="Sàn TMĐT" fill="#16a34a" stackId="a" radius={[0,0,0,0]} barSize={32} />
-                <Bar dataKey="saas" name="SaaS" fill="#3b82f6" stackId="a" />
-                <Bar dataKey="traceability" name="Truy xuất QR" fill="#f59e0b" stackId="a" radius={[6,6,0,0]} />
+                <Bar dataKey="marketplace" name="Sàn TMĐT" fill="#15803d" stackId="a" radius={[0,0,0,0]} barSize={32} />
+                <Bar dataKey="saas" name="SaaS" fill="#854d0e" stackId="a" />
+                <Bar dataKey="traceability" name="Truy xuất QR" fill="#d97706" stackId="a" radius={[6,6,0,0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -65,7 +65,7 @@ export default function AdminPage() {
 
         {/* Revenue Breakdown */}
         <div className="glass-card" style={{ padding: 24 }}>
-          <div className="card-title" style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}><DollarSign size={20} style={{ color: '#3b82f6' }} /> Phân bổ doanh thu T6</div>
+          <div className="card-title" style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}><DollarSign size={20} style={{ color: '#854d0e' }} /> Phân bổ doanh thu T6</div>
           <ResponsiveContainer width="100%" height={180}>
             <PieChart>
               <Pie data={[
@@ -110,7 +110,7 @@ export default function AdminPage() {
             const isWarning = d.severity >= 6 && d.severity < 8;
             const isCaution = d.severity >= 4 && d.severity < 6;
             
-            const color = isCritical ? '239,68,68' : isWarning ? '249,115,22' : isCaution ? '245,158,11' : '34,197,94';
+            const color = isCritical ? '185,28,28' : isWarning ? '217,119,6' : isCaution ? '202,138,4' : '21,128,61';
             const badgeColor = isCritical ? 'red' : isWarning ? 'orange' : isCaution ? 'yellow' : 'green';
 
             return (
@@ -180,14 +180,14 @@ export default function AdminPage() {
         </div>
 
         <div className="glass-card" style={{ padding: 24 }}>
-          <div className="card-title" style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}><Activity size={20} style={{ color: '#3b82f6' }} /> Hoạt động gần đây</div>
+          <div className="card-title" style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}><Activity size={20} style={{ color: '#854d0e' }} /> Hoạt động gần đây</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {[
-              { icon: <TrendingUp size={16} />, action: 'Giao dịch thành công', detail: 'Nguyễn Văn An mua NPK 20-20-15', time: '2 phút trước', color: 'var(--color-success)', bg: 'rgba(22, 163, 74, 0.1)' },
-              { icon: <AlertTriangle size={16} />, action: 'Tranh chấp mới', detail: 'Trần Thị Bích: "Hàng không đúng chất lượng"', time: '15 phút trước', color: 'var(--color-danger)', bg: 'rgba(239, 68, 68, 0.1)' },
-              { icon: <ShieldCheck size={16} />, action: 'Đăng ký KYC mới', detail: 'Công ty TNHH Nông Dược Phương Nam', time: '1 giờ trước', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.1)' },
-              { icon: <AlertTriangle size={16} />, action: 'Cảnh báo dịch bệnh', detail: 'AI phát hiện rầy nâu Long An', time: '2 giờ trước', color: 'var(--color-warning)', bg: 'rgba(249, 115, 22, 0.1)' },
-              { icon: <QrCode size={16} />, action: 'QR tem phát hành', detail: 'Lô hàng sầu riêng 3 tấn ở Đồng Tháp', time: '3 giờ trước', color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.1)' },
+              { icon: <TrendingUp size={16} />, action: 'Giao dịch thành công', detail: 'Nguyễn Văn An mua NPK 20-20-15', time: '2 phút trước', color: '#15803d', bg: 'rgba(21, 128, 61, 0.1)' },
+              { icon: <AlertTriangle size={16} />, action: 'Tranh chấp mới', detail: 'Trần Thị Bích: "Hàng không đúng chất lượng"', time: '15 phút trước', color: '#b91c1c', bg: 'rgba(185, 28, 28, 0.1)' },
+              { icon: <ShieldCheck size={16} />, action: 'Đăng ký KYC mới', detail: 'Công ty TNHH Nông Dược Phương Nam', time: '1 giờ trước', color: '#854d0e', bg: 'rgba(133, 77, 14, 0.1)' },
+              { icon: <AlertTriangle size={16} />, action: 'Cảnh báo dịch bệnh', detail: 'AI phát hiện rầy nâu Long An', time: '2 giờ trước', color: '#d97706', bg: 'rgba(217, 119, 6, 0.1)' },
+              { icon: <QrCode size={16} />, action: 'QR tem phát hành', detail: 'Lô hàng sầu riêng 3 tấn ở Đồng Tháp', time: '3 giờ trước', color: '#4d7c0f', bg: 'rgba(77, 124, 15, 0.1)' },
             ].map((a, i) => (
               <div key={i} style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
                 <div style={{ width: 40, height: 40, background: a.bg, color: a.color, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{a.icon}</div>

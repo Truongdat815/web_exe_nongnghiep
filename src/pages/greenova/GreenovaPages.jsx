@@ -1,7 +1,9 @@
 export { OverviewPage } from './OverviewPage';
+export { FarmerOverviewPage } from './FarmerOverviewPage';
 export { AIDiagnosisPage } from './AIDiagnosisPage';
 export { FeedPage } from './FeedPage';
 export { MarketplacePage } from './MarketplacePage';
+export { ProduceMarketPage } from './ProduceMarketPage';
 export { OrdersPage } from './OrdersPage';
 export { LedgerPage } from './LedgerPage';
 export { ExpertPage } from './ExpertPage';

@@ -51,6 +51,19 @@ export function LandingPage({ onLogin }) {
         </div>
       </header>
 
+      <div className="landing-route-dots" aria-label="Điều hướng landing">
+        {landingTabs.map((tab) => (
+          <button
+            key={tab.id}
+            className={landingPage === tab.id ? 'active' : ''}
+            onClick={() => navigate(tab.path)}
+            aria-label={tab.label}
+          >
+            <span />
+          </button>
+        ))}
+      </div>
+
       <section className="landing-stage">
         <Routes>
           <Route path="/" element={<HomeSection openAuth={openAuth} goLandingPage={goLandingPage} />} />
