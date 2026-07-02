@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { ChevronRight, Leaf, X } from 'lucide-react';
+import { ChevronRight, X } from 'lucide-react';
 import { roles } from '../../data/greenovaData';
 import { roleTheme } from '../../roles/roleTheme';
 
@@ -15,7 +15,7 @@ export function LandingPage({ onLogin }) {
   const [authMode, setAuthMode] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const landingPage = location.pathname === '/' ? 'home' : location.pathname.substring(1);
   const openAuth = (mode) => setAuthMode(mode);
 
@@ -36,8 +36,9 @@ export function LandingPage({ onLogin }) {
       <FloatingParticles />
       <header className="landing-header">
         <button className="landing-brand" onClick={() => navigate('/')} style={{ padding: 0, border: 'none', background: 'transparent' }}>
-          <img src="/color-wordmark.svg" alt="Greenova" style={{ height: 56, filter: 'brightness(0) invert(1)' }} />
+          <img src="/color-wordmark.svg" alt="Greenova" />
         </button>
+
         <nav className="landing-nav">
           {landingTabs.map((tab) => (
             <button key={tab.id} className={landingPage === tab.id ? 'active' : ''} onClick={() => navigate(tab.path)}>
@@ -45,6 +46,7 @@ export function LandingPage({ onLogin }) {
             </button>
           ))}
         </nav>
+
         <div className="landing-auth">
           <button className="ghost-button" onClick={() => openAuth('login')}>Đăng nhập</button>
           <button className="solid-button" onClick={() => openAuth('register')}>Đăng ký</button>
@@ -75,8 +77,6 @@ export function LandingPage({ onLogin }) {
         </Routes>
       </section>
 
-
-
       {authMode && (
         <div className="auth-overlay" onClick={() => setAuthMode(null)}>
           <section className="auth-dialog" onClick={(event) => event.stopPropagation()}>
@@ -84,12 +84,13 @@ export function LandingPage({ onLogin }) {
             <p className="eyebrow">{authMode === 'login' ? 'Đăng nhập demo' : 'Đăng ký demo'}</p>
             <h2>{authMode === 'login' ? 'Chọn vai trò để vào hệ thống' : 'Tạo tài khoản mẫu theo vai trò'}</h2>
             <p>
-              Bản MVP chưa dùng backend thật, nên bạn chọn role để trải nghiệm dashboard tương ứng.
+              Bản MVP dùng mock data để bạn trải nghiệm nhanh các dashboard nông dân, kỹ sư, đại lý, buyer và admin.
             </p>
             <div className="role-grid">
               {roles.map((role) => {
                 const meta = roleTheme[role.id];
                 const Icon = meta.icon;
+
                 return (
                   <button key={role.id} className="role-card" onClick={() => onLogin(role.id)}>
                     <span className="role-icon" style={{ color: meta.color }}>

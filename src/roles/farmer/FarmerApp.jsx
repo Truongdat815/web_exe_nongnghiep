@@ -4,7 +4,6 @@ import { FeedPage } from '../../pages/greenova/FeedPage';
 import { FarmerOverviewPage } from '../../pages/greenova/FarmerOverviewPage';
 import { LedgerPage } from '../../pages/greenova/LedgerPage';
 import { MarketplacePage } from '../../pages/greenova/MarketplacePage';
-import { OrdersPage } from '../../pages/greenova/OrdersPage';
 import { ProduceMarketPage } from '../../pages/greenova/ProduceMarketPage';
 import { farmerPages } from './pages';
 
@@ -21,7 +20,6 @@ export default function FarmerApp(props) {
     ai: <AIDiagnosisPage {...pageProps} />,
     market: <MarketplacePage {...pageProps} />,
     produce: <ProduceMarketPage {...pageProps} />,
-    orders: <OrdersPage {...pageProps} />,
     ledger: <LedgerPage {...pageProps} />,
   };
 

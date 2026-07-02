@@ -1,16 +1,19 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Bot,
   Camera,
   CheckCircle2,
+  History,
   Image as ImageIcon,
   Leaf,
   Loader2,
+  MessageSquarePlus,
   Mic,
   Paperclip,
   Send,
   Sparkles,
   Sprout,
+  X,
 } from 'lucide-react';
 import { addLedgerEntry, Badge } from './pageUtils';
 
@@ -26,13 +29,7 @@ const INITIAL_MESSAGES = [
     id: 'msg-welcome',
     sender: 'ai',
     time: 'Bây giờ',
-    text: 'Chào chú Đạt, con là GREENOVA AI. Chú mô tả cây trồng, triệu chứng, thời điểm phát hiện và chỉ số IoT nếu có. Con sẽ phân tích sơ bộ, gợi ý xử lý và báo khi nào cần gọi kỹ sư.',
-    sections: [
-      {
-        title: 'Con có thể hỗ trợ',
-        items: ['Nhận diện dấu hiệu nấm lá, thiếu dinh dưỡng, úng rễ.', 'Đọc nhanh độ ẩm, độ mặn, nhiệt độ từ trạm ESP32.', 'Gợi ý bước xử lý an toàn trước khi tạo SOS cho kỹ sư.'],
-      },
-    ],
+    text: 'Chào chú Đạt, chú mô tả triệu chứng hoặc gửi ảnh lá/cây. GREENOVA AI sẽ trả lời ngắn gọn và gợi ý bước xử lý đầu tiên.',
   },
   {
     id: 'msg-sample',
@@ -60,6 +57,68 @@ const INITIAL_MESSAGES = [
     products: ['Nano đồng bạc', 'Trichoderma', 'Bẫy dính vàng'],
   },
 ];
+
+const INITIAL_CHAT_SESSIONS = [
+  {
+    id: 'chat-lime-leaf',
+    title: 'Đốm vàng sau mưa',
+    updatedAt: '14 phút trước',
+    messages: INITIAL_MESSAGES,
+  },
+  {
+    id: 'chat-pineapple-root',
+    title: 'Khóm vàng mép lá',
+    updatedAt: 'Hôm qua',
+    messages: [
+      {
+        id: 'msg-pineapple-user',
+        sender: 'user',
+        time: 'Hôm qua',
+        text: 'Khóm gần mương bị vàng mép lá, rễ hơi mềm sau đợt ngập nước. Có nên bón phân không?',
+      },
+      {
+        id: 'msg-pineapple-ai',
+        sender: 'ai',
+        time: 'Hôm qua',
+        text: 'Ưu tiên thoát nước trước, chưa nên bón phân mạnh. Nếu rễ có mùi hôi hoặc nhũn lan nhanh thì nên tạo SOS để kỹ sư kiểm tra.',
+        diagnosis: 'Nguy cơ úng rễ do thoát nước kém',
+        confidence: 81,
+        severity: 'Cần xử lý sớm',
+        sections: [],
+        products: [],
+      },
+    ],
+  },
+  {
+    id: 'chat-irrigation-salt',
+    title: 'Tưới khi đất hơi mặn',
+    updatedAt: '2 ngày trước',
+    messages: [
+      {
+        id: 'msg-salt-user',
+        sender: 'user',
+        time: '2 ngày trước',
+        text: 'Độ mặn đất 0.9‰, độ ẩm 38%, có nên mở van tưới ngay không?',
+      },
+      {
+        id: 'msg-salt-ai',
+        sender: 'ai',
+        time: '2 ngày trước',
+        text: 'Có thể tưới nhưng nên chia nhịp ngắn 8-10 phút, không mở quá lâu một lần. Đo lại EC sau khi đất ráo mặt.',
+        diagnosis: 'Stress nước và mặn nhẹ',
+        confidence: 76,
+        severity: 'Cảnh báo nước tưới',
+        sections: [],
+        products: [],
+      },
+    ],
+  },
+];
+
+function createChatTitle(text) {
+  const clean = text.replace(/\s+/g, ' ').trim();
+  return clean.length > 34 ? `${clean.slice(0, 34)}...` : clean || 'Cuộc chat mới';
+}
 
 const RESPONSE_LIBRARY = [
   {
@@ -175,24 +234,73 @@ function buildAiMessage(text, farm) {
 }
 
 export function AIDiagnosisPage({ state, setState, notify }) {
+  const [chatSessions, setChatSessions] = useState(INITIAL_CHAT_SESSIONS);
+  const [activeChatId, setActiveChatId] = useState(INITIAL_CHAT_SESSIONS[0].id);
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [draft, setDraft] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [attachedName, setAttachedName] = useState('');
+  const [historyOpen, setHistoryOpen] = useState(false);
   const chatEndRef = useRef(null);
+  const activeChatIdRef = useRef(activeChatId);
   const timerRef = useRef(null);
   const farm = state.farms[0];
 
-  const latestDiagnosis = useMemo(
-    () => messages.filter((message) => message.sender === 'ai' && message.confidence).at(-1),
-    [messages],
-  );
+  useEffect(() => {
+    activeChatIdRef.current = activeChatId;
+  }, [activeChatId]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [messages, isTyping]);
 
   useEffect(() => () => window.clearTimeout(timerRef.current), []);
+
+  const appendToChat = (chatId, entries, userText = '') => {
+    setChatSessions((prev) => prev.map((session) => {
+      if (session.id !== chatId) return session;
+      const shouldRename = userText && (session.title === 'Cuộc chat mới' || session.messages.length <= 1);
+      return {
+        ...session,
+        title: shouldRename ? createChatTitle(userText) : session.title,
+        updatedAt: 'Vừa xong',
+        messages: [...session.messages, ...entries],
+      };
+    }));
+
+    if (activeChatIdRef.current === chatId) {
+      setMessages((prev) => [...prev, ...entries]);
+    }
+  };
+
+  const openChat = (session) => {
+    window.clearTimeout(timerRef.current);
+    setIsTyping(false);
+    setActiveChatId(session.id);
+    activeChatIdRef.current = session.id;
+    setMessages(session.messages);
+    setAttachedName('');
+    setDraft('');
+    setHistoryOpen(false);
+  };
+
+  const startNewChat = () => {
+    window.clearTimeout(timerRef.current);
+    const session = {
+      id: `chat-${Date.now()}`,
+      title: 'Cuộc chat mới',
+      updatedAt: 'Vừa xong',
+      messages: [INITIAL_MESSAGES[0]],
+    };
+    setChatSessions((prev) => [session, ...prev]);
+    setActiveChatId(session.id);
+    activeChatIdRef.current = session.id;
+    setMessages(session.messages);
+    setDraft('');
+    setAttachedName('');
+    setIsTyping(false);
+    setHistoryOpen(false);
+  };
 
   const persistDiagnosis = (aiMessage, userText) => {
     const diagnosis = {
@@ -252,14 +360,15 @@ export function AIDiagnosisPage({ state, setState, notify }) {
       text: attachedName ? `${userText}\nĐính kèm: ${attachedName}` : userText,
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    const chatId = activeChatIdRef.current;
+    appendToChat(chatId, [userMessage], userText);
     setDraft('');
     setAttachedName('');
     setIsTyping(true);
     window.clearTimeout(timerRef.current);
     timerRef.current = window.setTimeout(() => {
       const aiMessage = buildAiMessage(userText, farm);
-      setMessages((prev) => [...prev, aiMessage]);
+      appendToChat(chatId, [aiMessage]);
       persistDiagnosis(aiMessage, userText);
       setIsTyping(false);
       notify?.(aiMessage.confidence >= 75 ? 'AI đã trả lời và ghi nhật ký chẩn đoán.' : 'AI đã tạo khuyến nghị và đánh dấu cần kỹ sư xác minh.');
@@ -273,47 +382,34 @@ export function AIDiagnosisPage({ state, setState, notify }) {
 
   return (
     <section className="ai-chat-page">
-      <aside className="ai-chat-sidebar">
+      {historyOpen && <button className="ai-history-backdrop" aria-label="Đóng lịch sử chat" onClick={() => setHistoryOpen(false)} />}
+
+      <aside className={`ai-chat-sidebar ai-history-panel ${historyOpen ? 'open' : ''}`}>
         <div className="ai-chat-brand">
           <span><Sparkles size={18} /></span>
           <div>
             <strong>GREENOVA AI</strong>
-            <small>Trợ lý bệnh cây & IoT</small>
+            <small>Lịch sử tư vấn</small>
           </div>
+          <button className="ai-history-close" onClick={() => setHistoryOpen(false)} aria-label="Đóng lịch sử">
+            <X size={16} />
+          </button>
         </div>
 
-        <div className="ai-context-card">
-          <p className="eyebrow">Vườn đang theo dõi</p>
-          <h3>{farm.name || 'Vườn chanh Thạnh Phú'}</h3>
-          <div>
-            <span>Cây trồng</span>
-            <strong>{farm.crop}</strong>
-          </div>
-          <div>
-            <span>Độ ẩm đất</span>
-            <strong>{state.devices[0]?.telemetry?.soilMoisture || 82}%</strong>
-          </div>
-          <div>
-            <span>Nhiệt độ</span>
-            <strong>{state.devices[0]?.telemetry?.ambientTemp || 27}°C</strong>
-          </div>
-        </div>
+        <button className="ai-new-chat" onClick={startNewChat}>
+          <MessageSquarePlus size={16} />
+          Chat mới
+        </button>
 
-        {latestDiagnosis && (
-          <div className="ai-context-card">
-            <p className="eyebrow">Kết luận mới nhất</p>
-            <h3>{latestDiagnosis.diagnosis}</h3>
-            <Badge status={latestDiagnosis.confidence >= 75 ? 'success' : 'warning'}>
-              Confidence {latestDiagnosis.confidence}%
-            </Badge>
-          </div>
-        )}
-
-        <div className="ai-prompt-list">
-          <strong>Câu hỏi mẫu</strong>
-          {QUICK_PROMPTS.map((prompt) => (
-            <button key={prompt} onClick={() => sendMessage(prompt)} disabled={isTyping}>
-              {prompt}
+        <div className="ai-history-list">
+          {chatSessions.map((session) => (
+            <button
+              key={session.id}
+              className={session.id === activeChatId ? 'active' : ''}
+              onClick={() => openChat(session)}
+            >
+              <strong>{session.title}</strong>
+              <span>{session.updatedAt}</span>
             </button>
           ))}
         </div>
@@ -321,9 +417,12 @@ export function AIDiagnosisPage({ state, setState, notify }) {
 
       <main className="ai-chat-shell">
         <header className="ai-chat-header">
+          <button className="ai-history-toggle" onClick={() => setHistoryOpen(true)} aria-label="Mở lịch sử chat">
+            <History size={18} />
+          </button>
           <div>
-            <p className="eyebrow">Chat AI chẩn đoán</p>
-            <h1>Hỏi GREENOVA AI về triệu chứng cây trồng</h1>
+            <p className="eyebrow">GREENOVA AI</p>
+            <h1>Chat chẩn đoán cây trồng</h1>
           </div>
           <div className="ai-chat-status">
             <span />
@@ -332,6 +431,14 @@ export function AIDiagnosisPage({ state, setState, notify }) {
         </header>
 
         <div className="ai-message-list">
+          <div className="ai-inline-prompts" aria-label="Câu hỏi mẫu">
+            {QUICK_PROMPTS.slice(0, 2).map((prompt) => (
+              <button key={prompt} onClick={() => sendMessage(prompt)} disabled={isTyping}>
+                {prompt}
+              </button>
+            ))}
+          </div>
+
           {messages.map((message) => (
             <article key={message.id} className={`ai-message ${message.sender}`}>
               <div className="ai-message-avatar">
@@ -413,7 +520,7 @@ export function AIDiagnosisPage({ state, setState, notify }) {
                 }
               }}
               rows={1}
-              placeholder="Mô tả triệu chứng cây trồng, ví dụ: lá vàng, đốm nâu, rễ mềm, độ ẩm đất..."
+              placeholder="Nhập triệu chứng hoặc gửi ảnh..."
               disabled={isTyping}
             />
             <button className="ghost-mic" title="Ghi âm demo"><Mic size={18} /></button>
