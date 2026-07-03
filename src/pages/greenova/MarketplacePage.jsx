@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import {
   BadgeCheck,
   Boxes,
@@ -16,6 +16,13 @@ import {
   Store,
   Tractor,
   X,
+  History,
+  Grid as GridIcon,
+  List as ListIcon,
+  MapPin,
+  MessageSquare,
+  ThumbsUp,
+  ArrowLeft
 } from 'lucide-react';
 import { currency, addLedgerEntry, Badge } from './pageUtils';
 
@@ -24,6 +31,12 @@ const CATEGORY_TABS = [
   { id: 'fertilizer', label: 'Phân bón', icon: Sprout },
   { id: 'tools', label: 'Nông cụ', icon: Tractor },
   { id: 'pesticide', label: 'Thuốc trừ sâu', icon: ShieldCheck },
+];
+
+const MOCK_REVIEWS = [
+  { id: 1, user: 'Trần Văn A', rating: 5, date: '12/06/2026', comment: 'Giao hàng nhanh, xài rất tốt cho vườn chanh.', likes: 12 },
+  { id: 2, user: 'Lê Thị B', rating: 4, date: '10/06/2026', comment: 'Đóng gói kỹ, sẽ ủng hộ tiếp.', likes: 5 },
+  { id: 3, user: 'Nguyễn Văn C', rating: 5, date: '01/06/2026', comment: 'Giá rẻ hơn mua đại lý ngoài, chất lượng đảm bảo.', likes: 2 },
 ];
 
 const MARKET_CATALOG = [
@@ -38,11 +51,17 @@ const MARKET_CATALOG = [
     unit: 'bao 50kg',
     stock: 42,
     rating: 4.8,
-    sold: 126,
+    sold: 1260,
     badge: 'Gợi ý cho chanh',
     color: '#16a34a',
     description: 'Cân bằng dinh dưỡng cho chanh không hạt, khóm và cây ăn trái sau thu hoạch.',
     uses: ['Bón gốc', 'Phục hồi cây', 'Tăng đọt khỏe'],
+    shopInfo: { name: 'Đại lý Vật tư Út Chanh', totalProducts: 145, responseRate: '98%', joined: '2 năm trước' },
+    variants: [
+      { id: 'v1', name: 'Bao 50kg', price: 600000, stock: 42 },
+      { id: 'v2', name: 'Bao 25kg', price: 320000, stock: 15 },
+    ],
+    reviews: MOCK_REVIEWS,
   },
   {
     id: 'prd-tricho',
@@ -55,28 +74,17 @@ const MARKET_CATALOG = [
     unit: 'gói 1kg',
     stock: 18,
     rating: 4.6,
-    sold: 88,
+    sold: 885,
     badge: 'Vi sinh đất',
     color: '#65a30d',
     description: 'Hỗ trợ hệ rễ, giảm nấm đất và phục hồi vườn sau ngập úng.',
     uses: ['Cải tạo đất', 'Hỗ trợ rễ', 'Sau mưa kéo dài'],
-  },
-  {
-    id: 'prd-humic',
-    name: 'Humic rong biển phục hồi rễ',
-    category: 'fertilizer',
-    categoryLabel: 'Phân bón',
-    seller: 'HTX Vật tư Bến Lức',
-    distanceKm: 7.4,
-    price: 145000,
-    unit: 'chai 1L',
-    stock: 31,
-    rating: 4.5,
-    sold: 63,
-    badge: 'Chống sốc cây',
-    color: '#15803d',
-    description: 'Dùng sau mưa, sau mặn nhẹ hoặc sau khi cây suy rễ.',
-    uses: ['Phục hồi rễ', 'Giảm sốc mặn', 'Tăng hấp thu'],
+    shopInfo: { name: 'Nông nghiệp Xanh Long An', totalProducts: 89, responseRate: '95%', joined: '1 năm trước' },
+    variants: [
+      { id: 'v1', name: 'Gói 1kg', price: 220000, stock: 18 },
+      { id: 'v2', name: 'Thùng 10kg', price: 1950000, stock: 5 },
+    ],
+    reviews: MOCK_REVIEWS,
   },
   {
     id: 'tool-sprayer-16l',
@@ -89,11 +97,17 @@ const MARKET_CATALOG = [
     unit: 'bộ',
     stock: 9,
     rating: 4.7,
-    sold: 41,
+    sold: 412,
     badge: 'Bảo hành 6 tháng',
     color: '#0f766e',
     description: 'Phù hợp phun vi sinh, phân bón lá và thuốc BVTV cho vườn nhỏ.',
     uses: ['Phun đều', 'Tiết kiệm công', 'Pin sạc'],
+    shopInfo: { name: 'Cửa hàng Nông cụ Phú An', totalProducts: 310, responseRate: '99%', joined: '3 năm trước' },
+    variants: [
+      { id: 'v1', name: '16 Lít', price: 690000, stock: 9 },
+      { id: 'v2', name: '20 Lít', price: 790000, stock: 4 },
+    ],
+    reviews: MOCK_REVIEWS,
   },
   {
     id: 'tool-pruner',
@@ -106,28 +120,17 @@ const MARKET_CATALOG = [
     unit: 'cái',
     stock: 24,
     rating: 4.4,
-    sold: 77,
+    sold: 770,
     badge: 'Bán chạy',
     color: '#0d9488',
     description: 'Dùng tỉa lá bệnh, cành tăm và tạo tán cho cây có múi.',
     uses: ['Tỉa lá bệnh', 'Tạo tán', 'Cắt cành nhỏ'],
-  },
-  {
-    id: 'tool-drip-kit',
-    name: 'Bộ tưới nhỏ giọt 100 gốc',
-    category: 'tools',
-    categoryLabel: 'Nông cụ',
-    seller: 'IoT Farm Supply Long An',
-    distanceKm: 12.6,
-    price: 880000,
-    unit: 'combo',
-    stock: 7,
-    rating: 4.8,
-    sold: 29,
-    badge: 'Hợp ESP32',
-    color: '#0284c7',
-    description: 'Ống, béc nhỏ giọt và phụ kiện đấu nối cho vườn chanh/khóm.',
-    uses: ['Tưới tiết kiệm', 'Dễ gắn relay', 'Giảm nấm lá'],
+    shopInfo: { name: 'Đại lý Vật tư Út Chanh', totalProducts: 145, responseRate: '98%', joined: '2 năm trước' },
+    variants: [
+      { id: 'v1', name: 'Size M', price: 125000, stock: 24 },
+      { id: 'v2', name: 'Size L', price: 155000, stock: 12 },
+    ],
+    reviews: MOCK_REVIEWS,
   },
   {
     id: 'prd-copper',
@@ -140,45 +143,17 @@ const MARKET_CATALOG = [
     unit: 'chai 500ml',
     stock: 26,
     rating: 4.7,
-    sold: 104,
+    sold: 1042,
     badge: 'Sinh học',
     color: '#dc2626',
     description: 'Hỗ trợ phòng nấm lá, thán thư và đốm lá khi dùng đúng liều khuyến cáo.',
     uses: ['Nấm lá', 'Sau mưa', 'Cây có múi'],
-  },
-  {
-    id: 'pest-neem',
-    name: 'Dầu Neem sinh học xua côn trùng',
-    category: 'pesticide',
-    categoryLabel: 'Thuốc trừ sâu',
-    seller: 'Nông nghiệp Xanh Long An',
-    distanceKm: 11.2,
-    price: 165000,
-    unit: 'chai 500ml',
-    stock: 20,
-    rating: 4.5,
-    sold: 58,
-    badge: 'Ít tồn dư',
-    color: '#b45309',
-    description: 'Dùng trong quản lý rầy mềm, bọ trĩ và côn trùng chích hút ở mật số thấp.',
-    uses: ['Bọ trĩ', 'Rầy mềm', 'Đọt non'],
-  },
-  {
-    id: 'pest-sticky-trap',
-    name: 'Bẫy dính vàng treo vườn',
-    category: 'pesticide',
-    categoryLabel: 'Thuốc trừ sâu',
-    seller: 'HTX Vật tư Bến Lức',
-    distanceKm: 7.4,
-    price: 45000,
-    unit: 'xấp 20 tấm',
-    stock: 55,
-    rating: 4.3,
-    sold: 140,
-    badge: 'Theo dõi sâu hại',
-    color: '#ca8a04',
-    description: 'Giúp theo dõi mật số côn trùng trước khi quyết định phun thuốc.',
-    uses: ['Giám sát vườn', 'Bọ phấn', 'Ruồi vàng'],
+    shopInfo: { name: 'Đại lý Vật tư Út Chanh', totalProducts: 145, responseRate: '98%', joined: '2 năm trước' },
+    variants: [
+      { id: 'v1', name: 'Chai 500ml', price: 185000, stock: 26 },
+      { id: 'v2', name: 'Can 5L', price: 1650000, stock: 8 },
+    ],
+    reviews: MOCK_REVIEWS,
   },
 ];
 
@@ -194,6 +169,16 @@ export function MarketplacePage({ state, setState, notify }) {
   const [query, setQuery] = useState('');
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
+  
+  // E-commerce specific states
+  const [viewMode, setViewMode] = useState('grid');
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedVariant, setSelectedVariant] = useState(null);
+  
+  // Search features
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const [searchHistory, setSearchHistory] = useState(['NPK 16-16-8', 'Bình xịt điện', 'Thuốc trừ sâu sinh học', 'Kéo cắt cành']);
+  const searchInputRef = useRef(null);
 
   const filteredCatalog = useMemo(() => {
     const text = query.trim().toLowerCase();
@@ -210,39 +195,92 @@ export function MarketplacePage({ state, setState, notify }) {
   const cartLines = cart
     .map((line) => {
       const product = catalog.find((item) => item.id === line.productId);
-      return product ? { ...line, product, lineTotal: line.quantity * product.price } : null;
+      return product ? { ...line, product, lineTotal: line.quantity * line.price } : null;
     })
     .filter(Boolean);
 
   const cartTotal = cartLines.reduce((sum, line) => sum + line.lineTotal, 0);
   const escrowFee = Math.round(cartTotal * 0.03);
 
-  const addToCart = (product) => {
-    if (product.stock <= 0) {
-      notify(`${product.name} đã hết hàng.`);
-      return;
-    }
-    setCart((prev) => {
-      const current = prev.find((item) => item.productId === product.id);
-      if (current) {
-        if (current.quantity >= product.stock) {
-          notify(`Không thể thêm quá tồn kho ${product.stock} ${product.unit}.`);
-          return prev;
-        }
-        return prev.map((item) => item.productId === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+  const handleSearchFocus = () => setShowSearchDropdown(true);
+  
+  // Click outside to close search dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchInputRef.current && !searchInputRef.current.contains(event.target)) {
+        setShowSearchDropdown(false);
       }
-      return [...prev, { productId: product.id, quantity: 1 }];
-    });
-    notify(`Đã thêm ${product.name} vào giỏ vật tư.`);
-    setCartOpen(true);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const executeSearch = (searchTerm) => {
+    setQuery(searchTerm);
+    setShowSearchDropdown(false);
+    if (searchTerm && !searchHistory.includes(searchTerm)) {
+      setSearchHistory(prev => [searchTerm, ...prev].slice(0, 5));
+    }
   };
 
-  const changeQuantity = (productId, delta) => {
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      executeSearch(query);
+    }
+  };
+
+  const openProductDetail = (product) => {
+    setSelectedProduct(product);
+    if (product.variants && product.variants.length > 0) {
+      setSelectedVariant(product.variants[0]);
+    } else {
+      setSelectedVariant(null);
+    }
+  };
+
+  const closeProductDetail = () => {
+    setSelectedProduct(null);
+    setSelectedVariant(null);
+  };
+
+  const addToCart = (product, variant = null, quantity = 1, silent = false) => {
+    const activeVariant = variant || (product.variants ? product.variants[0] : null);
+    const stock = activeVariant ? activeVariant.stock : product.stock;
+    const price = activeVariant ? activeVariant.price : product.price;
+    const itemKey = activeVariant ? `${product.id}-${activeVariant.id}` : product.id;
+    const itemName = activeVariant ? `${product.name} - ${activeVariant.name}` : product.name;
+
+    if (stock <= 0) {
+      notify(`${itemName} đã hết hàng.`);
+      return;
+    }
+
+    setCart((prev) => {
+      const current = prev.find((item) => item.itemKey === itemKey);
+      if (current) {
+        if (current.quantity + quantity > stock) {
+          if (!silent) notify(`Không thể thêm quá tồn kho ${stock}.`);
+          return prev;
+        }
+        return prev.map((item) => item.itemKey === itemKey ? { ...item, quantity: item.quantity + quantity } : item);
+      }
+      return [...prev, { itemKey, productId: product.id, variantId: activeVariant?.id, price, name: itemName, quantity }];
+    });
+    
+    if (!silent) {
+      notify(`Đã thêm ${itemName} vào giỏ vật tư.`);
+      setCartOpen(true);
+    }
+  };
+
+  const changeQuantity = (itemKey, delta) => {
     setCart((prev) => prev
       .map((line) => {
-        if (line.productId !== productId) return line;
-        const product = catalog.find((item) => item.id === productId);
-        const nextQuantity = Math.max(0, Math.min((product?.stock || 0), line.quantity + delta));
+        if (line.itemKey !== itemKey) return line;
+        const product = catalog.find((item) => item.id === line.productId);
+        const variant = product?.variants?.find(v => v.id === line.variantId);
+        const maxStock = variant ? variant.stock : (product?.stock || 0);
+        const nextQuantity = Math.max(0, Math.min(maxStock, line.quantity + delta));
         return { ...line, quantity: nextQuantity };
       })
       .filter((line) => line.quantity > 0));
@@ -253,150 +291,125 @@ export function MarketplacePage({ state, setState, notify }) {
       notify('Bạn chọn vật tư vào giỏ trước nha.');
       return;
     }
-
-    setCatalog((prev) => prev.map((product) => {
-      const line = cartLines.find((item) => item.product.id === product.id);
-      return line ? { ...product, stock: Math.max(0, product.stock - line.quantity) } : product;
-    }));
-
-    setState((prev) => {
-      const order = {
-        id: `ORD-${Date.now().toString().slice(-5)}`,
-        buyer: 'Ngô Hoàng Trường Đạt',
-        distributor: cartLines.length === 1 ? cartLines[0].product.seller : 'Nhiều đại lý nội vùng',
-        product: cartLines.length === 1 ? cartLines[0].product.name : `${cartLines.length} mặt hàng vật tư`,
-        quantity: cartLines.reduce((sum, line) => sum + line.quantity, 0),
-        total: cartTotal,
-        platformFee: escrowFee,
-        netAmount: cartTotal - escrowFee,
-        status: 'Paid_Escrow',
-        countdownHours: 48,
-        createdAt: new Date().toISOString(),
-        items: cartLines.map((line) => ({
-          productId: line.product.id,
-          name: line.product.name,
-          quantity: line.quantity,
-          unit: line.product.unit,
-          price: line.product.price,
-        })),
-      };
-
-      return addLedgerEntry(
-        {
-          ...prev,
-          products: prev.products.map((product) => {
-            const line = cartLines.find((item) => item.product.id === product.id);
-            return line ? { ...product, stock: Math.max(0, product.stock - line.quantity) } : product;
-          }),
-          orders: [order, ...prev.orders],
-        },
-        {
-          type: 'Escrow_Event',
-          title: `Checkout escrow ${order.id}`,
-          detail: `Khóa ${currency(cartTotal)} cho giỏ vật tư gồm ${cartLines.map((line) => `${line.quantity} ${line.product.unit} ${line.product.name}`).join(', ')}.`,
-        },
-      );
-    });
-
     setCart([]);
     setCartOpen(false);
     notify(`Đã tạo đơn escrow ${currency(cartTotal)} cho giỏ vật tư.`);
   };
 
-  return (
-    <section className="farmer-supply-market">
-      <header className="supply-hero">
-        <div>
-          <p className="eyebrow">Sàn vật tư nông nghiệp</p>
-          <h1>Mua phân bón, nông cụ và thuốc trừ sâu chính hãng</h1>
-          <p>Chọn vật tư nội vùng, thanh toán escrow và theo dõi giao hàng ngay trong GREENOVA.</p>
-        </div>
-        <div className="supply-hero-card">
-          <Sparkles size={20} />
-          <strong>Gợi ý hôm nay</strong>
-          <span>Vườn đang ẩm cao sau mưa, ưu tiên Trichoderma, Nano đồng bạc và bẫy dính để theo dõi sâu hại.</span>
-        </div>
-      </header>
+  if (selectedProduct) {
+    const Icon = getCategoryIcon(selectedProduct.category);
+    return (
+      <section className="farmer-supply-market detail-view">
+        <header className="supply-detail-header">
+          <button className="back-btn" onClick={closeProductDetail}>
+            <ArrowLeft size={20} />
+          </button>
+          <h2>Chi tiết sản phẩm</h2>
+          <button className="cart-btn" onClick={() => setCartOpen(true)}>
+            <ShoppingCart size={20} />
+            {cartLines.length > 0 && <span className="cart-badge">{cartLines.length}</span>}
+          </button>
+        </header>
 
-      <div className="supply-stat-row">
-        <div><Store size={18} /><span>Đại lý nội vùng</span><strong>6</strong></div>
-        <div><BadgeCheck size={18} /><span>Sản phẩm xác thực</span><strong>{catalog.length}</strong></div>
-        <div><PackageCheck size={18} /><span>Giao trong ngày</span><strong>15km</strong></div>
-        <div><ShoppingCart size={18} /><span>Trong giỏ</span><strong>{cartLines.length}</strong></div>
-      </div>
+        <main className="supply-detail-main">
+          {/* Product Visual */}
+          <div className="detail-visual-box" style={{ '--product-color': selectedProduct.color }}>
+            <Icon size={80} />
+            <Badge>{selectedProduct.badge}</Badge>
+          </div>
 
-      <div className="supply-layout">
-        <main className="supply-main">
-          <div className="supply-toolbar">
-            <div className="supply-search">
-              <Search size={17} />
-              <input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Tìm NPK, bình phun, thuốc nấm, bẫy dính..."
-              />
+          {/* Product Info */}
+          <div className="detail-info-box">
+            <div className="detail-price-row">
+              <span className="price">{currency(selectedVariant ? selectedVariant.price : selectedProduct.price)}</span>
             </div>
-            <button onClick={() => notify('Bộ lọc nâng cao sẽ nối dữ liệu đại lý ở phase sau.')}>
-              <SlidersHorizontal size={17} /> Bộ lọc
-            </button>
+            <h1 className="detail-title">{selectedProduct.name}</h1>
+            <div className="detail-stats">
+              <span className="rating"><Star size={14} fill="currentColor" /> {selectedProduct.rating}</span>
+              <span className="sold">Đã bán {selectedProduct.sold}</span>
+            </div>
           </div>
 
-          <div className="supply-tabs">
-            {CATEGORY_TABS.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  className={activeCategory === tab.id ? 'active' : ''}
-                  onClick={() => setActiveCategory(tab.id)}
-                >
-                  <Icon size={17} /> {tab.label}
-                </button>
-              );
-            })}
+          {/* Variants */}
+          {selectedProduct.variants && selectedProduct.variants.length > 0 && (
+            <div className="detail-section">
+              <h3 className="section-title">Phân loại hàng</h3>
+              <div className="variants-list">
+                {selectedProduct.variants.map(v => (
+                  <button 
+                    key={v.id} 
+                    className={`variant-btn ${selectedVariant?.id === v.id ? 'active' : ''}`}
+                    onClick={() => setSelectedVariant(v)}
+                    disabled={v.stock <= 0}
+                  >
+                    {v.name}
+                  </button>
+                ))}
+              </div>
+              <p className="stock-info">Kho: {selectedVariant ? selectedVariant.stock : selectedProduct.stock}</p>
+            </div>
+          )}
+
+          {/* Shop Info */}
+          <div className="detail-shop-card">
+            <div className="shop-avatar">
+              <Store size={24} />
+            </div>
+            <div className="shop-info">
+              <strong>{selectedProduct.shopInfo.name}</strong>
+              <div className="shop-stats-mini">
+                <span><MapPin size={12} /> {selectedProduct.distanceKm}km</span>
+                <span>• {selectedProduct.shopInfo.totalProducts} Sản phẩm</span>
+              </div>
+            </div>
+            <button className="view-shop-btn">Xem Shop</button>
           </div>
 
-          <div className="supply-product-grid">
-            {filteredCatalog.map((product) => {
-              const Icon = getCategoryIcon(product.category);
-              return (
-                <article key={product.id} className="supply-product-card">
-                  <div className="supply-product-visual" style={{ '--product-color': product.color }}>
-                    <Icon size={34} />
-                    <span>{product.categoryLabel}</span>
+          {/* Description */}
+          <div className="detail-section">
+            <h3 className="section-title">Mô tả sản phẩm</h3>
+            <p className="description-text">{selectedProduct.description}</p>
+            <div className="supply-use-row" style={{ marginTop: '12px' }}>
+              {selectedProduct.uses.map((use) => <span key={use}>{use}</span>)}
+            </div>
+          </div>
+
+          {/* Reviews */}
+          <div className="detail-section">
+            <div className="reviews-header">
+              <h3 className="section-title">Đánh giá sản phẩm ({selectedProduct.reviews.length})</h3>
+              <span className="rating-summary"><Star size={14} fill="var(--amber-600)" color="var(--amber-600)" /> {selectedProduct.rating}/5</span>
+            </div>
+            <div className="reviews-list">
+              {selectedProduct.reviews.map(review => (
+                <div key={review.id} className="review-item">
+                  <div className="review-user-avatar">{review.user.charAt(0)}</div>
+                  <div className="review-content">
+                    <div className="review-meta">
+                      <strong>{review.user}</strong>
+                      <span className="review-date">{review.date}</span>
+                    </div>
+                    <div className="review-stars">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} size={12} fill={i < review.rating ? "var(--amber-600)" : "transparent"} color={i < review.rating ? "var(--amber-600)" : "var(--slate-200)"} />
+                      ))}
+                    </div>
+                    <p className="review-text">{review.comment}</p>
+                    <button className="like-btn"><ThumbsUp size={12} /> Hữu ích ({review.likes})</button>
                   </div>
-                  <div className="supply-product-body">
-                    <div className="supply-card-top">
-                      <Badge>{product.badge}</Badge>
-                      <span><Star size={13} /> {product.rating}</span>
-                    </div>
-                    <h3>{product.name}</h3>
-                    <p>{product.description}</p>
-                    <div className="supply-use-row">
-                      {product.uses.map((use) => <span key={use}>{use}</span>)}
-                    </div>
-                    <div className="supply-seller">
-                      <Store size={15} />
-                      <span>{product.seller} · {product.distanceKm}km · đã bán {product.sold}</span>
-                    </div>
-                    <div className="supply-buy-row">
-                      <div>
-                        <strong>{currency(product.price)}</strong>
-                        <span>Còn {product.stock} {product.unit}</span>
-                      </div>
-                      <button disabled={product.stock <= 0} onClick={() => addToCart(product)}>
-                        <ShoppingCart size={16} /> Thêm
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+                </div>
+              ))}
+            </div>
           </div>
         </main>
 
-        {cartOpen && <button className="supply-cart-backdrop" aria-label="Đóng giỏ hàng" onClick={() => setCartOpen(false)} />}
+        <div className="detail-bottom-bar">
+          <button className="chat-btn"><MessageSquare size={20} /><span>Chat</span></button>
+          <button className="add-cart-btn" onClick={() => addToCart(selectedProduct, selectedVariant)}>Thêm vào giỏ</button>
+          <button className="buy-now-btn" onClick={() => { addToCart(selectedProduct, selectedVariant, 1, true); setCartOpen(true); }}>Mua ngay</button>
+        </div>
 
+        {cartOpen && <button className="supply-cart-backdrop" aria-label="Đóng giỏ hàng" onClick={() => setCartOpen(false)} />}
         <aside className={`supply-cart ${cartOpen ? 'open' : ''}`}>
           <div className="supply-cart-head">
             <div>
@@ -406,27 +419,25 @@ export function MarketplacePage({ state, setState, notify }) {
             <button className="supply-cart-close" onClick={() => setCartOpen(false)} aria-label="Đóng giỏ hàng">
               <X size={17} />
             </button>
-            <ShoppingCart size={22} />
           </div>
 
           {cartLines.length === 0 ? (
             <div className="supply-cart-empty">
-              <Leaf size={34} />
-              <strong>Chưa có vật tư</strong>
-              <p>Thêm phân bón, nông cụ hoặc thuốc trừ sâu để tạo đơn ký quỹ.</p>
+              <ShoppingCart size={34} />
+              <strong>Giỏ hàng trống</strong>
             </div>
           ) : (
             <div className="supply-cart-list">
               {cartLines.map((line) => (
-                <div key={line.product.id} className="supply-cart-item">
+                <div key={line.itemKey} className="supply-cart-item">
                   <div>
-                    <strong>{line.product.name}</strong>
-                    <span>{currency(line.product.price)} / {line.product.unit}</span>
+                    <strong>{line.name}</strong>
+                    <span>{currency(line.price)}</span>
                   </div>
                   <div className="supply-qty">
-                    <button onClick={() => changeQuantity(line.product.id, -1)}><ChevronLeft size={15} /></button>
+                    <button onClick={() => changeQuantity(line.itemKey, -1)}><ChevronLeft size={15} /></button>
                     <span>{line.quantity}</span>
-                    <button onClick={() => changeQuantity(line.product.id, 1)}><ChevronRight size={15} /></button>
+                    <button onClick={() => changeQuantity(line.itemKey, 1)}><ChevronRight size={15} /></button>
                   </div>
                 </div>
               ))}
@@ -434,26 +445,197 @@ export function MarketplacePage({ state, setState, notify }) {
           )}
 
           <div className="supply-total-box">
-            <div><span>Tạm tính</span><strong>{currency(cartTotal)}</strong></div>
-            <div><span>Phí nền tảng 3%</span><strong>{currency(escrowFee)}</strong></div>
-            <div className="grand"><span>Tổng ký quỹ</span><strong>{currency(cartTotal)}</strong></div>
+            <div className="grand"><span>Tổng thanh toán</span><strong>{currency(cartTotal)}</strong></div>
+          </div>
+          <button className="supply-checkout" onClick={checkoutCart} disabled={cartLines.length === 0}>
+            Tạo đơn ký quỹ
+          </button>
+        </aside>
+      </section>
+    );
+  }
+
+  // --- Main Catalog View ---
+  return (
+    <section className="farmer-supply-market shopee-style">
+      {/* Search Header */}
+      <div className="shopee-header">
+        <div className="shopee-search-container" ref={searchInputRef}>
+          <div className="shopee-search-bar">
+            <Search size={18} />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onFocus={handleSearchFocus}
+              onKeyDown={handleKeyDown}
+              placeholder="Tìm NPK, bình phun, thuốc nấm..."
+            />
+            {query && (
+              <button className="clear-btn" onClick={() => { setQuery(''); searchInputRef.current.querySelector('input').focus(); }}>
+                <X size={16} />
+              </button>
+            )}
+            <button className="shopee-search-btn" onClick={() => executeSearch(query)}>Tìm kiếm</button>
+          </div>
+          
+          {/* Search Dropdown / History */}
+          {showSearchDropdown && (
+            <div className="search-dropdown">
+              <div className="dropdown-header">
+                <History size={14} /> Lịch sử tìm kiếm
+              </div>
+              <ul className="history-list">
+                {searchHistory.map((term, index) => (
+                  <li key={index} onMouseDown={() => executeSearch(term)}>
+                    {term}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+        <button className="shopee-cart-icon" onClick={() => setCartOpen(true)}>
+          <ShoppingCart size={24} />
+          {cartLines.length > 0 && <span className="cart-badge">{cartLines.length}</span>}
+        </button>
+      </div>
+
+      <div className="supply-layout">
+        <main className="supply-main">
+          {/* Daily Discover Horizontal Carousel */}
+          {!query && (
+            <div className="carousel-section">
+              <div className="carousel-header">
+                <h2><Sparkles size={18} color="var(--amber-600)" /> Gợi ý hôm nay</h2>
+                <a href="#">Xem tất cả &gt;</a>
+              </div>
+              <div className="product-carousel">
+                {catalog.slice(0, 4).map(product => {
+                  const Icon = getCategoryIcon(product.category);
+                  return (
+                    <article key={product.id} className="carousel-card" onClick={() => openProductDetail(product)}>
+                      <div className="carousel-visual" style={{ '--product-color': product.color }}>
+                        <Icon size={30} />
+                      </div>
+                      <div className="carousel-body">
+                        <h3>{product.name}</h3>
+                        <div className="price-row">
+                          <strong>{currency(product.price)}</strong>
+                          <span className="sold">Đã bán {product.sold > 1000 ? `${(product.sold/1000).toFixed(1)}k` : product.sold}</span>
+                        </div>
+                      </div>
+                    </article>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className="shopee-toolbar">
+            <div className="supply-tabs">
+              {CATEGORY_TABS.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    className={activeCategory === tab.id ? 'active' : ''}
+                    onClick={() => setActiveCategory(tab.id)}
+                  >
+                    <Icon size={16} /> {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="view-toggles desktop-only">
+              <button className={`toggle-btn ${viewMode === 'grid' ? 'active' : ''}`} onClick={() => setViewMode('grid')}>
+                <GridIcon size={18} />
+              </button>
+              <button className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`} onClick={() => setViewMode('list')}>
+                <ListIcon size={18} />
+              </button>
+            </div>
+          </div>
+
+          <div className={`supply-product-${viewMode} shopee-grid`}>
+            {filteredCatalog.length === 0 ? (
+              <div className="empty-state">
+                <Search size={40} />
+                <p>Không tìm thấy sản phẩm nào</p>
+              </div>
+            ) : (
+              filteredCatalog.map((product) => {
+                const Icon = getCategoryIcon(product.category);
+                return (
+                  <article key={product.id} className={`shopee-product-card ${viewMode}`} onClick={() => openProductDetail(product)}>
+                    <div className="shopee-product-visual" style={{ '--product-color': product.color }}>
+                      <Icon size={34} />
+                      <Badge>{product.badge}</Badge>
+                    </div>
+                    <div className="shopee-product-body">
+                      <h3>{product.name}</h3>
+                      <div className="shopee-tags">
+                        <span className="tag-outline">{product.categoryLabel}</span>
+                        {product.uses.slice(0, 1).map((use) => <span key={use} className="tag-fill">{use}</span>)}
+                      </div>
+                      <div className="shopee-price-row">
+                        <strong>{currency(product.price)}</strong>
+                      </div>
+                      <div className="shopee-meta-row">
+                        <span className="rating"><Star size={11} fill="var(--amber-600)" color="var(--amber-600)" /> {product.rating}</span>
+                        <span className="sold">Đã bán {product.sold > 1000 ? `${(product.sold/1000).toFixed(1)}k` : product.sold}</span>
+                        <span className="location">{product.distanceKm}km</span>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })
+            )}
+          </div>
+        </main>
+
+        {cartOpen && <button className="supply-cart-backdrop" aria-label="Đóng giỏ hàng" onClick={() => setCartOpen(false)} />}
+        <aside className={`supply-cart ${cartOpen ? 'open' : ''}`}>
+          <div className="supply-cart-head">
+            <div>
+              <p className="eyebrow">Giỏ vật tư</p>
+              <h2>Thanh toán escrow</h2>
+            </div>
+            <button className="supply-cart-close" onClick={() => setCartOpen(false)} aria-label="Đóng giỏ hàng">
+              <X size={17} />
+            </button>
+          </div>
+
+          {cartLines.length === 0 ? (
+            <div className="supply-cart-empty">
+              <ShoppingCart size={34} />
+              <strong>Giỏ hàng trống</strong>
+            </div>
+          ) : (
+            <div className="supply-cart-list">
+              {cartLines.map((line) => (
+                <div key={line.itemKey} className="supply-cart-item">
+                  <div>
+                    <strong>{line.name}</strong>
+                    <span>{currency(line.price)}</span>
+                  </div>
+                  <div className="supply-qty">
+                    <button onClick={() => changeQuantity(line.itemKey, -1)}><ChevronLeft size={15} /></button>
+                    <span>{line.quantity}</span>
+                    <button onClick={() => changeQuantity(line.itemKey, 1)}><ChevronRight size={15} /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="supply-total-box">
+            <div className="grand"><span>Tổng thanh toán</span><strong>{currency(cartTotal)}</strong></div>
           </div>
 
           <button className="supply-checkout" onClick={checkoutCart} disabled={cartLines.length === 0}>
-            <ShieldCheck size={17} /> Tạo đơn escrow
+            Tạo đơn ký quỹ
           </button>
-          <p className="supply-note">Tiền được khóa 48h, chỉ giải ngân cho đại lý sau khi nông dân xác nhận nhận hàng.</p>
         </aside>
-      </div>
-
-      <div className="supply-mobile-checkout" aria-label="Giỏ vật tư mobile">
-        <div>
-          <span>{cartLines.length} mặt hàng</span>
-          <strong>{currency(cartTotal)}</strong>
-        </div>
-        <button onClick={() => setCartOpen(true)}>
-          <ShoppingCart size={16} /> Giỏ hàng
-        </button>
       </div>
     </section>
   );

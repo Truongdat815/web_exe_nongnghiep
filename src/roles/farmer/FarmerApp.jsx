@@ -1,10 +1,9 @@
 import RoleApp from '../shared/RoleApp';
 import { AIDiagnosisPage } from '../../pages/greenova/AIDiagnosisPage';
 import { FeedPage } from '../../pages/greenova/FeedPage';
-import { FarmerOverviewPage } from '../../pages/greenova/FarmerOverviewPage';
-import { LedgerPage } from '../../pages/greenova/LedgerPage';
-import { MarketplacePage } from '../../pages/greenova/MarketplacePage';
-import { ProduceMarketPage } from '../../pages/greenova/ProduceMarketPage';
+import { OverviewWrapperPage } from '../../pages/greenova/OverviewWrapperPage';
+import { ProfilePage } from '../../pages/greenova/ProfilePage';
+import { CommerceWrapperPage } from '../../pages/greenova/CommerceWrapperPage';
 import { farmerPages } from './pages';
 
 export default function FarmerApp(props) {
@@ -15,12 +14,11 @@ export default function FarmerApp(props) {
     notify: props.shellProps.notify,
   };
   const pageComponents = {
-    overview: <FarmerOverviewPage {...pageProps} />,
+    overview: <OverviewWrapperPage {...pageProps} />,
     feed: <FeedPage {...pageProps} />,
     ai: <AIDiagnosisPage {...pageProps} />,
-    market: <MarketplacePage {...pageProps} />,
-    produce: <ProduceMarketPage {...pageProps} />,
-    ledger: <LedgerPage {...pageProps} />,
+    commerce: <CommerceWrapperPage {...pageProps} />,
+    profile: <ProfilePage {...pageProps} />,
   };
 
   return <RoleApp {...props} navItems={farmerPages} pageComponents={pageComponents} fallbackPage="overview" />;

@@ -1,0 +1,378 @@
+/* =========================================================
+   SHOPEE-STYLE PROFILE PAGE
+   ========================================================= */
+
+.shopee-profile-page {
+  background: #f5f5f5; /* Classic Shopee background */
+  min-height: calc(100vh - var(--topbar-height));
+  padding-bottom: 40px;
+}
+
+/* 1. Header Wrapper */
+.shop-header-wrapper {
+  background: white;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+}
+
+.shop-header-bg {
+  height: 180px;
+  width: 100%;
+  position: relative;
+  background: linear-gradient(135deg, var(--green-600) 0%, var(--green-800) 100%);
+}
+
+.shop-header-bg .bg-pattern {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: radial-gradient(white 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.1;
+}
+
+.shop-header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 24px 20px;
+  gap: 40px;
+  margin-top: -60px; /* Overlaps banner */
+}
+
+/* Header Avatar Card */
+.shop-info-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: white;
+  padding: 16px 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  min-width: 350px;
+}
+
+.shop-avatar-box {
+  position: relative;
+}
+
+.shop-avatar-box img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 4px solid white;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.shop-mall-badge {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ee4d2d; /* Shopee Mall red/orange */
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(238, 77, 45, 0.3);
+}
+
+.shop-details h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 4px 0;
+}
+
+.shop-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #757575;
+  margin-bottom: 12px;
+}
+
+.shop-status .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.shop-status .dot.online {
+  background: #26aa99;
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid #d5d5d5;
+  background: white;
+  color: #555;
+  border-radius: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-outline:hover {
+  background: #f8f8f8;
+  border-color: #c5c5c5;
+}
+
+/* Header Stats Card */
+.shop-stats-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: white;
+  padding: 16px 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  min-height: 112px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #555;
+}
+
+.stat-item svg {
+  color: #ee4d2d;
+}
+
+.stat-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-text label {
+  font-size: 12px;
+  color: #757575;
+}
+
+.stat-text strong {
+  font-size: 16px;
+  color: #ee4d2d;
+  font-weight: 700;
+}
+
+/* 2. Main Layout */
+.shopee-profile-body {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 40px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.shopee-sidebar {
+  width: 250px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.shopee-main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Shopee Standard Card */
+.shopee-card {
+  background: white;
+  border-radius: 2px;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+}
+
+.shopee-card-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.shopee-card-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  text-transform: uppercase;
+}
+
+/* Contact List */
+.contact-list {
+  list-style: none;
+  padding: 20px 24px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contact-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.contact-list li svg {
+  color: #ee4d2d;
+  margin-top: 2px;
+}
+
+.contact-list li div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.contact-list li label {
+  font-size: 12px;
+  color: #757575;
+}
+
+.contact-list li span {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Badges Grid (Products Style) */
+.shopee-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  padding: 24px;
+  background: #f5f5f5;
+}
+
+.shopee-badge-item {
+  background: white;
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px 16px;
+  transition: all 0.2s;
+  cursor: pointer;
+  position: relative;
+}
+
+.shopee-badge-item:hover {
+  border-color: #ee4d2d;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.badge-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-bottom: 16px;
+}
+
+.badge-icon.vietgap { background: #26aa99; }
+.badge-icon.organic { background: #84cc16; }
+.badge-icon.trusted { background: #3b82f6; }
+.badge-icon.award { background: #f59e0b; }
+
+.badge-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.badge-info strong {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge-info span {
+  font-size: 12px;
+  color: #757575;
+}
+
+.badge-view-btn {
+  background: #ee4d2d;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 2px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.shopee-badge-item:hover .badge-view-btn {
+  opacity: 1;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 980px) {
+  .shop-header-content {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    margin-top: -40px;
+  }
+  
+  .shop-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+  }
+
+  .stat-item {
+    color: #333;
+    text-shadow: none;
+  }
+
+  .stat-item svg {
+    color: #ee4d2d;
+  }
+  
+  .stat-text strong {
+    background: #f5f5f5;
+  }
+
+  .shopee-profile-body {
+    flex-direction: column;
+  }
+
+  .shopee-sidebar {
+    width: 100%;
+  }
+}

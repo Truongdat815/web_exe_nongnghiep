@@ -225,9 +225,15 @@ function Shell({ role, activePage, setActivePage, navItems = [], onLogout, onRes
               <Bell size={18} />
               {unread > 0 && <i>{unread}</i>}
             </button>
-            <button className="icon-button topbar-menu-button" onClick={() => setMobileOpen(true)} title="Tài khoản">
-              <Menu size={18} />
-            </button>
+            {role !== 'farmer' ? (
+              <button className="icon-button topbar-menu-button" onClick={() => setMobileOpen(true)} title="Tài khoản">
+                <Menu size={18} />
+              </button>
+            ) : (
+              <button className="icon-button topbar-menu-button" onClick={onLogout} title="Đăng xuất">
+                <LogOut size={18} />
+              </button>
+            )}
           </div>
           {notifOpen && (
             <div className="notification-popover">
