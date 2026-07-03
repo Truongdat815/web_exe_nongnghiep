@@ -13298,6 +13298,10 @@ body,
     grid-row: 1;
   }
 
+.embedded-ledger {
+  margin-top: 24px;
+}
+
   .topbar-title,
   .search-pill {
     display: none;
@@ -13910,5 +13914,19 @@ body,
     width: 148px !important;
     height: 148px !important;
     min-width: 148px !important;
+  }
+}
+
+/* Fix mobile centering for menu */
+@media (max-width: 980px) {
+  .top-nav-tabs {
+    justify-content: center !important;
+    overflow: visible !important;
+    gap: 2px !important;
+  }
+  .top-nav-tabs a {
+    flex: 1 !important;
+    min-width: 0 !important;
+    max-width: 76px !important;
   }
 }
