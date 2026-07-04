@@ -1,8 +1,9 @@
-import { Activity, ClipboardList, FileCheck2, MessageCircle } from 'lucide-react';
+import { CalendarClock, ClipboardList, Map, MessageCircle, UserRound } from 'lucide-react';
 
 export const expertPages = [
   { id: 'feed', label: 'Bảng tin', icon: MessageCircle },
+  { id: 'bookings', label: 'Lịch tư vấn', icon: CalendarClock },
+  { id: 'region', label: 'Dữ liệu vùng', icon: Map },
   { id: 'expert', label: 'SOS bệnh cây', icon: ClipboardList },
-  { id: 'overview', label: 'Dữ liệu vùng', icon: Activity },
-  { id: 'ledger', label: 'Nhật ký tham chiếu', icon: FileCheck2 },
+  { id: 'profile', label: 'Hồ sơ', icon: UserRound },
 ];

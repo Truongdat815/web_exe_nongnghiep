@@ -54,6 +54,7 @@ const MARKET_CATALOG = [
     sold: 1260,
     badge: 'Gợi ý cho chanh',
     color: '#16a34a',
+    image: 'https://loremflickr.com/720/520/fertilizer,bag,agriculture?lock=1101',
     description: 'Cân bằng dinh dưỡng cho chanh không hạt, khóm và cây ăn trái sau thu hoạch.',
     uses: ['Bón gốc', 'Phục hồi cây', 'Tăng đọt khỏe'],
     shopInfo: { name: 'Đại lý Vật tư Út Chanh', totalProducts: 145, responseRate: '98%', joined: '2 năm trước' },
@@ -77,6 +78,7 @@ const MARKET_CATALOG = [
     sold: 885,
     badge: 'Vi sinh đất',
     color: '#65a30d',
+    image: 'https://loremflickr.com/720/520/organic,fertilizer,soil?lock=1102',
     description: 'Hỗ trợ hệ rễ, giảm nấm đất và phục hồi vườn sau ngập úng.',
     uses: ['Cải tạo đất', 'Hỗ trợ rễ', 'Sau mưa kéo dài'],
     shopInfo: { name: 'Nông nghiệp Xanh Long An', totalProducts: 89, responseRate: '95%', joined: '1 năm trước' },
@@ -100,6 +102,7 @@ const MARKET_CATALOG = [
     sold: 412,
     badge: 'Bảo hành 6 tháng',
     color: '#0f766e',
+    image: 'https://www.greenhousepolytunnels.com.au/cdn/shop/files/pixelcut-export_25.png?v=1762613472&width=1090',
     description: 'Phù hợp phun vi sinh, phân bón lá và thuốc BVTV cho vườn nhỏ.',
     uses: ['Phun đều', 'Tiết kiệm công', 'Pin sạc'],
     shopInfo: { name: 'Cửa hàng Nông cụ Phú An', totalProducts: 310, responseRate: '99%', joined: '3 năm trước' },
@@ -123,6 +126,7 @@ const MARKET_CATALOG = [
     sold: 770,
     badge: 'Bán chạy',
     color: '#0d9488',
+    image: 'https://loremflickr.com/720/520/pruning,shears,garden?lock=1103',
     description: 'Dùng tỉa lá bệnh, cành tăm và tạo tán cho cây có múi.',
     uses: ['Tỉa lá bệnh', 'Tạo tán', 'Cắt cành nhỏ'],
     shopInfo: { name: 'Đại lý Vật tư Út Chanh', totalProducts: 145, responseRate: '98%', joined: '2 năm trước' },
@@ -146,6 +150,7 @@ const MARKET_CATALOG = [
     sold: 1042,
     badge: 'Sinh học',
     color: '#dc2626',
+    image: 'https://yatanstore.com/cdn/shop/files/nano-copper.jpg?v=1759242718&width=1445',
     description: 'Hỗ trợ phòng nấm lá, thán thư và đốm lá khi dùng đúng liều khuyến cáo.',
     uses: ['Nấm lá', 'Sau mưa', 'Cây có múi'],
     shopInfo: { name: 'Đại lý Vật tư Út Chanh', totalProducts: 145, responseRate: '98%', joined: '2 năm trước' },
@@ -161,6 +166,27 @@ function getCategoryIcon(category) {
   if (category === 'fertilizer') return Sprout;
   if (category === 'tools') return Tractor;
   return ShieldCheck;
+}
+
+function ProductVisual({ product, Icon, className = '' }) {
+  return (
+    <div className={`market-product-photo ${className}`} style={{ '--product-color': product.color }}>
+      {product.image && (
+        <img
+          src={product.image}
+          alt={product.name}
+          loading="lazy"
+          onError={(event) => {
+            event.currentTarget.style.display = 'none';
+          }}
+        />
+      )}
+      <div className="market-photo-fallback">
+        <Icon size={34} />
+      </div>
+      <Badge>{product.badge}</Badge>
+    </div>
+  );
 }
 
 export function MarketplacePage({ state, setState, notify }) {
@@ -313,10 +339,7 @@ export function MarketplacePage({ state, setState, notify }) {
 
         <main className="supply-detail-main">
           {/* Product Visual */}
-          <div className="detail-visual-box" style={{ '--product-color': selectedProduct.color }}>
-            <Icon size={80} />
-            <Badge>{selectedProduct.badge}</Badge>
-          </div>
+          <ProductVisual product={selectedProduct} Icon={Icon} className="detail-visual-box" />
 
           {/* Product Info */}
           <div className="detail-info-box">
@@ -514,9 +537,7 @@ export function MarketplacePage({ state, setState, notify }) {
                   const Icon = getCategoryIcon(product.category);
                   return (
                     <article key={product.id} className="carousel-card" onClick={() => openProductDetail(product)}>
-                      <div className="carousel-visual" style={{ '--product-color': product.color }}>
-                        <Icon size={30} />
-                      </div>
+                      <ProductVisual product={product} Icon={Icon} className="carousel-visual" />
                       <div className="carousel-body">
                         <h3>{product.name}</h3>
                         <div className="price-row">
@@ -567,10 +588,7 @@ export function MarketplacePage({ state, setState, notify }) {
                 const Icon = getCategoryIcon(product.category);
                 return (
                   <article key={product.id} className={`shopee-product-card ${viewMode}`} onClick={() => openProductDetail(product)}>
-                    <div className="shopee-product-visual" style={{ '--product-color': product.color }}>
-                      <Icon size={34} />
-                      <Badge>{product.badge}</Badge>
-                    </div>
+                    <ProductVisual product={product} Icon={Icon} className="shopee-product-visual" />
                     <div className="shopee-product-body">
                       <h3>{product.name}</h3>
                       <div className="shopee-tags">

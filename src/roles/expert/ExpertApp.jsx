@@ -1,8 +1,9 @@
 import RoleApp from '../shared/RoleApp';
+import { ExpertBookingsPage } from '../../pages/greenova/ExpertBookingsPage';
 import { ExpertPage } from '../../pages/greenova/ExpertPage';
+import { ExpertProfilePage } from '../../pages/greenova/ExpertProfilePage';
+import { ExpertRegionPage } from '../../pages/greenova/ExpertRegionPage';
 import { FeedPage } from '../../pages/greenova/FeedPage';
-import { LedgerPage } from '../../pages/greenova/LedgerPage';
-import { OverviewPage } from '../../pages/greenova/OverviewPage';
 import { expertPages } from './pages';
 
 export default function ExpertApp(props) {
@@ -14,9 +15,10 @@ export default function ExpertApp(props) {
   };
   const pageComponents = {
     feed: <FeedPage {...pageProps} />,
+    bookings: <ExpertBookingsPage {...pageProps} />,
+    region: <ExpertRegionPage {...pageProps} />,
     expert: <ExpertPage {...pageProps} />,
-    overview: <OverviewPage {...pageProps} />,
-    ledger: <LedgerPage {...pageProps} />,
+    profile: <ExpertProfilePage {...pageProps} />,
   };
 
   return <RoleApp {...props} navItems={expertPages} pageComponents={pageComponents} fallbackPage="feed" />;
