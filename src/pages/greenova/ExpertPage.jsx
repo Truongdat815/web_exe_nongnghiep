@@ -51,30 +51,62 @@ export function ExpertPage({ state, setState, notify }) {
   const stats = useMemo(() => {
     const open = tickets.filter((ticket) => ticket.status === 'Open').length;
     const resolved = tickets.filter((ticket) => ticket.status === 'Resolved').length;
-    const lowConfidence = tickets.filter((ticket) => Number(ticket.confidence) < 75).length;
+    const lowConfidence = tickets.filter((ticket) => Number(ticket.confidence) < 82).length;
     const highPriority = tickets.filter((ticket) => ticket.priority === 'High').length;
     return { open, resolved, lowConfidence, highPriority };
   }, [tickets]);
 
   const resolveTicket = (ticket) => {
     setState((prev) => {
-      let next = {
-        ...prev,
-        sosTickets: prev.sosTickets.map((item) =>
-          item.id === ticket.id
-            ? { ...item, status: 'Resolved', expertDiagnosis: diagnosisText, treatment: treatmentText }
-            : item,
-        ),
-      };
+      let next = { ...prev };
+      const updatedTickets = prev.sosTickets.map((item) => {
+        if (item.id !== ticket.id) return item;
+
+        const newReview = {
+          expertId: `expert-${Date.now()}`,
+          diagnosis: diagnosisText,
+          treatment: treatmentText,
+          date: new Date().toISOString()
+        };
+
+        const reviews = [...(item.expertReviews || []), newReview];
+        const isResolved = reviews.length >= (item.requiredReviews || 1);
+
+        return {
+          ...item,
+          expertReviews: reviews,
+          status: isResolved ? 'Resolved' : 'Open',
+          expertDiagnosis: isResolved ? diagnosisText : item.expertDiagnosis,
+          treatment: isResolved ? treatmentText : item.treatment,
+          dataStatus: isResolved ? 'Sufficient' : 'Needs_Expert_Verification',
+          knowledgeStatus: isResolved ? 'Learned' : item.knowledgeStatus,
+        };
+      });
+
+      next.sosTickets = updatedTickets;
+
+      const currentReviewCount = (ticket.expertReviews?.length || 0) + 1;
+      const isResolved = currentReviewCount >= (ticket.requiredReviews || 1);
+
       next = addLedgerEntry(next, {
         type: 'Expert_Prescription',
         farmId: ticket.farmId,
-        title: `Chuyên gia kê đơn cho ${ticket.id}`,
+        title: isResolved ? `Hoàn tất kê đơn cho ${ticket.id}` : `Thêm phản hồi kỹ sư cho ${ticket.id}`,
         detail: treatmentText,
       });
       return next;
     });
-    notify(`Đã kê đơn xử lý cho ca bệnh ${ticket.id}.`);
+
+    const currentReviewCount = (ticket.expertReviews?.length || 0) + 1;
+    const isResolved = currentReviewCount >= (ticket.requiredReviews || 1);
+    
+    if (isResolved) {
+      notify(`Đã đủ phản hồi. Đánh dấu Đủ Dữ Liệu và ghi ledger cho ${ticket.id}.`);
+    } else {
+      notify(`Đã ghi nhận phản hồi. Cần thêm ${ticket.requiredReviews - currentReviewCount} đánh giá nữa cho ${ticket.id}.`);
+      setDiagnosisText('');
+      setTreatmentText('');
+    }
   };
 
   return (
@@ -95,7 +127,7 @@ export function ExpertPage({ state, setState, notify }) {
       <div className="sos-stat-grid">
         <SosStat icon={ClipboardList} label="Ca đang mở" value={stats.open} note="cần xử lý" />
         <SosStat icon={CheckCircle2} label="Đã kê đơn" value={stats.resolved} note="đã ghi ledger" tone="green" />
-        <SosStat icon={Bot} label="AI confidence thấp" value={stats.lowConfidence} note="< 75%" tone="amber" />
+        <SosStat icon={Bot} label="AI confidence thấp" value={stats.lowConfidence} note="< 82%" tone="amber" />
         <SosStat icon={AlertTriangle} label="Ưu tiên cao" value={stats.highPriority} note="cần xem trước" tone="red" />
       </div>
 
@@ -177,7 +209,7 @@ export function ExpertPage({ state, setState, notify }) {
                   <div className="confidence-bar">
                     <i style={{ width: `${selectedTicket.confidence}%` }} />
                   </div>
-                  <p>{selectedTicket.confidence < 75 ? 'Confidence dưới ngưỡng tự kê đơn, cần chuyên gia xác nhận.' : 'AI đủ tự tin nhưng vẫn cần kiểm tra phác đồ.'}</p>
+                  <p>{selectedTicket.confidence < 82 ? 'Confidence dưới ngưỡng tự kê đơn, cần nhiều chuyên gia xác nhận.' : 'AI đủ tự tin nhưng vẫn cần kiểm tra phác đồ.'}</p>
                 </article>
 
                 <article className="sos-intel-card">
@@ -219,6 +251,18 @@ export function ExpertPage({ state, setState, notify }) {
 
                 {selectedTicket.status === 'Open' ? (
                   <div className="sos-form">
+                    <div className="sos-reviews-progress" style={{ marginBottom: 16, padding: 12, background: 'var(--color-bg-subtle)', borderRadius: 8 }}>
+                      <strong>Xác minh dữ liệu: {selectedTicket.expertReviews?.length || 0} / {selectedTicket.requiredReviews || 1} kỹ sư</strong>
+                      {selectedTicket.expertReviews?.length > 0 && (
+                        <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          {selectedTicket.expertReviews.map((r, i) => (
+                             <div key={i} style={{ fontSize: 13 }}>
+                               <strong>Kỹ sư {i+1}:</strong> {r.diagnosis} - {r.treatment}
+                             </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                     <label>
                       Chẩn đoán chuyên môn
                       <input value={diagnosisText} onChange={(event) => setDiagnosisText(event.target.value)} />
@@ -229,7 +273,7 @@ export function ExpertPage({ state, setState, notify }) {
                     </label>
                     <div className="sos-form-actions">
                       <button onClick={() => resolveTicket(selectedTicket)}>
-                        <Send size={16} /> Gửi phác đồ và ghi ledger
+                        <Send size={16} /> { (selectedTicket.expertReviews?.length || 0) + 1 >= (selectedTicket.requiredReviews || 1) ? 'Xác nhận cuối và đánh dấu Đủ Dữ Liệu' : 'Gửi xác nhận (Cần thêm)' }
                       </button>
                     </div>
                   </div>
@@ -243,7 +287,7 @@ export function ExpertPage({ state, setState, notify }) {
                       <span>Phác đồ</span>
                       <p>{selectedTicket.treatment}</p>
                     </div>
-                    <small><CheckCircle2 size={15} /> Đã ghi vào ledger canh tác</small>
+                    <small><CheckCircle2 size={15} /> Đã ghi vào ledger canh tác. Dữ liệu đã đủ để AI học cho lần sau.</small>
                   </div>
                 )}
               </article>

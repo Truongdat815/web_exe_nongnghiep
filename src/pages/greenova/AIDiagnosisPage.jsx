@@ -303,6 +303,7 @@ export function AIDiagnosisPage({ state, setState, notify }) {
   };
 
   const persistDiagnosis = (aiMessage, userText) => {
+    const needsExpertVerification = aiMessage.confidence < 82;
     const diagnosis = {
       id: `AI-${Date.now()}`,
       farmId: farm.id,
@@ -311,7 +312,8 @@ export function AIDiagnosisPage({ state, setState, notify }) {
       confidence: aiMessage.confidence,
       severity: aiMessage.severity,
       prescription: aiMessage.sections.flatMap((section) => section.items).slice(0, 4).join(' '),
-      status: aiMessage.confidence >= 75 ? 'Auto_Prescribed' : 'Need_Expert',
+      status: needsExpertVerification ? 'Need_Expert' : 'Auto_Prescribed',
+      dataStatus: needsExpertVerification ? 'Needs_Expert_Verification' : 'Sufficient',
       createdAt: new Date().toISOString(),
     };
 
@@ -323,7 +325,7 @@ export function AIDiagnosisPage({ state, setState, notify }) {
         title: `AI chẩn đoán: ${diagnosis.disease}`,
         detail: `Câu hỏi: ${userText}. Confidence ${diagnosis.confidence}%. ${diagnosis.prescription}`,
       });
-      if (aiMessage.confidence < 75) {
+      if (needsExpertVerification) {
         next.sosTickets = [
           {
             id: `SOS-${Date.now().toString().slice(-4)}`,
@@ -331,9 +333,15 @@ export function AIDiagnosisPage({ state, setState, notify }) {
             farmer: 'Ngô Hoàng Trường Đạt',
             crop: farm.crop,
             issue: diagnosis.disease,
+            question: userText,
+            aiReply: aiMessage.text,
+            aiProducts: aiMessage.products,
             confidence: diagnosis.confidence,
             priority: 'High',
             status: 'Open',
+            knowledgeStatus: 'Learning',
+            requiredReviews: 3,
+            expertReviews: [],
             iotSummary: 'Đính kèm lịch sử IoT 30 ngày: độ ẩm, nhiệt độ, độ mặn và mưa 24h gần nhất.',
             expertDiagnosis: '',
             treatment: '',
@@ -371,7 +379,7 @@ export function AIDiagnosisPage({ state, setState, notify }) {
       appendToChat(chatId, [aiMessage]);
       persistDiagnosis(aiMessage, userText);
       setIsTyping(false);
-      notify?.(aiMessage.confidence >= 75 ? 'AI đã trả lời và ghi nhật ký chẩn đoán.' : 'AI đã tạo khuyến nghị và đánh dấu cần kỹ sư xác minh.');
+      notify?.(aiMessage.confidence >= 82 ? 'AI đã trả lời và ghi nhật ký chẩn đoán.' : 'AI đã tạo khuyến nghị và đánh dấu cần kỹ sư xác minh.');
     }, 2000);
   };
 
@@ -458,7 +466,7 @@ export function AIDiagnosisPage({ state, setState, notify }) {
                       <span>Chẩn đoán sơ bộ</span>
                       <strong>{message.diagnosis}</strong>
                     </div>
-                    <Badge status={message.confidence >= 75 ? 'success' : 'warning'}>{message.confidence}%</Badge>
+                    <Badge status={message.confidence >= 82 ? 'success' : 'warning'}>{message.confidence}%</Badge>
                   </div>
                 )}
 
