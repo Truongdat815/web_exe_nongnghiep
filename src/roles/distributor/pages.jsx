@@ -1,7 +1,8 @@
-import { AlertTriangle, Gavel, Package } from 'lucide-react';
+import { BarChart3, ShoppingBag, Store, UserRound } from 'lucide-react';
 
 export const distributorPages = [
-  { id: 'distributor', label: 'Kho & đơn', icon: Package },
-  { id: 'auction', label: 'Đấu giá', icon: Gavel },
-  { id: 'overview', label: 'Cảnh báo vùng', icon: AlertTriangle },
+  { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+  { id: 'store', label: 'Cửa hàng', icon: Store },
+  { id: 'orders', label: 'Đơn hàng', icon: ShoppingBag },
+  { id: 'profile', label: 'Cá nhân', icon: UserRound },
 ];
