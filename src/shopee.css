@@ -676,9 +676,25 @@
   color: white;
 }
 
+@media (max-width: 1100px) {
+  .desktop-only {
+    display: none;
+  }
+}
+
 @media (max-width: 760px) {
   .shopee-header {
     padding: 10px 16px;
+    gap: 10px;
+  }
+  .shopee-search-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+  .shopee-cart-icon {
+    flex-shrink: 0;
   }
   .supply-product-grid {
     grid-template-columns: repeat(2, 1fr);
