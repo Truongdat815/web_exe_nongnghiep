@@ -77,6 +77,27 @@ const FARM_AUDIT = {
       ['25/06/2026', 'Tưới', 'Không mở van do đất còn đủ ẩm'],
     ],
   },
+  'farm-lime-02': {
+    irrigationCount: 55,
+    irrigationLiters: 19500,
+    lastIrrigation: '24/06/2026 06:10',
+    rainfall7d: 48,
+    avgMoisture: 44,
+    fertilizerEc: 1.05,
+    fertilizerLimit: 1.8,
+    pesticideResidue: 0.04,
+    pesticideLimit: 0.3,
+    sunlightHours: 6.2,
+    compliance: 'Đạt VietGAP, hồ sơ tổ hợp tác',
+    treatment: 'Trichoderma cải tạo đất, bón NPK định kỳ',
+    note: 'Không ghi nhận thuốc BVTV vượt ngưỡng trong 30 ngày gần nhất.',
+    history: [
+      ['02/10/2025', 'Gieo trồng', 'Chanh không hạt, 2.1 ha - tổ hợp tác Nhựt Chánh'],
+      ['02/06/2026', 'Bón phân', 'NPK hữu cơ 16-16-8, EC sau tưới 1.05 mS/cm'],
+      ['18/06/2026', 'Kiểm định', 'Tổ hợp tác đạt chuẩn VietGAP đợt 1/2026'],
+      ['24/06/2026', 'Tưới', 'Mở van 20 phút theo lịch tự động'],
+    ],
+  },
 };
 
 function formatDate(value) {

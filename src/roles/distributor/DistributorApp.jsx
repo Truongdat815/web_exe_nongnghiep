@@ -6,6 +6,7 @@ import {
   DistributorStorePage,
   useDistributorDemoState,
 } from '../../pages/greenova/DistributorPage';
+import { FeedPage } from '../../pages/greenova/FeedPage';
 import { distributorPages } from './pages';
 
 export default function DistributorApp(props) {
@@ -22,6 +23,7 @@ export default function DistributorApp(props) {
     store: <DistributorStorePage {...pageProps} />,
     orders: <DistributorOrdersPage {...pageProps} />,
     profile: <DistributorProfilePage {...pageProps} />,
+    feed: <FeedPage {...pageProps} />,
   };
 
   return <RoleApp {...props} navItems={distributorPages} pageComponents={pageComponents} fallbackPage="dashboard" />;

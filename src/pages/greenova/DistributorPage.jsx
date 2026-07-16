@@ -21,7 +21,7 @@ import {
   UserRound,
   WalletCards,
 } from 'lucide-react';
-import { Badge, currency } from './pageUtils';
+import { Badge, currency, initialsAvatar } from './pageUtils';
 
 const DEFAULT_CATEGORIES = ['Phân bón', 'Thuốc trừ sâu', 'Nông cụ', 'Hạt giống', 'Vi sinh đất'];
 
@@ -107,7 +107,7 @@ function emptyDraft(category = DEFAULT_CATEGORIES[0]) {
 }
 
 export function useDistributorDemoState(notify) {
-  const [shopAvatar, setShopAvatar] = useState('https://api.dicebear.com/9.x/initials/svg?seed=Ut%20Chanh&backgroundColor=bbf7d0');
+  const [shopAvatar, setShopAvatar] = useState(() => initialsAvatar('Út Chanh', '#2563eb'));
   const [shopCover, setShopCover] = useState('/agri_store.png');
   const [profile, setProfile] = useState({
     owner: 'Nguyễn Văn Út',
