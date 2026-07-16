@@ -11,6 +11,7 @@ import {
   Upload,
   UserCheck,
 } from 'lucide-react';
+import { initialsAvatar } from './pageUtils';
 
 const DEFAULT_CERTS = [
   { id: 'CERT-01', title: 'Kỹ sư Nông học', issuer: 'ĐH Nông Lâm TP.HCM', year: '2018' },
@@ -25,7 +26,7 @@ const REVIEWS = [
 ];
 
 export function ExpertProfilePage({ notify }) {
-  const [avatar, setAvatar] = useState('https://api.dicebear.com/9.x/initials/svg?seed=Nguyen%20Minh%20Khoa&backgroundColor=bbf7d0');
+  const [avatar, setAvatar] = useState(() => initialsAvatar('Nguyễn Minh Khoa', '#0f766e'));
   const [certs, setCerts] = useState(DEFAULT_CERTS);
 
   const handleAvatar = (event) => {

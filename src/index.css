@@ -4093,7 +4093,7 @@ code {
   color: #f8fafc;
   min-height: 100vh;
   padding: 24px 32px;
-  font-family: var(--font-sans);
+  font-family: var(--theme-font, 'Be Vietnam Pro', system-ui, sans-serif);
 }
 
 .hub-header {
@@ -4149,8 +4149,8 @@ code {
 .intel-hub-layout { display: grid; grid-template-columns: 320px 1fr; gap: 24px; align-items: start; }
 .intel-sidebar { display: flex; flex-direction: column; gap: 24px; }
 .intel-panel { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; overflow: hidden; }
-.panel-header { padding: 16px; background: rgba(15, 23, 42, 0.5); border-bottom: 1px solid rgba(255, 255, 255, 0.05); display: flex; justify-content: space-between; align-items: center; }
-.panel-header h3 { margin: 0; font-size: 14px; color: #cbd5e1; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+.intel-hub-wrapper .panel-header { padding: 16px; background: rgba(15, 23, 42, 0.5); border-bottom: 1px solid rgba(255, 255, 255, 0.05); display: flex; justify-content: space-between; align-items: center; }
+.intel-hub-wrapper .panel-header h3 { margin: 0; font-size: 14px; color: #cbd5e1; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
 .danger-btn { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
 .danger-btn:hover { background: #ef4444; color: white; }
 
@@ -4210,7 +4210,7 @@ code {
   color: #f8fafc;
   min-height: 100vh;
   padding: 24px 32px;
-  font-family: var(--font-sans);
+  font-family: var(--theme-font, 'Be Vietnam Pro', system-ui, sans-serif);
 }
 
 .expert-header {
@@ -4341,7 +4341,7 @@ code {
 .prescription-area h3 { margin: 0 0 20px; font-size: 16px; color: #10b981; display: flex; align-items: center; gap: 8px; }
 .form-group { margin-bottom: 16px; }
 .form-group label { display: block; margin-bottom: 8px; font-size: 13px; color: #94a3b8; font-weight: 600; }
-.glass-input { width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 12px; color: #f8fafc; font-family: var(--font-sans); font-size: 14px; transition: all 0.2s; }
+.glass-input { width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 12px; color: #f8fafc; font-family: var(--theme-font, 'Be Vietnam Pro', system-ui, sans-serif); font-size: 14px; transition: all 0.2s; }
 .glass-input:focus { outline: none; border-color: #10b981; background: rgba(16, 185, 129, 0.05); }
 .form-actions { display: flex; justify-content: flex-end; margin-top: 24px; }
 .resolve-btn { background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background 0.2s; }
@@ -14040,6 +14040,9 @@ body,
   color: #08291b;
   font-size: 22px;
   line-height: 1.05;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
 }
 
 .ledger-metric-card p {
@@ -15520,7 +15523,7 @@ body,
 
 .dealer-product-form {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 

@@ -78,6 +78,18 @@ export function addLedgerEntry(state, entry) {
   };
 }
 
+export function initialsAvatar(name = '', bg = '#16a34a', fg = '#ffffff') {
+  const initials = name
+    .split(' ')
+    .filter(Boolean)
+    .slice(-2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase() || '?';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" rx="32" fill="${bg}"/><text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" font-family="Arial, sans-serif" font-size="84" font-weight="700" fill="${fg}">${initials}</text></svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
 export function StatCard({ icon: Icon, label, value, note, tone = 'green' }) {
   return (
     <article className={`stat-card tone-${tone}`}>

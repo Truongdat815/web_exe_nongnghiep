@@ -3,6 +3,7 @@ import { AuctionPage } from '../../pages/greenova/AuctionPage';
 import { BuyerPage } from '../../pages/greenova/BuyerPage';
 import { LedgerPage } from '../../pages/greenova/LedgerPage';
 import { OverviewPage } from '../../pages/greenova/OverviewPage';
+import { FeedPage } from '../../pages/greenova/FeedPage';
 import { buyerPages } from './pages';
 
 export default function BuyerApp(props) {
@@ -17,6 +18,7 @@ export default function BuyerApp(props) {
     ledger: <LedgerPage {...pageProps} />,
     auction: <AuctionPage {...pageProps} />,
     overview: <OverviewPage {...pageProps} />,
+    feed: <FeedPage {...pageProps} />,
   };
 
   return <RoleApp {...props} navItems={buyerPages} pageComponents={pageComponents} fallbackPage="buyer" />;
