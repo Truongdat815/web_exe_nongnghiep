@@ -15953,3 +15953,1515 @@ body,
     text-align: left;
   }
 }
+
+/* ==========================================================================
+   Landing page professional polish
+   ========================================================================== */
+.landing-page {
+  --landing-ink: #10231b;
+  --landing-muted: #52645b;
+  --landing-soft: #f5faf6;
+  --landing-panel: rgba(255, 255, 255, 0.94);
+  --landing-line: rgba(16, 35, 27, 0.12);
+  --landing-shadow: 0 22px 70px rgba(15, 47, 31, 0.12);
+  --landing-button-shadow: 0 14px 32px rgba(4, 120, 87, 0.24);
+  min-height: 100vh !important;
+  background:
+    linear-gradient(90deg, rgba(245, 251, 246, 0.92) 0%, rgba(242, 249, 243, 0.78) 43%, rgba(221, 241, 227, 0.48) 72%, rgba(5, 46, 31, 0.16) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(238, 247, 239, 0.82)),
+    url('/botanical_bg.png') center top / cover fixed,
+    #eef7ef !important;
+  color: var(--landing-ink) !important;
+}
+
+.floating-particles {
+  display: none !important;
+}
+
+.landing-stage {
+  padding: 116px 24px 84px !important;
+}
+
+.landing-panel,
+.landing-home-page,
+.landing-info-page,
+.landing-iot-page,
+.benefits-simple-animated,
+.workflow-sequence-section {
+  width: min(1180px, 100%) !important;
+  margin-inline: auto !important;
+}
+
+.landing-header {
+  width: min(1180px, calc(100% - 48px)) !important;
+  min-height: 78px !important;
+  padding: 12px 16px 12px 22px !important;
+  border: 1px solid rgba(255, 255, 255, 0.76) !important;
+  border-radius: 18px !important;
+  background: rgba(255, 255, 255, 0.86) !important;
+  box-shadow: 0 18px 54px rgba(15, 47, 31, 0.13) !important;
+  backdrop-filter: blur(22px) saturate(1.14) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.14) !important;
+}
+
+.landing-header::after {
+  display: none !important;
+}
+
+.landing-brand {
+  min-width: 152px !important;
+  justify-content: flex-start !important;
+}
+
+.landing-brand img {
+  width: 148px !important;
+  height: auto !important;
+  max-height: 42px !important;
+  object-fit: contain !important;
+}
+
+.landing-nav {
+  margin-inline: auto !important;
+  padding: 4px !important;
+  gap: 2px !important;
+  border: 1px solid rgba(16, 35, 27, 0.1) !important;
+  border-radius: 999px !important;
+  background: rgba(244, 248, 244, 0.86) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92) !important;
+}
+
+.landing-nav button,
+.outline-link {
+  min-height: 40px !important;
+  padding: 0 18px !important;
+  border-radius: 999px !important;
+  color: #41554b !important;
+  font-size: 14px !important;
+  font-weight: 850 !important;
+  letter-spacing: 0 !important;
+  transition: background 180ms ease, color 180ms ease, box-shadow 180ms ease, transform 180ms ease !important;
+}
+
+.landing-nav button:hover,
+.landing-nav button.active,
+.outline-link:hover {
+  background: #ffffff !important;
+  color: #065f46 !important;
+  box-shadow: 0 8px 22px rgba(15, 47, 31, 0.08) !important;
+  transform: translateY(-1px) !important;
+}
+
+.landing-auth {
+  gap: 10px !important;
+}
+
+.ghost-button,
+.solid-button {
+  min-height: 48px !important;
+  padding: 0 20px !important;
+  border-radius: 13px !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0 !important;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease, transform 180ms ease !important;
+}
+
+.ghost-button {
+  border: 1px solid rgba(4, 120, 87, 0.18) !important;
+  background: rgba(255, 255, 255, 0.86) !important;
+  color: #07543e !important;
+  box-shadow: none !important;
+}
+
+.solid-button {
+  border: 1px solid rgba(5, 150, 105, 0.1) !important;
+  background: linear-gradient(135deg, #087a55, #03543f) !important;
+  color: #ffffff !important;
+  box-shadow: var(--landing-button-shadow) !important;
+}
+
+.ghost-button:hover,
+.solid-button:hover {
+  transform: translateY(-2px) !important;
+}
+
+.ghost-button:hover {
+  border-color: rgba(4, 120, 87, 0.3) !important;
+  background: #ffffff !important;
+}
+
+.solid-button:hover {
+  background: linear-gradient(135deg, #066a4b, #023f31) !important;
+}
+
+.landing-route-dots {
+  right: 22px !important;
+  gap: 10px !important;
+}
+
+.landing-route-dots button {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.landing-route-dots button span {
+  width: 7px !important;
+  height: 7px !important;
+  background: rgba(6, 95, 70, 0.32) !important;
+  box-shadow: none !important;
+}
+
+.landing-route-dots button.active span {
+  width: 9px !important;
+  height: 9px !important;
+  background: #087a55 !important;
+  box-shadow: 0 0 0 5px rgba(8, 122, 85, 0.14) !important;
+}
+
+.landing-home-v2 {
+  grid-template-columns: minmax(0, 1.02fr) minmax(420px, 0.86fr) !important;
+  gap: 58px !important;
+  align-items: center !important;
+  padding-top: 46px !important;
+  padding-bottom: 34px !important;
+}
+
+.landing-trust-pill {
+  width: fit-content !important;
+  max-width: 100% !important;
+  margin-bottom: 18px !important;
+  padding: 7px !important;
+  border: 1px solid rgba(8, 122, 85, 0.14) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  box-shadow: 0 12px 34px rgba(15, 47, 31, 0.08) !important;
+}
+
+.landing-trust-pill span {
+  padding: 7px 12px !important;
+  border-radius: 999px !important;
+  background: #087a55 !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  font-weight: 950 !important;
+  letter-spacing: 0 !important;
+  text-transform: uppercase !important;
+}
+
+.landing-trust-pill strong {
+  padding: 0 10px !important;
+  color: #1f352b !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+}
+
+.landing-hero-copy h1,
+.section-heading h2,
+.landing-mini-heading h2,
+.benefit-simple-card h3,
+.workflow-seq-card h3,
+.landing-product-card h3,
+.landing-pipeline-card h3 {
+  letter-spacing: 0 !important;
+}
+
+.landing-hero-copy h1 {
+  max-width: 680px !important;
+  margin: 0 !important;
+  color: #0c2118 !important;
+  font-size: 3.85rem !important;
+  line-height: 1.07 !important;
+  font-weight: 900 !important;
+  text-wrap: balance !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.54) !important;
+}
+
+.landing-hero-copy > p {
+  max-width: 650px !important;
+  margin-top: 20px !important;
+  color: var(--landing-muted) !important;
+  font-size: 1.02rem !important;
+  line-height: 1.78 !important;
+  font-weight: 650 !important;
+  text-shadow: none !important;
+}
+
+.landing-cta {
+  margin-top: 28px !important;
+  gap: 12px !important;
+}
+
+.solid-button.large {
+  min-height: 54px !important;
+  padding-inline: 24px !important;
+}
+
+.button-link {
+  min-height: 54px !important;
+  border: 1px solid rgba(16, 35, 27, 0.1) !important;
+  background: rgba(255, 255, 255, 0.84) !important;
+  color: #0f3d2b !important;
+  box-shadow: 0 10px 28px rgba(15, 47, 31, 0.07) !important;
+}
+
+.hero-metrics-premium {
+  width: min(660px, 100%) !important;
+  margin-top: 30px !important;
+  padding: 12px !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  border: 1px solid rgba(16, 35, 27, 0.1) !important;
+  border-radius: 18px !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+  box-shadow: var(--landing-shadow) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+.hero-metrics-premium .metric-item {
+  min-width: 0 !important;
+  min-height: 76px !important;
+  padding: 12px !important;
+  border-radius: 13px !important;
+  background: linear-gradient(180deg, #ffffff, #f2faf4) !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.hero-metrics-premium .metric-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  background: #e8f6ed !important;
+  color: #087a55 !important;
+}
+
+.hero-metrics-premium .metric-text strong {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: #10231b !important;
+  color: #17231d !important;
+  font-size: 1.35rem !important;
+  line-height: 1.05 !important;
+  font-weight: 950 !important;
+  opacity: 1 !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+
+.hero-metrics-premium .metric-text span {
+  -webkit-text-fill-color: #3f5148 !important;
+  color: #5d6e64 !important;
+  font-size: 0.78rem !important;
+  line-height: 1.25 !important;
+  font-weight: 850 !important;
+  opacity: 1 !important;
+}
+
+.premium-hero-widget {
+  width: 100% !important;
+  min-height: 460px !important;
+  padding: 0 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  place-items: center !important;
+  justify-self: stretch !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.premium-hero-widget::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 34px 24px auto auto !important;
+  width: min(82%, 410px) !important;
+  height: 320px !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  border-radius: 24px !important;
+  background:
+    linear-gradient(180deg, rgba(5, 46, 31, 0.1), rgba(5, 46, 31, 0.56)),
+    url('/lime_orchard.png') center / cover !important;
+  box-shadow: 0 26px 72px rgba(15, 47, 31, 0.18) !important;
+  transform: rotate(1.6deg) !important;
+}
+
+.premium-hero-widget .glass-widget-main {
+  width: 100% !important;
+  max-width: 570px !important;
+  justify-self: center !important;
+  margin: 0 !important;
+  padding: 24px !important;
+  border: 1px solid rgba(16, 35, 27, 0.12) !important;
+  border-radius: 18px !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  box-shadow: 0 24px 70px rgba(15, 47, 31, 0.16) !important;
+  color: var(--landing-ink) !important;
+  backdrop-filter: blur(18px) saturate(1.08) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.08) !important;
+}
+
+.premium-hero-widget .widget-title {
+  color: var(--landing-ink) !important;
+  font-size: 1rem !important;
+}
+
+.premium-hero-widget .widget-title svg,
+.premium-hero-widget .stat-icon svg {
+  color: #087a55 !important;
+}
+
+.premium-hero-widget .status-indicator {
+  min-height: 30px !important;
+  padding: 0 10px !important;
+  border: 1px solid rgba(5, 150, 105, 0.1) !important;
+  background: #e8f7ef !important;
+  color: #047857 !important;
+  font-weight: 850 !important;
+}
+
+.premium-hero-widget .widget-body {
+  grid-template-columns: 190px minmax(0, 1fr) !important;
+  gap: 22px !important;
+}
+
+.premium-hero-widget .sensor-ring-container {
+  width: 190px !important;
+  height: 190px !important;
+  min-width: 190px !important;
+}
+
+.premium-hero-widget .bg-ring {
+  stroke: #e8f0ea !important;
+}
+
+.premium-hero-widget .progress-ring {
+  stroke: #087a55 !important;
+}
+
+.premium-hero-widget .sensor-ring-value strong {
+  color: #12231b !important;
+  font-size: 2.35rem !important;
+}
+
+.premium-hero-widget .sensor-ring-value strong span {
+  color: #12b981 !important;
+}
+
+.premium-hero-widget .sensor-ring-value small {
+  color: #66766d !important;
+  font-weight: 750 !important;
+}
+
+.premium-hero-widget .sensor-stats {
+  gap: 10px !important;
+}
+
+.premium-hero-widget .stat-row {
+  min-height: 72px !important;
+  border: 1px solid rgba(16, 35, 27, 0.08) !important;
+  border-radius: 14px !important;
+  background: #f7faf7 !important;
+}
+
+.premium-hero-widget .stat-icon {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 11px !important;
+  background: #e8f6ed !important;
+}
+
+.premium-hero-widget .stat-info span {
+  color: #6a786f !important;
+  font-size: 0.74rem !important;
+}
+
+.premium-hero-widget .stat-info strong {
+  color: #12231b !important;
+  font-size: 0.92rem !important;
+}
+
+.premium-hero-widget .stat-info small {
+  color: #68776e !important;
+  font-weight: 720 !important;
+}
+
+.landing-proof-strip,
+.landing-product-card,
+.landing-pipeline-section,
+.benefit-simple-card,
+.workflow-seq-card,
+.premium-card,
+.iot-sensor-card.premium-card.dark-mode {
+  border: 1px solid rgba(16, 35, 27, 0.1) !important;
+  border-radius: 16px !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 16px 42px rgba(15, 47, 31, 0.08) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+.landing-proof-strip {
+  margin: 12px 0 22px !important;
+  padding: 10px !important;
+}
+
+.landing-proof-strip span {
+  min-height: 48px !important;
+  border: 1px solid rgba(16, 35, 27, 0.07) !important;
+  border-radius: 12px !important;
+  background: #f6faf6 !important;
+  color: #375146 !important;
+  font-size: 0.82rem !important;
+  line-height: 1.3 !important;
+}
+
+.landing-product-grid,
+.landing-pipeline-grid,
+.benefits-simple-grid {
+  gap: 14px !important;
+}
+
+.landing-product-card,
+.landing-pipeline-card,
+.benefit-simple-card,
+.workflow-seq-card {
+  padding: 20px !important;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease !important;
+}
+
+.landing-product-card:hover,
+.landing-pipeline-card:hover,
+.benefit-simple-card:hover,
+.workflow-seq-card:hover,
+.premium-card:hover {
+  border-color: rgba(8, 122, 85, 0.24) !important;
+  box-shadow: 0 20px 52px rgba(15, 47, 31, 0.12) !important;
+  transform: translateY(-3px) !important;
+}
+
+.landing-product-card svg,
+.landing-pipeline-card svg,
+.premium-card .feature-icon {
+  color: #087a55 !important;
+}
+
+.landing-product-card p,
+.landing-pipeline-card p,
+.benefit-simple-card p,
+.workflow-seq-card p,
+.section-heading p {
+  color: #596b61 !important;
+  font-weight: 620 !important;
+}
+
+.landing-pipeline-section {
+  margin-top: 16px !important;
+  padding: 24px !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(242, 249, 244, 0.92)) !important;
+}
+
+.landing-mini-heading span,
+.eyebrow {
+  color: #087a55 !important;
+  letter-spacing: 0 !important;
+}
+
+.about-split-layout {
+  grid-template-columns: minmax(0, 0.92fr) minmax(360px, 1.08fr) !important;
+  gap: 28px !important;
+}
+
+.about-left-col,
+.about-right-col {
+  min-width: 0 !important;
+}
+
+.about-split-layout .section-heading,
+.landing-iot-page .section-heading,
+.benefits-simple-animated .section-heading,
+.workflow-sequence-section .section-heading {
+  max-width: 760px !important;
+  margin-bottom: 28px !important;
+}
+
+.text-center {
+  text-align: center !important;
+  margin-inline: auto !important;
+}
+
+.section-heading h2 {
+  color: #10231b !important;
+  font-size: 2.65rem !important;
+  line-height: 1.12 !important;
+  font-weight: 900 !important;
+  text-wrap: balance !important;
+}
+
+.section-heading p {
+  font-size: 1rem !important;
+  line-height: 1.72 !important;
+}
+
+.landing-feature-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+.premium-card {
+  padding: 18px !important;
+}
+
+.produce-showcase.paged {
+  padding-top: 0 !important;
+}
+
+.produce-heading {
+  align-items: flex-start !important;
+  margin-bottom: 14px !important;
+}
+
+.produce-heading h2 {
+  color: #10231b !important;
+  font-size: 2rem !important;
+  line-height: 1.15 !important;
+  letter-spacing: 0 !important;
+}
+
+.produce-grid.premium-grid {
+  gap: 12px !important;
+}
+
+.produce-card {
+  min-height: 260px !important;
+  border-radius: 18px !important;
+  border: 1px solid rgba(255, 255, 255, 0.68) !important;
+  box-shadow: 0 18px 46px rgba(15, 47, 31, 0.14) !important;
+}
+
+.produce-card::after {
+  background: linear-gradient(180deg, rgba(5, 46, 31, 0.08), rgba(5, 46, 31, 0.78)) !important;
+}
+
+.iot-command-center {
+  grid-template-columns: minmax(360px, 0.92fr) minmax(0, 1.08fr) !important;
+  gap: 16px !important;
+}
+
+.iot-map-card {
+  min-height: 430px !important;
+  border-radius: 18px !important;
+  border: 1px solid rgba(255, 255, 255, 0.68) !important;
+  box-shadow: 0 24px 64px rgba(15, 47, 31, 0.16) !important;
+}
+
+.iot-strip {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+.iot-sensor-card.premium-card.dark-mode {
+  min-height: 190px !important;
+  color: #10231b !important;
+}
+
+.iot-sensor-card.premium-card.dark-mode::before {
+  display: none !important;
+}
+
+.iot-sensor-card .sensor-icon-wrapper,
+.benefit-simple-icon,
+.seq-icon {
+  border-radius: 13px !important;
+  box-shadow: inset 0 0 0 1px rgba(16, 35, 27, 0.06) !important;
+}
+
+.iot-sensor-card .sensor-data span {
+  color: #6a786f !important;
+  font-size: 0.78rem !important;
+}
+
+.iot-sensor-card .sensor-data strong {
+  color: #10231b !important;
+  font-size: 2rem !important;
+}
+
+.iot-sensor-card .status-badge {
+  width: fit-content !important;
+  border-radius: 999px !important;
+  font-weight: 850 !important;
+}
+
+.benefits-simple-animated,
+.workflow-sequence-section {
+  min-height: auto !important;
+  padding-top: 52px !important;
+  padding-bottom: 52px !important;
+}
+
+.benefits-simple-grid {
+  max-width: 100% !important;
+}
+
+.benefit-simple-card h3,
+.workflow-seq-card h3,
+.landing-product-card h3,
+.landing-pipeline-card h3 {
+  color: #10231b !important;
+  font-size: 1.08rem !important;
+  line-height: 1.34 !important;
+}
+
+.workflow-sequence-grid {
+  max-width: 100% !important;
+  gap: 12px !important;
+}
+
+.workflow-seq-card::after {
+  border-color: rgba(8, 122, 85, 0.26) !important;
+}
+
+.seq-number {
+  top: 18px !important;
+  right: 18px !important;
+  color: rgba(8, 122, 85, 0.3) !important;
+  font-size: 1.45rem !important;
+}
+
+.auth-dialog {
+  border: 1px solid rgba(16, 35, 27, 0.12) !important;
+  border-radius: 18px !important;
+}
+
+.landing-page button:focus-visible,
+.landing-page a:focus-visible {
+  outline: 3px solid rgba(8, 122, 85, 0.28) !important;
+  outline-offset: 3px !important;
+}
+
+@media (max-width: 1180px) {
+  .landing-home-v2 {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 34px !important;
+  }
+
+  .landing-hero-copy h1,
+  .landing-hero-copy > p,
+  .landing-cta,
+  .hero-metrics-premium {
+    max-width: 760px !important;
+  }
+
+  .premium-hero-widget {
+    max-width: 680px !important;
+    margin-inline: auto !important;
+  }
+
+  .about-split-layout,
+  .iot-command-center {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .produce-grid,
+  .iot-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .landing-stage {
+    padding-top: 152px !important;
+  }
+
+  .landing-header {
+    width: min(680px, calc(100% - 24px)) !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    padding: 12px !important;
+  }
+
+  .landing-brand {
+    min-width: 132px !important;
+  }
+
+  .landing-brand img {
+    width: 132px !important;
+  }
+
+  .landing-nav {
+    order: 3 !important;
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    overflow: hidden !important;
+    justify-content: stretch !important;
+    scrollbar-width: none !important;
+  }
+
+  .landing-nav::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .landing-nav button {
+    min-width: 0 !important;
+    flex: 1 1 0 !important;
+    min-height: 36px !important;
+    padding-inline: 6px !important;
+    font-size: 11px !important;
+    white-space: nowrap !important;
+  }
+
+  .landing-auth {
+    margin-left: auto !important;
+  }
+
+  .ghost-button,
+  .solid-button {
+    min-height: 42px !important;
+    padding-inline: 14px !important;
+    font-size: 13px !important;
+  }
+
+  .landing-hero-copy h1 {
+    font-size: 3rem !important;
+  }
+
+  .section-heading h2 {
+    font-size: 2.2rem !important;
+  }
+
+  .landing-proof-strip,
+  .landing-product-grid,
+  .landing-pipeline-grid,
+  .benefits-simple-grid,
+  .workflow-sequence-grid,
+  .landing-feature-grid,
+  .produce-grid,
+  .iot-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .landing-page {
+    background:
+      linear-gradient(180deg, rgba(248, 252, 249, 0.96) 0%, rgba(240, 249, 242, 0.86) 56%, rgba(220, 241, 226, 0.72) 100%),
+      url('/botanical_bg.png') center top / cover fixed,
+      #eef7ef !important;
+  }
+
+  .landing-stage {
+    padding: 144px 14px 56px !important;
+  }
+
+  .landing-header {
+    top: 10px !important;
+    width: calc(100% - 20px) !important;
+    border-radius: 14px !important;
+  }
+
+  .landing-auth {
+    gap: 6px !important;
+  }
+
+  .ghost-button,
+  .solid-button {
+    min-height: 38px !important;
+    padding-inline: 11px !important;
+    border-radius: 11px !important;
+    font-size: 12px !important;
+  }
+
+  .landing-home-v2 {
+    padding-top: 28px !important;
+  }
+
+  .landing-trust-pill {
+    display: grid !important;
+    gap: 6px !important;
+    border-radius: 14px !important;
+  }
+
+  .landing-trust-pill span,
+  .landing-trust-pill strong {
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .landing-hero-copy h1 {
+    font-size: 2.35rem !important;
+    line-height: 1.1 !important;
+  }
+
+  .landing-hero-copy > p,
+  .section-heading p {
+    font-size: 0.94rem !important;
+  }
+
+  .landing-cta {
+    align-items: stretch !important;
+  }
+
+  .landing-cta button {
+    width: 100% !important;
+  }
+
+  .hero-metrics-premium,
+  .landing-proof-strip,
+  .landing-product-grid,
+  .landing-pipeline-grid,
+  .benefits-simple-grid,
+  .workflow-sequence-grid,
+  .landing-feature-grid,
+  .produce-grid,
+  .iot-strip {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .hero-metrics-premium .metric-item {
+    min-height: 68px !important;
+  }
+
+  .premium-hero-widget {
+    min-height: auto !important;
+  }
+
+  .premium-hero-widget::before {
+    inset: 18px 12px auto auto !important;
+    width: 76% !important;
+    height: 220px !important;
+    border-radius: 18px !important;
+  }
+
+  .premium-hero-widget .glass-widget-main {
+    padding: 16px !important;
+    border-radius: 16px !important;
+  }
+
+  .premium-hero-widget .widget-header {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+
+  .premium-hero-widget .widget-body {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .premium-hero-widget .sensor-ring-container {
+    width: 156px !important;
+    height: 156px !important;
+    min-width: 156px !important;
+  }
+
+  .section-heading h2 {
+    font-size: 1.9rem !important;
+  }
+
+  .landing-pipeline-section {
+    padding: 18px !important;
+  }
+
+  .iot-map-card {
+    min-height: 340px !important;
+  }
+
+  .landing-route-dots {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-page *,
+  .landing-page *::before,
+  .landing-page *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* About landing: fill the visual gap with a richer operations panel. */
+.about-right-col {
+  display: grid !important;
+  align-content: start !important;
+  gap: 16px !important;
+}
+
+.about-system-panel {
+  position: relative !important;
+  overflow: hidden !important;
+  min-height: 330px !important;
+  padding: 22px !important;
+  border: 1px solid rgba(255, 255, 255, 0.64) !important;
+  border-radius: 18px !important;
+  color: #ffffff !important;
+  background:
+    linear-gradient(135deg, rgba(4, 47, 36, 0.94), rgba(5, 95, 70, 0.76)),
+    url('/pineapple_field.png') center / cover !important;
+  box-shadow: 0 24px 64px rgba(15, 47, 31, 0.18) !important;
+}
+
+.about-system-panel::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px) !important;
+  background-size: 46px 46px !important;
+  opacity: 0.18 !important;
+  pointer-events: none !important;
+}
+
+.about-system-panel > * {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.about-system-head {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+}
+
+.about-system-head .eyebrow {
+  margin-bottom: 8px !important;
+  color: #a7f3d0 !important;
+}
+
+.about-system-head h3 {
+  max-width: 520px !important;
+  margin: 0 !important;
+  color: #ffffff !important;
+  font-size: clamp(1.55rem, 2.2vw, 2.1rem) !important;
+  line-height: 1.16 !important;
+  font-weight: 950 !important;
+}
+
+.about-system-live {
+  min-height: 34px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  padding: 0 11px !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #dcfce7 !important;
+  font-size: 0.76rem !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.about-system-stats {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  margin-top: 18px !important;
+}
+
+.about-system-stats span {
+  min-width: 0 !important;
+  min-height: 70px !important;
+  padding: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.about-system-stats strong,
+.about-system-stats small {
+  display: block !important;
+}
+
+.about-system-stats strong {
+  color: #ffffff !important;
+  font-size: 1.55rem !important;
+  line-height: 1.05 !important;
+  font-weight: 950 !important;
+}
+
+.about-system-stats small {
+  margin-top: 5px !important;
+  color: rgba(236, 253, 245, 0.82) !important;
+  font-size: 0.76rem !important;
+  font-weight: 800 !important;
+}
+
+.about-operation-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  margin-top: 12px !important;
+}
+
+.about-operation-item {
+  min-width: 0 !important;
+  min-height: 112px !important;
+  display: grid !important;
+  grid-template-columns: 38px minmax(0, 1fr) !important;
+  gap: 10px !important;
+  align-items: start !important;
+  padding: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, 0.11) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.about-operation-item svg {
+  width: 38px !important;
+  height: 38px !important;
+  padding: 9px !important;
+  border-radius: 12px !important;
+  color: #bbf7d0 !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+.about-operation-item span,
+.about-operation-item strong,
+.about-operation-item p {
+  display: block !important;
+}
+
+.about-operation-item span {
+  color: rgba(236, 253, 245, 0.76) !important;
+  font-size: 0.72rem !important;
+  font-weight: 900 !important;
+}
+
+.about-operation-item strong {
+  margin-top: 3px !important;
+  color: #ffffff !important;
+  font-size: 1.05rem !important;
+  line-height: 1.15 !important;
+  font-weight: 950 !important;
+}
+
+.about-operation-item p {
+  margin: 6px 0 0 !important;
+  color: rgba(236, 253, 245, 0.78) !important;
+  font-size: 0.76rem !important;
+  line-height: 1.45 !important;
+  font-weight: 700 !important;
+}
+
+@media (max-width: 860px) {
+  .about-system-panel {
+    min-height: auto !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .about-system-head {
+    display: grid !important;
+  }
+
+  .about-system-stats,
+  .about-operation-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* About landing: rebalance the split so the left column no longer drops down. */
+.landing-info-page.about-split-layout {
+  display: grid !important;
+  grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr) !important;
+  align-items: start !important;
+  align-content: start !important;
+  gap: 34px !important;
+  min-height: auto !important;
+  height: auto !important;
+  padding-top: 42px !important;
+  padding-bottom: 64px !important;
+}
+
+.landing-info-page .about-left-col {
+  display: grid !important;
+  align-content: start !important;
+  justify-content: stretch !important;
+  gap: 22px !important;
+  min-width: 0 !important;
+}
+
+.landing-info-page .about-left-col .section-heading {
+  margin-bottom: 0 !important;
+}
+
+.landing-info-page .about-left-col .landing-feature-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+.landing-info-page .about-right-col {
+  padding-top: 0 !important;
+}
+
+.landing-info-page .produce-showcase.paged {
+  width: 100% !important;
+}
+
+.landing-info-page .produce-heading {
+  min-height: 44px !important;
+  display: flex !important;
+  align-items: end !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+}
+
+.landing-info-page .produce-grid.premium-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-rows: none !important;
+  gap: 12px !important;
+}
+
+.landing-info-page .produce-grid.premium-grid .produce-card {
+  min-height: clamp(240px, 21vw, 285px) !important;
+}
+
+@media (max-width: 1180px) {
+  .landing-info-page.about-split-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .landing-info-page .produce-grid.premium-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .landing-info-page.about-split-layout {
+    padding-top: 28px !important;
+  }
+
+  .landing-info-page .about-left-col .landing-feature-grid,
+  .landing-info-page .produce-grid.premium-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* IoT landing: sharpen telemetry text and add company device catalog. */
+.landing-iot-page {
+  padding-top: 54px !important;
+  padding-bottom: 72px !important;
+}
+
+.landing-iot-page .section-heading {
+  max-width: 880px !important;
+  margin-bottom: 30px !important;
+  padding: 22px 26px !important;
+  border: 1px solid rgba(16, 35, 27, 0.1) !important;
+  border-radius: 18px !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 16px 44px rgba(15, 47, 31, 0.08) !important;
+  text-align: left !important;
+}
+
+.landing-iot-page .section-heading h2 {
+  color: #10231b !important;
+  -webkit-text-fill-color: #10231b !important;
+  text-shadow: none !important;
+}
+
+.landing-iot-page .section-heading p {
+  color: #43564c !important;
+  -webkit-text-fill-color: #43564c !important;
+  font-weight: 720 !important;
+}
+
+.landing-iot-page .iot-command-center {
+  align-items: stretch !important;
+}
+
+.landing-iot-page .iot-map-card strong {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.44) !important;
+}
+
+.landing-iot-page .iot-sensor-card.premium-card.dark-mode {
+  min-height: 176px !important;
+  padding: 22px !important;
+  border: 1px solid rgba(16, 35, 27, 0.1) !important;
+  border-radius: 16px !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  box-shadow: 0 18px 46px rgba(15, 47, 31, 0.1) !important;
+  color: #10231b !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.landing-iot-page .iot-sensor-card .sensor-icon-wrapper {
+  width: 64px !important;
+  height: 64px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 22px !important;
+  border: 1px solid rgba(16, 35, 27, 0.08) !important;
+  border-radius: 14px !important;
+  background: #f7fbf8 !important;
+  box-shadow: none !important;
+}
+
+.landing-iot-page .iot-sensor-card .sensor-data span {
+  color: #46594f !important;
+  -webkit-text-fill-color: #46594f !important;
+  font-size: 0.92rem !important;
+  font-weight: 750 !important;
+  opacity: 1 !important;
+}
+
+.landing-iot-page .iot-sensor-card .sensor-data strong {
+  margin: 8px 0 14px !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: #10231b !important;
+  color: #10231b !important;
+  font-size: clamp(2rem, 3vw, 2.8rem) !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  opacity: 1 !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+
+.landing-iot-page .iot-sensor-card .status-badge {
+  min-height: 32px !important;
+  padding: 0 13px !important;
+  border-radius: 999px !important;
+  font-size: 0.86rem !important;
+  font-weight: 900 !important;
+  opacity: 1 !important;
+}
+
+.landing-iot-page .status-badge.warning {
+  color: #0284c7 !important;
+  -webkit-text-fill-color: #0284c7 !important;
+  background: #e0f2fe !important;
+  border-color: #7dd3fc !important;
+}
+
+.landing-iot-page .status-badge.safe {
+  color: #15803d !important;
+  -webkit-text-fill-color: #15803d !important;
+  background: #dcfce7 !important;
+  border-color: #86efac !important;
+}
+
+.landing-iot-page .status-badge.danger {
+  color: #475569 !important;
+  -webkit-text-fill-color: #475569 !important;
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+.landing-iot-page .status-badge.active {
+  color: #b45309 !important;
+  -webkit-text-fill-color: #b45309 !important;
+  background: #fef3c7 !important;
+  border-color: #fcd34d !important;
+}
+
+.iot-device-catalog {
+  margin-top: 18px !important;
+  padding: 22px !important;
+  border: 1px solid rgba(16, 35, 27, 0.1) !important;
+  border-radius: 18px !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 18px 48px rgba(15, 47, 31, 0.09) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+.iot-device-heading {
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  margin-bottom: 16px !important;
+}
+
+.iot-device-heading h3 {
+  max-width: 720px !important;
+  margin: 0 !important;
+  color: #10231b !important;
+  font-size: clamp(1.55rem, 2.7vw, 2.35rem) !important;
+  line-height: 1.12 !important;
+  font-weight: 950 !important;
+}
+
+.iot-device-heading > span {
+  min-height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0 13px !important;
+  border-radius: 999px !important;
+  background: #ecfdf5 !important;
+  color: #047857 !important;
+  font-size: 0.82rem !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+.iot-kit-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+.iot-kit-card {
+  min-width: 0 !important;
+  padding: 18px !important;
+  border: 1px solid rgba(16, 35, 27, 0.1) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(180deg, #ffffff, #f6faf7) !important;
+  box-shadow: 0 12px 34px rgba(15, 47, 31, 0.07) !important;
+}
+
+.iot-kit-top {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-bottom: 14px !important;
+}
+
+.iot-kit-top svg {
+  width: 42px !important;
+  height: 42px !important;
+  padding: 10px !important;
+  border-radius: 13px !important;
+  color: #047857 !important;
+  background: #dcfce7 !important;
+}
+
+.iot-kit-top span {
+  color: #b45309 !important;
+  font-size: 0.86rem !important;
+  font-weight: 950 !important;
+}
+
+.iot-kit-card h4 {
+  margin: 0 !important;
+  color: #10231b !important;
+  font-size: 1.12rem !important;
+  line-height: 1.28 !important;
+  font-weight: 950 !important;
+}
+
+.iot-kit-card > strong {
+  display: block !important;
+  margin-top: 8px !important;
+  color: #047857 !important;
+  font-size: 0.88rem !important;
+  line-height: 1.35 !important;
+  font-weight: 900 !important;
+}
+
+.iot-kit-card p {
+  margin: 9px 0 0 !important;
+  color: #56685e !important;
+  font-size: 0.88rem !important;
+  line-height: 1.58 !important;
+  font-weight: 650 !important;
+}
+
+.iot-kit-tags {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 7px !important;
+  margin-top: 14px !important;
+}
+
+.iot-kit-tags small {
+  min-height: 26px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0 9px !important;
+  border-radius: 999px !important;
+  background: #eef7ef !important;
+  color: #315246 !important;
+  font-size: 0.72rem !important;
+  font-weight: 850 !important;
+}
+
+.iot-component-list {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  margin-top: 12px !important;
+}
+
+.iot-component-list article {
+  min-width: 0 !important;
+  padding: 13px !important;
+  border: 1px dashed rgba(4, 120, 87, 0.22) !important;
+  border-radius: 14px !important;
+  background: rgba(236, 253, 245, 0.7) !important;
+}
+
+.iot-component-list span {
+  display: block !important;
+  color: #047857 !important;
+  font-size: 0.75rem !important;
+  font-weight: 950 !important;
+  text-transform: uppercase !important;
+}
+
+.iot-component-list p {
+  margin: 6px 0 0 !important;
+  color: #40554a !important;
+  font-size: 0.82rem !important;
+  line-height: 1.46 !important;
+  font-weight: 700 !important;
+}
+
+@media (max-width: 980px) {
+  .iot-kit-grid,
+  .iot-component-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .iot-device-heading {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .landing-iot-page {
+    padding-top: 56px !important;
+  }
+
+  .landing-iot-page .section-heading {
+    padding: 18px !important;
+  }
+
+  .iot-kit-grid,
+  .iot-component-list {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .iot-device-catalog {
+    padding: 16px !important;
+  }
+}

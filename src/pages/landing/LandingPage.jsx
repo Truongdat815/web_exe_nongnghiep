@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { ChevronRight, X } from 'lucide-react';
 import { roles } from '../../data/greenovaData';
@@ -18,6 +18,13 @@ export function LandingPage({ onLogin }) {
 
   const landingPage = location.pathname === '/' ? 'home' : location.pathname.substring(1);
   const openAuth = (mode) => setAuthMode(mode);
+
+  useEffect(() => {
+    const resetScroll = () => window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    resetScroll();
+    const timer = window.setTimeout(resetScroll, 80);
+    return () => window.clearTimeout(timer);
+  }, [location.pathname]);
 
   const landingTabs = [
     { id: 'home', label: 'Trang chủ', path: '/' },

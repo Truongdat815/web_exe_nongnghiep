@@ -1,5 +1,48 @@
-import { Droplets, TestTube2, CloudFog, Power } from 'lucide-react';
+import { CloudFog, Cpu, Droplets, Power, Radio, TestTube2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+
+const telemetryCards = [
+  ['Độ ẩm đất', '38%', 'Dưới ngưỡng 40%', Droplets, '#0284c7', 'warning'],
+  ['Độ mặn', '0.5‰', 'An toàn để tưới', TestTube2, '#16a34a', 'safe'],
+  ['Không khí', '88%', 'Nguy cơ nấm lá', CloudFog, '#475569', 'danger'],
+  ['Van tưới', 'ON', 'Tự động bật', Power, '#d97706', 'active'],
+];
+
+const deviceCatalog = [
+  {
+    name: 'Kit trạm chính công nghiệp',
+    price: '1.890.000đ',
+    icon: Cpu,
+    meta: 'ESP32 + 4G A7670C + LoRa',
+    detail: 'Đo NPK/độ ẩm/nhiệt đất, SHT30, mưa và điều khiển van trục chính.',
+    tags: ['IP65', 'Solar 5W', 'RS485'],
+  },
+  {
+    name: 'Kit node phụ giá rẻ',
+    price: '450.000đ',
+    icon: Radio,
+    meta: 'ESP8266 + LoRa SX1278',
+    detail: 'Node phụ cho từng luống, đo độ ẩm đất, DHT11 và đóng ngắt van Phi 21.',
+    tags: ['Pin 18650', 'Relay', 'WiFi'],
+  },
+  {
+    name: 'Kit ESP32-C3 solar mini',
+    price: '520.000đ',
+    icon: Cpu,
+    meta: 'ESP32-C3 + ESP-NOW',
+    detail: 'Node tiết kiệm năng lượng cho cây mới trồng, có mưa, SHT30 và pin mặt trời mini.',
+    tags: ['Solar mini', 'SHT30', 'ESP-NOW'],
+  },
+];
+
+const componentGroups = [
+  ['Vi điều khiển', 'ESP32, ESP32-C3, ESP8266 NodeMCU'],
+  ['Truyền thông', '4G LTE A7670C, LoRa SX1278 433MHz'],
+  ['Cảm biến đất', 'NPK RS485, độ ẩm, nhiệt độ đất'],
+  ['Môi trường', 'SHT30 ngoài trời, DHT11, cảm biến mưa'],
+  ['Chấp hành', 'Relay cách ly quang, van điện từ Phi 21/27/34'],
+  ['Nguồn/vỏ', 'Hộp IP65, solar 5W, pin 18650, TP4056'],
+];
 
 export function IoTSection() {
   const container = {
@@ -42,12 +85,7 @@ export function IoTSection() {
           <strong>Vườn chanh không hạt Thạnh Phú</strong>
         </div>
         <div className="iot-strip">
-          {[
-            ['Độ ẩm đất', '38%', 'Dưới ngưỡng 40%', Droplets, '#38bdf8', 'warning'],
-            ['Độ mặn', '0.5‰', 'An toàn để tưới', TestTube2, '#4ade80', 'safe'],
-            ['Không khí', '88%', 'Nguy cơ nấm lá', CloudFog, '#cbd5e1', 'danger'],
-            ['Van tưới', 'ON', 'Tự động bật', Power, '#facc15', 'active'],
-          ].map(([label, value, note, Icon, color, status]) => (
+          {telemetryCards.map(([label, value, note, Icon, color, status]) => (
             <motion.div 
               variants={item} 
               whileHover={{ scale: 1.05, y: -5 }}
@@ -66,6 +104,42 @@ export function IoTSection() {
           ))}
         </div>
       </motion.div>
+
+      <motion.section variants={item} className="iot-device-catalog">
+        <div className="iot-device-heading">
+          <div>
+            <p className="eyebrow">Thiết bị IoT GREENOVA</p>
+            <h3>Danh mục phần cứng công ty triển khai cho từng quy mô vườn.</h3>
+          </div>
+          <span>3 kit demo · 6 nhóm linh kiện</span>
+        </div>
+
+        <div className="iot-kit-grid">
+          {deviceCatalog.map(({ name, price, icon: Icon, meta, detail, tags }) => (
+            <article key={name} className="iot-kit-card">
+              <div className="iot-kit-top">
+                <Icon size={20} />
+                <span>{price}</span>
+              </div>
+              <h4>{name}</h4>
+              <strong>{meta}</strong>
+              <p>{detail}</p>
+              <div className="iot-kit-tags">
+                {tags.map((tag) => <small key={tag}>{tag}</small>)}
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="iot-component-list">
+          {componentGroups.map(([group, items]) => (
+            <article key={group}>
+              <span>{group}</span>
+              <p>{items}</p>
+            </article>
+          ))}
+        </div>
+      </motion.section>
     </motion.div>
   );
 }
